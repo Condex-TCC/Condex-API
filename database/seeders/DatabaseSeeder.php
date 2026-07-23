@@ -2,24 +2,29 @@
 
 namespace Database\Seeders;
 
+use App\Models\Unidade;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+//Classe que adicionar os dados falsos aos banco de dados
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
+    //Função que chamas as outras seeders, para gerar outros falsos
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        //Chamandos as outras seedars
+        $this->call([
+            SindicoSeeder::class,
+            PorteiroSeeder::class,
+            RegrasSeeder::class,
+            LaudosSeeder::class,
+            CategoriaUnidadeSeeder::class,
+            UnidadeSeeder::class,
+            MoradorSeeder::class,
         ]);
+
     }
 }

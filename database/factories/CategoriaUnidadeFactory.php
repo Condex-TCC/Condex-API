@@ -5,20 +5,17 @@ namespace Database\Factories;
 use App\Models\Categoria_unidade;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<Categoria_unidade>
- */
+//Classe que cria os dados falsos
 class CategoriaUnidadeFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Categoria_unidade::class;
+
+    //Função que gera os dados falsos
     public function definition(): array
-    {
+    {   
+        //Retorna os dados falsos
         return [
-            //
+            "descricao_categoria_unidade" => $this->faker->text(), //Gera um texto falso
         ];
     }
 }

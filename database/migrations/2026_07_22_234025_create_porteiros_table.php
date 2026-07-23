@@ -6,13 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    //Função que cria as migrations
     public function up(): void
     {
         Schema::create('porteiros', function (Blueprint $table) {
-            $table->id();
+            $table->id("pk_id_porteiro"); //Chave primaria
+            $table->string("nome_porteito"); //Campo de nome
+            $table->string("email_porteiro", 150)->unique(); //Campo de email
+            $table->string("senha_porteiro"); //Campo de senha
             $table->timestamps();
         });
     }

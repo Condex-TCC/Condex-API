@@ -6,13 +6,12 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    //Função que cria as migrations
     public function up(): void
     {
         Schema::create('categoria_unidades', function (Blueprint $table) {
-            $table->id();
+            $table->id("pk_id_categoria_unidade"); //Gera uma chave primária
+            $table->text("descricao_categoria_unidade"); //Campo de descrição da unidade
             $table->timestamps();
         });
     }
