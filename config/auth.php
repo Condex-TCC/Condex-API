@@ -37,10 +37,26 @@ return [
     |
     */
 
+    //Definindo onde o AUTH vai armazenar os usurários e de onde os dados vão ser fornecidos para a validação
     'guards' => [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+        ],
+
+        'morador' => [
+            'driver' => 'session',
+            'provider' => 'moradores',
+        ],
+
+        'sinico' => [
+            'driver' => 'session',
+            'provider' => 'sindicos',
+        ],
+
+        'porteiro' => [
+            'driver' => 'session',
+            'provider' => 'porteiros',
         ],
     ],
 
@@ -61,16 +77,22 @@ return [
     |
     */
 
+    //Indicando de onde em qual model o laravel vai utilizar para autenticar o usuário
     'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', User::class),
+        'moradores' => [
+            'driver' => 'eloquent', //Indicando qual vai ser o método de validação
+            'model' => App\Models\Morador::class //Incicando qual modelo vai ser validado
+        ],
+        
+        'sindicos' => [
+            'driver' => 'eloquent', //Indicando qual vai ser o método de validação
+            'model' => App\Models\Sindico::class //Incicando qual modelo vai ser validado
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'porteiros' => [
+            'driver' => 'eloquent', //Indicando qual vai ser o método de validação
+            'model' => App\Models\Porteiro::class //Incicando qual modelo vai ser validado
+        ]
     ],
 
     /*
