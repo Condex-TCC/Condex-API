@@ -28,7 +28,6 @@ class Morador extends Authenticatable
         "nome_morador",
         "cpf_morador",
         "email_morador",
-        "senha_sindico",
         "telefone_morador",
         "senha_morador",
         "fk_id_unidade_morador",
@@ -43,5 +42,14 @@ class Morador extends Authenticatable
     {
         //Na autenticação se chama esse campo
         return $this->senha_morador;
+    }
+
+    //Adicionando aos relacionanementos
+    
+    //Função que repesenta a relacioanamento da tabela Morador com unidade
+    public function unidade(){
+        
+        //Retorna um objeto do model Unidade | Passagem do campo de chave estrangeira personalizada
+        return $this->belongsTo(Unidade::class, "fk_id_unidade_morador");
     }
 }
