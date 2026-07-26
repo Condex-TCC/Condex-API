@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\MoradorController;
+use App\Http\Controllers\PorteiroController;
+use App\Models\Morador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,7 +19,38 @@ Route::middleware("auth:sanctum")->group(function() {
     //Para acessar esse grupo de rotas é necessário ter a habilidade do token de sindico
     Route::middleware("ability:sindico")->prefix("/sindico")->group(function() {
 
-        //Rotas do sindico
+        //Grupo de rotas para relizar o CRUD do morador
+        Route::prefix("morador")->group(function() {
+
+            //Rota para recuperar todos os moradores
+            Route::get("/get", [MoradorController::class, "index"]);
+
+            //Rota para criar um morador
+            Route::post("/create", [MoradorController::class, 'store']);
+
+            //Rota para atualizar um morador
+            Route::put("/update/{id}", [MoradorController::class, 'update']);
+            
+            //Rota para deletar um morador
+            Route::delete('/delete/{id}', [MoradorController::class, 'destroy']);
+        });
+
+        //Grupo de rotas para relizar o CRUD do porteiro
+        Route::prefix("porteiro")->group(function() {
+
+            //Rota para recuperar todos os porteiros
+            Route::get("/get", [PorteiroController::class, "index"]);
+
+            //Rota para criar um porteiro
+            Route::post("/create", [PorteiroController::class, 'store']);
+
+            //Rota para atualizar um porteiro
+            Route::put("/update/{id}", [PorteiroController::class, 'update']);
+            
+            //Rota para deletar um porteiro
+            Route::delete('/delete/{id}', [PorteiroController::class, 'destroy']);
+
+        });
 
     });
 
