@@ -22,5 +22,6 @@ class Regras extends Model
     protected $fillable = [
         "nome_regra",
         "descricao_regra",
+        "fk_id_sindico_regras",
     ];
 }

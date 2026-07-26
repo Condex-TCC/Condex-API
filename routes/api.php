@@ -3,6 +3,7 @@
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MoradorController;
 use App\Http\Controllers\PorteiroController;
+use App\Http\Controllers\RegrasController;
 use Illuminate\Support\Facades\Route;
 
 //Rota de login
@@ -47,6 +48,23 @@ Route::middleware("auth:sanctum")->group(function() {
             
             //Rota para deletar um porteiro
             Route::delete('/delete/{id}', [PorteiroController::class, 'destroy']);
+
+        });
+
+        //Grupo de rotas para realizar CRUD nas regras
+        Route::prefix("/regras")->group(function() {
+
+            //Rota para recuperar todos os porteiros
+            Route::get("/get", [RegrasController::class, "index"]);
+
+            //Rota para criar um porteiro
+            Route::post("/create", [RegrasController::class, 'store']);
+
+            //Rota para atualizar um porteiro
+            Route::put("/update/{id}", [RegrasController::class, 'update']);
+            
+            //Rota para deletar um porteiro
+            Route::delete('/delete/{id}', [RegrasController::class, 'destroy']);
 
         });
 
