@@ -20,7 +20,7 @@ class MoradorController extends Controller
         //Pegando todos os moradores, com os moradores e carregando o relacionamento com unidade
         $moradores = Morador::with('unidade')->get();
 
-        //Aplicando resurce para tratar a o json com os dados das faturas
+        //Aplicando resurce para tratar a o json com os dados das moradores
         $jsonTratadado = MoradorResurce::collection($moradores);
 
         //Retorna o json com os moradores filtrados

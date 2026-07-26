@@ -26,7 +26,8 @@ class Porteiro extends Authenticatable
     //Mostra qual campos podem ser preenchidos em massa
     protected $fillable = [
         "nome_porteito",
-        "email_porteiro"
+        "email_porteiro",
+        "senha_porteiro"
     ];
 
     /**

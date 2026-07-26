@@ -3,8 +3,6 @@
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MoradorController;
 use App\Http\Controllers\PorteiroController;
-use App\Models\Morador;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 //Rota de login
