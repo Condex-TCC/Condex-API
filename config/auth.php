@@ -49,7 +49,7 @@ return [
             'provider' => 'moradores',
         ],
 
-        'sinico' => [
+        'sindico' => [
             'driver' => 'session',
             'provider' => 'sindicos',
         ],

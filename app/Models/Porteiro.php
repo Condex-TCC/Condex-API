@@ -12,7 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 //Essa classa herda de Authenticatable, porque a classe que herda apenas o model, interaje apenas com
 //o banco de dados, já a classe herda Authenticatable pode trabalhar com autenticação
-class Porteiro extends Model
+class Porteiro extends Authenticatable
 {
    //Permite gerar dados falsos, e gerar dados tokens para as APIs
     use HasFactory, HasApiTokens;

@@ -4,7 +4,7 @@ namespace App;
 
 //É um tracho de código que pode ser herdado por qualquer outra classe
 //Esse trecho de código tem como objetivo criar um retorno padronizado do json
-trait HpptResposta
+trait HttpResposta
 {
     //Função que formata a saída o array em casso de sucesso
     public function responseJson(string $message, int|string $status, array $data = []){
