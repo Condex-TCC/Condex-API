@@ -68,6 +68,23 @@ Route::middleware("auth:sanctum")->group(function() {
 
         });
 
+        //Grupo de rotas para realizar CRUD dos laudos
+        Route::prefix("/laudos")->group(function() {
+
+            //Rota para recuperar todos os porteiros
+            Route::get("/get", [RegrasController::class, "index"]);
+
+            //Rota para criar um porteiro
+            Route::post("/create", [RegrasController::class, 'store']);
+
+            //Rota para atualizar um porteiro
+            Route::put("/update/{id}", [RegrasController::class, 'update']);
+            
+            //Rota para deletar um porteiro
+            Route::delete('/delete/{id}', [RegrasController::class, 'destroy']);
+
+        });
+
     });
 
     //Para acessar esse grupo de rotas é necessário ter a habilidade do token de morador
