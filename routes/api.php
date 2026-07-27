@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LaudoController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MoradorController;
 use App\Http\Controllers\PorteiroController;
@@ -72,16 +73,17 @@ Route::middleware("auth:sanctum")->group(function() {
         Route::prefix("/laudos")->group(function() {
 
             //Rota para recuperar todos os porteiros
-            Route::get("/get", [RegrasController::class, "index"]);
+            Route::get("/get", [LaudoController::class, "index"]);
 
             //Rota para criar um porteiro
-            Route::post("/create", [RegrasController::class, 'store']);
+            Route::post("/create", [LaudoController::class, 'store']);
 
             //Rota para atualizar um porteiro
-            Route::put("/update/{id}", [RegrasController::class, 'update']);
+            //Essa rota, por mais que seja de atualização, para trabalhar com arquivos o PHP/Laravel só aceita o POST
+            Route::post("/update/{id}", [LaudoController::class, 'update']);
             
             //Rota para deletar um porteiro
-            Route::delete('/delete/{id}', [RegrasController::class, 'destroy']);
+            Route::delete('/delete/{id}', [LaudoController::class, 'destroy']);
 
         });
 
