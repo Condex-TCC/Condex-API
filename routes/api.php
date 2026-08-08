@@ -5,6 +5,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MoradorController;
 use App\Http\Controllers\PorteiroController;
 use App\Http\Controllers\RegrasController;
+use App\Http\Controllers\VisitanteController;
 use Illuminate\Support\Facades\Route;
 
 //Rota de login
@@ -69,6 +70,25 @@ Route::middleware("auth:sanctum")->group(function() {
 
         });
 
+        // Grupo de rotas para realizar o CRUD dos visitantes
+        Route::prefix("visitante")->group(function() {
+
+            // Recuperar todos os visitantes
+            Route::get("/get", [VisitanteController::class, "index"]);
+
+            // Criar um visitante
+            Route::post("/create", [VisitanteController::class, "store"]);
+
+            // Recuperar um visitante específico
+            Route::get("/get/{id}", [VisitanteController::class, "show"]);
+
+            // Atualizar um visitante
+            Route::put("/update/{id}", [VisitanteController::class, "update"]);
+
+            // Deletar um visitante
+            Route::delete("/delete/{id}", [VisitanteController::class, "destroy"]);
+
+});
         //Grupo de rotas para realizar CRUD dos laudos
         Route::prefix("/laudos")->group(function() {
 
