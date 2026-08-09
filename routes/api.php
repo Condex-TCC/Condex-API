@@ -88,7 +88,28 @@ Route::middleware("auth:sanctum")->group(function() {
             // Deletar um visitante
             Route::delete("/delete/{id}", [VisitanteController::class, "destroy"]);
 
-});
+        });
+
+        //Grupo de rotas para realizar CRUD nas encomendas
+        Route::prefix("/encomenda")->group(function() {
+
+            //Rota para recuperar todos as encomendas
+            Route::get("/get", [EncomendaController::class, "index"]);
+
+            // Rota para recuperar uma encomenda específica
+            Route::get("/get/{id}", [EncomendaController::class, "show"]);
+
+            //Rota para criar uma encomenda
+            Route::post("/create", [EncomendaController::class, 'store']);
+
+            //Rota para atualizar uma encomenda
+            Route::put("/update/{id}", [EncomendaController::class, 'update']);
+            
+            //Rota para deletar uma encomenda
+            Route::delete('/delete/{id}', [EncomendaController::class, 'destroy']);
+
+        });
+
         //Grupo de rotas para realizar CRUD dos laudos
         Route::prefix("/laudos")->group(function() {
 
