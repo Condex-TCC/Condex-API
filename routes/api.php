@@ -23,10 +23,13 @@ Route::middleware("auth:sanctum")->group(function() {
     Route::middleware("ability:sindico")->prefix("/sindico")->group(function() {
 
         //Grupo de rotas para relizar o CRUD do morador
-        Route::prefix("morador")->group(function() {
+        Route::prefix("/morador")->group(function() {
 
             //Rota para recuperar todos os moradores
             Route::get("/get", [MoradorController::class, "index"]);
+
+            //Rota que recupera apenas um morador
+            Route::get("/show/{id}", [MoradorController::class, 'show']);
 
             //Rota para criar um morador
             Route::post("/create", [MoradorController::class, 'store']);
@@ -39,10 +42,13 @@ Route::middleware("auth:sanctum")->group(function() {
         });
 
         //Grupo de rotas para relizar o CRUD do porteiro
-        Route::prefix("porteiro")->group(function() {
+        Route::prefix("/porteiro")->group(function() {
 
             //Rota para recuperar todos os porteiros
             Route::get("/get", [PorteiroController::class, "index"]);
+
+            //Rota que recupera apenas um morador
+            Route::get("/show/{id}", [PorteiroController::class, 'show']);
 
             //Rota para criar um porteiro
             Route::post("/create", [PorteiroController::class, 'store']);
@@ -73,7 +79,7 @@ Route::middleware("auth:sanctum")->group(function() {
         });
 
         // Grupo de rotas para realizar o CRUD dos visitantes
-        Route::prefix("visitante")->group(function() {
+        Route::prefix("/visitante")->group(function() {
 
             // Recuperar todos os visitantes
             Route::get("/get", [VisitanteController::class, "index"]);
@@ -136,7 +142,7 @@ Route::middleware("auth:sanctum")->group(function() {
     // Para acessar esse grupo é necessário ter a habilidade de token de morador
     Route::middleware("ability:morador")->prefix("/morador")->group(function() {
 
-    Route::prefix("autorizacao")->group(function() {
+    Route::prefix("/autorizacao")->group(function() {
 
     // Morador autoriza um visitante
     Route::post("/create", [
