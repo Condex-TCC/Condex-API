@@ -7,182 +7,143 @@ use App\Models\Visitante;
 use Illuminate\Http\Request;
 use App\HttpResposta;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Hash;
 
-class VisitanteController extends Controller{
-
-    //Adiciona a trait com as respotas padrões para APIs
+class VisitanteController extends Controller
+{
     use HttpResposta;
 
-    //Função que recupera todos os visitantes
+    // Get all visitors
     public function index()
     {
-        //Pegando todos os visitantes do banco de dados
         $visitantes = Visitante::all();
 
-        
-        //Aplicando resurce para tratar a o json com os dados dos visitantes
-        $jsonTratadado = VisitanteResources::collection($visitantes);
-
-        //Retorna o json com os visitantes filtrados
         return $this->responseJson(
-            "Usuarios recuperados com sucesso!", //Menssagem
-            200, //Status code
-            [$jsonTratadado], //Envia o json tratado nos dados da requisição 
+            "Visitors retrieved successfully!",
+            200,
+            [
+                VisitanteResources::collection($visitantes)
+            ]
         );
     }
 
-    //Função que cadastra o visitante
+    // Create a visitor
     public function store(Request $request)
     {
-        //Pegando os dados do corpo da requisição e montando um array com os campos do banco de dados
-        $dadosMapeados = [
-            "nome_visitante" => $request->input("nome"),
-            "email_visitante" => $request->input("email"),
-            'senha_visitante' => Hash::make($request->input("password")),
-        ];
-
-        //Validando o array mapeado
-        $validator = Validator::make($dadosMapeados, [
-            "nome_visitante" => 'required|string|max:100',
-            "email_visitante" => 'required|string|max:150',
-            "senha_visitante" => "required",
+        $validator = Validator::make($request->all(), [
+            'nome' => 'required|string|max:100',
+            'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante',
+            'fk_morador' => 'required|integer',
+            'fk_funcionario' => 'required|integer',
         ]);
 
-        //Caso os dados não passasem na validação
-        if($validator->fails()){
-
-            //Retorna um Json com fotmatação de erro
+        if ($validator->fails()) {
             return $this->errorJson(
-                "Os dados passados não estão corretos!", //Menssagem
-                400, //Status code
-                //Passando os erros
+                "The provided data is invalid!",
+                400,
                 [
-                    //Pegando o array de erros dados pelo validator
                     $validator->errors()
                 ]
             );
         }
 
-        //Cadastrando o novo visitante
+        $dadosMapeados = [
+            'nome_visitante' => $request->input('nome'),
+            'cpf_visitante' => $request->input('cpf'),
+            'fk_morador' => $request->input('fk_morador'),
+            'fk_funcionario' => $request->input('fk_funcionario'),
+        ];
+
         $novoVisitante = Visitante::create($dadosMapeados);
 
-        //Retornando um json de sucuesso
         return $this->responseJson(
-            "Visitante criado com sucesso!", //Menssagem
-            201, //Status code
-            //Passando os dados
+            "Visitor created successfully!",
+            201,
             [
-                //Passando o morador criado
                 new VisitanteResources($novoVisitante)
             ]
         );
-
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // Get a specific visitor
     public function show(string $id)
-{
-    $visitante = Visitante::findOrFail($id);
+    {
+        $visitante = Visitante::findOrFail($id);
 
-    return $this->responseJson(
-        "Visitante recuperado com sucesso!",
-        200,
-        [
-            new VisitanteResources($visitante)
-        ]
-    );
-}
+        return $this->responseJson(
+            "Visitor retrieved successfully!",
+            200,
+            [
+                new VisitanteResources($visitante)
+            ]
+        );
+    }
 
-    //Função que atualiza o visitante
+    // Update a visitor
     public function update(Request $request, string $id)
     {
-        //Pegando os dados do corpo da requisição e montando um array com os campos do banco de dados
-        $dadosMapeados = [
-            "nome_visitante" => $request->input("nome"),
-            "email_visitante" => $request->input("email"),
-            'senha_visitante' => Hash::make($request->input("password")),
-        ];
-
-        //Validando o array mapeado
-        $validator = Validator::make($dadosMapeados, [
-            "nome_visitante" => 'required|string|max:100',
-            "email_visitante" => 'required|string|max:150',
-            "senha_visitante" => "required",
+        $validator = Validator::make($request->all(), [
+            'nome' => 'required|string|max:100',
+            'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante,' . $id . ',pk_id_visitante',
+            'fk_morador' => 'required|integer',
+            'fk_funcionario' => 'required|integer',
         ]);
 
-        //Caso os dados não passasem na validação
-        if($validator->fails()){
-
-            //Retorna um Json com fotmatação de erro
+        if ($validator->fails()) {
             return $this->errorJson(
-                "Os dados passados não estão corretos!", //Menssagem
-                400, //Status code
-                //Passando os erros
+                "The provided data is invalid!",
+                400,
                 [
-                    //Pegando o array de erros dados pelo validator
                     $validator->errors()
                 ]
             );
         }
 
-        //Pegando o visitante do bando de dados pelo id
         $visitante = Visitante::findOrFail($id);
 
-        //Atualizando os dados do visitante
+        $dadosMapeados = [
+            'nome_visitante' => $request->input('nome'),
+            'cpf_visitante' => $request->input('cpf'),
+            'fk_morador' => $request->input('fk_morador'),
+            'fk_funcionario' => $request->input('fk_funcionario'),
+        ];
+
         $atualizado = $visitante->update($dadosMapeados);
 
-         //Se o update não foi atualizado
-        if(!$atualizado){
-
-            //Retornando um responsta Json 
-            return $this->responseJson(
-                "Não foi possivel realizar a atualização do Visitante", //Menssagem
-                400, //Status code
+        if (!$atualizado) {
+            return $this->errorJson(
+                "Could not update the visitor.",
+                400
             );
         }
 
-        //Pegando o visitante com os novos dados
-        $novoVisitante = Visitante::findOrFail($id); 
+        $visitanteAtualizado = Visitante::findOrFail($id);
 
-        //Retorno o json com os dados do visitante atualizado
-        //Retornando um json de sucuesso
         return $this->responseJson(
-            "Visitante atualizado com sucesso!", //Menssagem
-            200, //Status code
-            //Passando os dados
+            "Visitor updated successfully!",
+            200,
             [
-                //Passando o morador criado
-                new VisitanteResources($novoVisitante)
+                new VisitanteResources($visitanteAtualizado)
             ]
         );
     }
 
-    //Função que remove o visitante
+    // Delete a visitor
     public function destroy(string $id)
     {
-        //Pegando o visitante do banco de dados pelo Id
         $visitante = Visitante::findOrFail($id);
 
-        //Deletando o visitante
         $deletado = $visitante->delete();
 
-        //Verificando de o visitante foi deletado com sucesso
-        if(!$deletado){
-
-            //Retorna um Json de erro
+        if (!$deletado) {
             return $this->errorJson(
-                "Não foi possivel deletar o visitante", //Menssagem
-                400, //Status code
+                "Could not delete the visitor.",
+                400
             );
         }
 
-        //Retornando um json de sucesso
         return $this->responseJson(
-            "Visitante apagado com sucesso!", //Menssagem
-            200, //Status code
+            "Visitor deleted successfully!",
+            200
         );
     }
 }

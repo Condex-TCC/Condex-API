@@ -29,7 +29,7 @@ return new class extends Migration
 
             $table->foreign('fk_id_morador')
                 ->references('pk_id_morador')
-                ->on('moradores')
+                ->on('moradors')
                 ->onDelete('cascade');
         });
     }
