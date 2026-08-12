@@ -14,9 +14,9 @@ class LaudoResources extends JsonResource
     {
         //Esse função retorna um array associativo com os campos filtrados
         return [
-            'id' => $this->pk_id_laudos, //Envia o id do laudo
-            'laudo' => $this->nome_laudo, //Envia o nome do laudo
-            'caminho' => "http://127.0.0.1:8000/storage/" . $this->caminho_laudo, //Envia o caminho do laudo
+            "id" => $this->pk_id_laudos, //Envia o id do laudo
+            "laudo" => $this->nome_laudo, //Envia o nome do laudo
+            "caminho" => "http://127.0.0.1:8000/storage/" . $this->caminho_laudo, //Envia o caminho do laudo
         ];
     }
 }

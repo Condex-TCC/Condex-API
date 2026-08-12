@@ -8,6 +8,7 @@ use App\Http\Controllers\RegrasController;
 use App\Http\Controllers\VisitanteController;
 use App\Http\Controllers\EncomendaController;
 use App\Http\Controllers\AutorizacaoVisitanteController;
+use App\Http\Controllers\EspacoController;
 use Illuminate\Support\Facades\Route;
 
 //Rota de login
@@ -35,7 +36,7 @@ Route::middleware("auth:sanctum")->group(function() {
             Route::put("/update/{id}", [MoradorController::class, 'update']);
             
             //Rota para deletar um morador
-            Route::delete('/delete/{id}', [MoradorController::class, 'destroy']);
+            Route::delete("/delete/{id}", [MoradorController::class, 'destroy']);
         });
 
         //Grupo de rotas para relizar o CRUD do porteiro
@@ -51,7 +52,7 @@ Route::middleware("auth:sanctum")->group(function() {
             Route::put("/update/{id}", [PorteiroController::class, 'update']);
             
             //Rota para deletar um porteiro
-            Route::delete('/delete/{id}', [PorteiroController::class, 'destroy']);
+            Route::delete("/delete/{id}", [PorteiroController::class, 'destroy']);
 
         });
 
@@ -68,7 +69,7 @@ Route::middleware("auth:sanctum")->group(function() {
             Route::put("/update/{id}", [RegrasController::class, 'update']);
             
             //Rota para deletar um porteiro
-            Route::delete('/delete/{id}', [RegrasController::class, 'destroy']);
+            Route::delete("/delete/{id}", [RegrasController::class, 'destroy']);
 
         });
 
@@ -108,7 +109,27 @@ Route::middleware("auth:sanctum")->group(function() {
             Route::put("/update/{id}", [EncomendaController::class, 'update']);
             
             //Rota para deletar uma encomenda
-            Route::delete('/delete/{id}', [EncomendaController::class, 'destroy']);
+            Route::delete("/delete/{id}", [EncomendaController::class, 'destroy']);
+
+        });
+
+        // Grupo de rotas para realizar CRUD nos espaços
+        Route::prefix("espaco")->group(function() {
+
+           // Rota para recuperar todos os espaços
+           Route::get("/get", [EspacoController::class, "index"]);
+
+           // Rota para recuperar um espaço específico
+           Route::get("/get/{id}", [EspacoController::class, "show"]);
+
+           // Rota para criar um espaço
+           Route::post("/create", [EspacoController::class, "store"]);
+
+           // Rota para atualizar um espaço
+           Route::put("/update/{id}", [EspacoController::class, "update"]);
+
+          // Rota para deletar um espaço
+          Route::delete("/delete/{id}", [EspacoController::class, "destroy"]);
 
         });
 
@@ -126,7 +147,7 @@ Route::middleware("auth:sanctum")->group(function() {
             Route::post("/update/{id}", [LaudoController::class, 'update']);
             
             //Rota para deletar um porteiro
-            Route::delete('/delete/{id}', [LaudoController::class, 'destroy']);
+            Route::delete("/delete/{id}", [LaudoController::class, 'destroy']);
 
         });
 
@@ -211,18 +232,25 @@ Route::middleware("auth:sanctum")->group(function() {
     });
 
 
+    
     // Encomendas
     Route::prefix("encomenda")->group(function() {
 
-        Route::get("/get", [EncomendaController::class, "index"]);
+    Route::get("/get", [EncomendaController::class, "index"]);
 
-        Route::get("/get/{id}", [EncomendaController::class, "show"]);
+    Route::get("/get/{id}", [EncomendaController::class, "show"]);
 
-        Route::put("/update/{id}", [EncomendaController::class, "update"]);
+    Route::put("/update/{id}", [EncomendaController::class, "update"]);
 
-        Route::delete('/delete/{id}', [EncomendaController::class, 'destroy']);
+    Route::delete("/delete/{id}", [EncomendaController::class, 'destroy']);
 
-    });
+    // Registrar retirada de uma encomenda
+    Route::put("/withdraw/{id}", [
+        EncomendaController::class,
+        "registerWithdrawal"
+    ]);
+
+});
 
 });
 });

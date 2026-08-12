@@ -15,7 +15,7 @@ class RegrasResources extends JsonResource
     {
         //Retorna um array associativo com os campos filtrados
         return [
-            'id' => $this->pk_id_regra, //Envia o Id da regra
+            "id" => $this->pk_id_regra, //Envia o Id da regra
             "regra" => $this->nome_regra, //Envia o nome da regra
             "descricao" => $this->descricao_regra, //Envia a descrição da regra
         ];

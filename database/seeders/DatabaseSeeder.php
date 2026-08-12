@@ -25,6 +25,8 @@ class DatabaseSeeder extends Seeder
             UnidadeSeeder::class,
             MoradorSeeder::class,
             VisitanteSeeder::class,
+            EspacoSeeder::class,
+            EncomendaSeeder::class,
         ]);
 
     }

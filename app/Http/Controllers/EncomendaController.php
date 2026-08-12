@@ -173,6 +173,49 @@ class EncomendaController extends Controller
 
     }
 
+    // Função que registra a retirada de uma encomenda
+    public function registerWithdrawal(string $id)
+    {
+    // Pegando a encomenda pelo ID
+    $encomenda = Encomenda::findOrFail($id);
+
+    // Verificando se a encomenda já foi retirada
+    if ($encomenda->data_retirada !== null) {
+
+        return $this->errorJson(
+            "Esta encomenda já foi retirada!",
+            400
+        );
+    }
+
+    // Registrando a data e hora da retirada
+    $encomenda->data_retirada = now();
+
+    // Salvando a alteração
+    $retiradaRegistrada = $encomenda->save();
+
+    // Verificando se a retirada foi registrada
+    if (!$retiradaRegistrada) {
+
+        return $this->errorJson(
+            "Não foi possível registrar a retirada da encomenda!",
+            400
+        );
+    }
+
+    // Buscando novamente a encomenda atualizada
+    $encomendaAtualizada = Encomenda::findOrFail($id);
+
+    // Retornando resposta de sucesso
+    return $this->responseJson(
+        "Retirada da encomenda registrada com sucesso!",
+        200,
+        [
+            new EncomendaResources($encomendaAtualizada)
+        ]
+    );
+    }
+
     //Função que apaga as encomendas
     public function destroy(string $id)
     {

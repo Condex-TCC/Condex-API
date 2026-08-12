@@ -39,7 +39,7 @@ class PorteiroController extends Controller
         $dadosMapeados = [
             "nome_porteito" => $request->input("nome"),
             "email_porteiro" => $request->input("email"),
-            'senha_porteiro' => Hash::make($request->input("password")),
+            "senha_porteiro" => Hash::make($request->input("password")),
         ];
 
         //Validando o array mapeado
@@ -95,7 +95,7 @@ class PorteiroController extends Controller
         $dadosMapeados = [
             "nome_porteito" => $request->input("nome"),
             "email_porteiro" => $request->input("email"),
-            'senha_porteiro' => Hash::make($request->input("password")),
+            "senha_porteiro" => Hash::make($request->input("password")),
         ];
 
         //Validando o array mapeado

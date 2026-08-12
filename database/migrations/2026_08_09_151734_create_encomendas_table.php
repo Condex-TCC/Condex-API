@@ -10,16 +10,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('encomenda', function (Blueprint $table) {
-            $table->id("pk_id_encomenda"); //Chave primária
-            $table->string("nome_encomenda", 255); //Campo de nome da encomenda
-            $table->text("descricao_encomenda"); //Campo que descreve a encomenda
-            $table->unsignedBigInteger("fk_id_porteiro_encomenda"); //Campo que irá armazenar o id do porteiro
+    $table->id("pk_id_encomenda");
 
-            //Fazendo o relacionanmento com o porteiro
-            $table->foreign("fk_id_porteiro_encomenda")->references("pk_id_porteiro")->on("porteiros");
+    $table->string("nome_encomenda", 255);
+    $table->text("descricao_encomenda");
 
-            $table->timestamps();
-        });
+    $table->unsignedBigInteger("fk_id_porteiro_encomenda");
+
+    $table->foreign("fk_id_porteiro_encomenda")
+          ->references("pk_id_porteiro")
+          ->on("porteiros");
+
+    $table->timestamp("data_retirada")->nullable();
+
+    $table->timestamps();
+});
+
     }
 
     /**

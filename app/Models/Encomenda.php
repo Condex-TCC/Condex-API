@@ -20,8 +20,13 @@ class Encomenda extends Model
 
     //Mostra qual campos podem ser preenchidos em massa
     protected $fillable = [
-        'nome_encomenda',
-        'descricao_encomenda',
+        "nome_encomenda",
+        "descricao_encomenda",
         "fk_id_porteiro_encomenda",
+        "data_retirada"
+    ];
+
+    protected $casts = [
+    "data_retirada" => "datetime"
     ];
 }
