@@ -85,12 +85,22 @@ class MoradorController extends Controller
 
     }
 
-    /**
-     * Display the specified resource.
-     */
+   //Função que recupera o morador
     public function show(string $id)
     {
-        //
+        //Pegando o morador no banco de dados
+        $morador = Morador::findOrFail($id);
+
+        //Retornando um json de sucuesso
+        return $this->responseJson(
+            "Morador recuperado com sucesso!", //Menssagem
+            200, //Status code
+            //Passando os dados
+            [
+                //Passando o morador criado
+                new MoradorResurce($morador)
+            ]
+        );
     }
 
     //Função que atualiza um morador

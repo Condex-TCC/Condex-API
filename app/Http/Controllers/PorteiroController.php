@@ -80,12 +80,23 @@ class PorteiroController extends Controller
 
     }
 
-    /**
-     * Display the specified resource.
-     */
+    //Função que pega um usuário do banco ade dados
     public function show(string $id)
     {
-        //
+        //Recupera o usuário no banco de dados
+        $porteiro = Porteiro::findOrFail($id);
+
+        //Retorno o json com os dados do porteiro atualizado
+        //Retornando um json de sucuesso
+        return $this->responseJson(
+            "Porteiro recupedado com sucesso!", //Menssagem
+            200, //Status code
+            //Passando os dados
+            [
+                //Passando o morador criado
+                new PorteiroResurce($porteiro)
+            ]
+        );
     }
 
     //Função que atualiza o porteiro
