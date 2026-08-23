@@ -9,6 +9,7 @@ use App\Http\Controllers\VisitanteController;
 use App\Http\Controllers\EncomendaController;
 use App\Http\Controllers\AutorizacaoVisitanteController;
 use App\Http\Controllers\EspacoController;
+use App\Http\Controllers\SindicoController;
 use Illuminate\Support\Facades\Route;
 
 //Rota de login
@@ -22,6 +23,26 @@ Route::middleware("auth:sanctum")->group(function() {
 
     //Para acessar esse grupo de rotas é necessário ter a habilidade do token de sindico
     Route::middleware("ability:sindico")->prefix("/sindico")->group(function() {
+
+        // Grupo de rotas para realizar o CRUD do síndico
+        Route::prefix("/gerenciar")->group(function() {
+
+        // Recuperar todos os síndicos
+        Route::get("/get", [SindicoController::class, "index"]);
+
+        // Recuperar um síndico específico
+        Route::get("/show/{id}", [SindicoController::class, "show"]);
+
+        // Criar um síndico
+        Route::post("/create", [SindicoController::class, "store"]);
+
+        // Atualizar um síndico
+        Route::put("/update/{id}", [SindicoController::class, "update"]);
+
+        // Deletar um síndico
+        Route::delete("/delete/{id}", [SindicoController::class, "destroy"]);
+
+        });
 
         //Grupo de rotas para relizar o CRUD do morador
         Route::prefix("/morador")->group(function() {
