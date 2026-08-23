@@ -37,14 +37,14 @@ class PorteiroController extends Controller
     {
         //Pegando os dados do corpo da requisição e montando um array com os campos do banco de dados
         $dadosMapeados = [
-            "nome_porteito" => $request->input("nome"),
+            "nome_porteiro" => $request->input("nome"),
             "email_porteiro" => $request->input("email"),
             "senha_porteiro" => Hash::make($request->input("password")),
         ];
 
         //Validando o array mapeado
         $validator = Validator::make($dadosMapeados, [
-            "nome_porteito" => 'required|string|max:100',
+            "nome_porteiro" => 'required|string|max:100',
             "email_porteiro" => 'required|string|max:150',
             "senha_porteiro" => "required",
         ]);
@@ -69,11 +69,11 @@ class PorteiroController extends Controller
 
         //Retornando um json de sucuesso
         return $this->responseJson(
-            "Morador criado com sucesso!", //Menssagem
+            "Porteiro criado com sucesso!", //Menssagem
             200, //Status code
             //Passando os dados
             [
-                //Passando o morador criado
+                //Passando o porteiro criado
                 new PorteiroResurce($novoPorteiro)
             ]
         );
@@ -104,14 +104,14 @@ class PorteiroController extends Controller
     {
         //Pegando os dados do corpo da requisição e montando um array com os campos do banco de dados
         $dadosMapeados = [
-            "nome_porteito" => $request->input("nome"),
+            "nome_porteiro" => $request->input("nome"),
             "email_porteiro" => $request->input("email"),
             "senha_porteiro" => Hash::make($request->input("password")),
         ];
 
         //Validando o array mapeado
         $validator = Validator::make($dadosMapeados, [
-            "nome_porteito" => 'required|string|max:100',
+            "nome_porteiro" => 'required|string|max:100',
             "email_porteiro" => 'required|string|max:150',
             "senha_porteiro" => "required",
         ]);

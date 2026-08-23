@@ -100,45 +100,6 @@ Route::middleware("auth:sanctum")->group(function() {
 
         });
 
-        // Grupo de rotas para realizar o CRUD dos visitantes
-        Route::prefix("/visitante")->group(function() {
-
-            // Recuperar todos os visitantes
-            Route::get("/get", [VisitanteController::class, "index"]);
-
-            // Criar um visitante
-            Route::post("/create", [VisitanteController::class, "store"]);
-
-            // Recuperar um visitante específico
-            Route::get("/get/{id}", [VisitanteController::class, "show"]);
-
-            // Atualizar um visitante
-            Route::put("/update/{id}", [VisitanteController::class, "update"]);
-
-            // Deletar um visitante
-            Route::delete("/delete/{id}", [VisitanteController::class, "destroy"]);
-
-        });
-
-        //Grupo de rotas para realizar CRUD nas encomendas
-        Route::prefix("/encomenda")->group(function() {
-
-            //Rota para recuperar todos as encomendas
-            Route::get("/get", [EncomendaController::class, "index"]);
-
-            // Rota para recuperar uma encomenda específica
-            Route::get("/get/{id}", [EncomendaController::class, "show"]);
-
-            //Rota para criar uma encomenda
-            Route::post("/create", [EncomendaController::class, 'store']);
-
-            //Rota para atualizar uma encomenda
-            Route::put("/update/{id}", [EncomendaController::class, 'update']);
-            
-            //Rota para deletar uma encomenda
-            Route::delete("/delete/{id}", [EncomendaController::class, 'destroy']);
-
-        });
 
         // Grupo de rotas para realizar CRUD nos espaços
         Route::prefix("espaco")->group(function() {
@@ -219,22 +180,13 @@ Route::middleware("auth:sanctum")->group(function() {
     Route::prefix("autorizacao")->group(function() {
 
     // Consultar visitantes autorizados
-    Route::get("/authorized", [
-        AutorizacaoVisitanteController::class,
-        "getAuthorizedVisitors"
-    ]);
+    Route::get("/authorized", [AutorizacaoVisitanteController::class,"getAuthorizedVisitors"]);
 
     // Liberar entrada
-    Route::put("/entry/{id}", [
-        AutorizacaoVisitanteController::class,
-        "allowEntry"
-    ]);
+    Route::put("/entry/{id}", [AutorizacaoVisitanteController::class,"allowEntry"]);
 
     // Registrar saída
-    Route::put("/exit/{id}", [
-        AutorizacaoVisitanteController::class,
-        "registerExit"
-    ]);
+    Route::put("/exit/{id}", [AutorizacaoVisitanteController::class,"registerExit"]);
 
     });
 
@@ -256,6 +208,8 @@ Route::middleware("auth:sanctum")->group(function() {
 
         Route::put("/update/{id}", [VisitanteController::class, "update"]);
 
+        Route::delete("/delete/{id}", [VisitanteController::class, "destroy"]);
+
     });
 
 
@@ -265,7 +219,7 @@ Route::middleware("auth:sanctum")->group(function() {
 
     Route::get("/get", [EncomendaController::class, "index"]);
 
-    Route::get("/get/{id}", [EncomendaController::class, "show"]);
+    Route::post("/create", [EncomendaController::class, "store"]);
 
     Route::put("/update/{id}", [EncomendaController::class, "update"]);
 

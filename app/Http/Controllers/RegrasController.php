@@ -74,11 +74,11 @@ class RegrasController extends Controller
 
         //Retornando um json de sucuesso
         return $this->responseJson(
-            "Morador criado com sucesso!", //Menssagem
+            "Regra criada com sucesso!", //Menssagem
             200, //Status code
             //Passando os dados
             [
-                //Passando o morador criado
+                //Passando o regra criado
                 new RegrasResources($novoRegra)
             ]
         );
