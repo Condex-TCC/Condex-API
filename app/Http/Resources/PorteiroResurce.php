@@ -15,7 +15,7 @@ class PorteiroResurce extends JsonResource
         //Esse função retorna um array associativo com os campos filtrados
         return [
             "id" => $this->pk_id_porteiro, //Envia o id
-            "nome" => $this->nome_porteito, //Envia o nome
+            "nome" => $this->nome_porteiro, //Envia o nome
             "email" => $this->email_porteiro, //Envia o email
         ];
     }
