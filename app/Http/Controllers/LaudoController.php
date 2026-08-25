@@ -87,12 +87,23 @@ class LaudoController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
+    //Função que pega um laudo do banco ade dados
     public function show(string $id)
     {
-        //
+        //Recupera o laudo no banco de dados
+        $laudo = Laudos::findOrFail($id);
+
+        //Retorno o json com as regras atualizadas
+        //Retornando um json de sucuesso
+        return $this->responseJson(
+            "Laudo recupedado com sucesso!", //Menssagem
+            200, //Status code
+            //Passando os dados
+            [
+                //Passando a regra recuperada
+                new LaudoResources($laudo)
+            ]
+        );
     }
 
     //Função que atualiza um morador

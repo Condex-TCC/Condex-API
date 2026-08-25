@@ -130,6 +130,9 @@ Route::middleware("auth:sanctum")->group(function() {
             //Rota para recuperar todos os porteiros
             Route::get("/get", [LaudoController::class, "index"]);
 
+            //Rota para recuperar um registro
+            Route::get("/show/{id}", [LaudoController::class, 'show']);
+
             //Rota para criar um porteiro
             Route::post("/create", [LaudoController::class, 'store']);
 
