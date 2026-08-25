@@ -84,12 +84,23 @@ class RegrasController extends Controller
         );
     }
 
-    /**
-     * Display the specified resource.
-     */
+   //Função que pega uma regra do banco ade dados
     public function show(string $id)
     {
-        //
+        //Recupera a regra no banco de dados
+        $regra = Regras::findOrFail($id);
+
+        //Retorno o json com as regras atualizadas
+        //Retornando um json de sucuesso
+        return $this->responseJson(
+            "Regras recupedado com sucesso!", //Menssagem
+            200, //Status code
+            //Passando os dados
+            [
+                //Passando a regra recuperada
+                new RegrasResources($regra)
+            ]
+        );
     }
 
     //Função que atuiliza o registro

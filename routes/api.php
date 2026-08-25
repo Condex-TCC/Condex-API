@@ -89,6 +89,9 @@ Route::middleware("auth:sanctum")->group(function() {
             //Rota para recuperar todos os porteiros
             Route::get("/get", [RegrasController::class, "index"]);
 
+            //Rota que recupera apenas uma regra
+            Route::get('/show/{id}', [RegrasController::class, 'show']);
+
             //Rota para criar um porteiro
             Route::post("/create", [RegrasController::class, 'store']);
 
