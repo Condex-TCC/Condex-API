@@ -23,7 +23,15 @@ class LaudoController extends Controller
         $jsonFiltrado = LaudoResources::collection($laudos);
 
         //Retornando os laudos filtrados
-        return $jsonFiltrado;
+        return $this->responseJson(
+            "Laudo cadastrado com sucesso!", //Menssagem
+            200, //Status code
+            //Passando os dados
+            [
+                //Passando o novo laudo criado
+                $jsonFiltrado
+            ]
+        );
     }
 
     //Função que cadastra o morador
