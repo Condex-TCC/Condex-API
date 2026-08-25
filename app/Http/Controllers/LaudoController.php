@@ -120,53 +120,51 @@ class LaudoController extends Controller
 
         $nomeLaudo = $dadosPassados['nome']; //Obtendo o nome do array
 
-        //Obtendo o documento da requisição
-        $documento = $request->file("documento");
+        // Recuperando o laudo atual do banco de dados pelo id
+        $laudo = Laudos::findOrFail($id);
 
-        //Verifica se o documente o nome foram enviados
-        if($documento != null && $nomeLaudo != null){
+        // Mapeando os dados básicos que SEMPRE serão atualizados (como o nome)
+        $dadosMapeados = [
+            "nome_laudo" => $nomeLaudo,
+            "fk_id_sindico_laudo" => $idSindico
+        ];
 
-            //Salvando o documento na pasta storage com uma hash no nome para evitar conflito | retorna o nome do arquivo
+        // Verificando se o usuário enviou um ARQUIVO NOVO de fato
+        if($request->hasFile("documento")){
+            
+            // Obtendo o documento da requisição
+            $documento = $request->file("documento");
+            
+            // Salvando o novo documento na pasta storage
             $caminhoDocumento = $documento->store('laudos', 'public');
+            
+            // Adicionando o novo caminho ao array que vai para o banco de dados
+            $dadosMapeados["caminho_laudo"] = $caminhoDocumento;
+        }
 
-            //Pegando os dados obtidos e mepeando um array
-            $dadosMapeados = [
-                "nome_laudo" => $nomeLaudo,
-                "caminho_laudo" => $caminhoDocumento,
-                "fk_id_sindico_laudo" => $idSindico
-            ];
+        // Atualizando os dados do laudo com os dados passados no array
+        $atualizado = $laudo->update($dadosMapeados);
 
-            //Regando o laudo do banco de dados pelo id
-            $laudos = Laudos::findOrFail($id);
-
-            //Atualizando os dados do laudo com os dados passados no array
-            $atualizado = $laudos->update($dadosMapeados);
-
-            //Se o update não foi atualizado
-            if(!$atualizado){
-
-                //Retornando um responsta Json 
-                return $this->responseJson(
-                    "Não foi possivel realizar a atualização do Laudo", //Menssagem
-                    400, //Status code
-                );
-            }
-
-            //Pegando o laudo com os novos dados
-            $novoLaudo =  Laudos::findOrFail($id);
-
-            //Retorno o json com os dados do morador atualizado
-            //Retornando um json de sucuesso
+        // Se o update falhar por algum motivo no banco
+        if(!$atualizado){
+            // Retornando uma resposta Json de erro
             return $this->responseJson(
-                "Laudo atualizado com sucesso!", //Menssagem
-                200, //Status code
-                //Passando os dados
-                [
-                    //Passando o morador criado
-                    new LaudoResources($novoLaudo)
-                ]
+                "Não foi possivel realizar a atualização do Laudo", // Mensagem
+                400, // Status code
             );
         }
+
+        // Pegando o laudo com os novos dados atualizados
+        $novoLaudo = Laudos::findOrFail($id);
+
+        // Retornando um json de sucesso com os dados atualizados
+        return $this->responseJson(
+            "Laudo atualizado com sucesso!", // Mensagem
+            200, // Status code
+            [
+                new LaudoResources($novoLaudo) // Passando os dados
+            ]
+        );
     }
 
     //Função que remove o laudo
