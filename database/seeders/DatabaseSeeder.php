@@ -27,6 +27,9 @@ class DatabaseSeeder extends Seeder
             VisitanteSeeder::class,
             EspacoSeeder::class,
             EncomendaSeeder::class,
+            ComunicadoSeeder::class,
+            RespostaSeeder::class,
+            EnvioSeeder::class,
         ]);
 
     }
