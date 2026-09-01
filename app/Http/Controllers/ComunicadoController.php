@@ -71,7 +71,7 @@ class ComunicadoController extends Controller
 
         // Mapeando os dados recebidos
         $dadosMapeados = [
-            "descricao_comunicado" => $request->input("descricao"),
+            "descricao_comunicado" => $request->input("descricao_comunicado"),
             "fk_id_sindico_comunicados" => $idSindico,
         ];
 

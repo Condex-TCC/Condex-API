@@ -13,7 +13,7 @@ class ComunicadoFactory extends Factory
     public function definition(): array
     {
         return [
-            'descricao_comunicado' => fake()->paragraph(),
+            'descricao_comunicado' => fake()->sentence(15),
             'fk_id_sindico_comunicados' => Sindico::inRandomOrder()
                 ->first()
                 ->pk_id_sindico,
