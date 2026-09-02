@@ -22,16 +22,6 @@ class Unidade extends Model
     protected $fillable = [
         "bloco_unidade",
         "numero_unidade",
-        "fk_id_unidade_categoria",
+        "descricao_unidade",
     ];
-
-    //Adicionando aos relacionanementos
-    
-    //Função que repesenta a relacioanamento da tabela unidade com unidade_categoria
-    public function categoria(){
-        
-        //Retorna um objeto do model Categoria_unidade | Passagem do campo de chave estrangeira personalizada
-        return $this->belongsTo(Categoria_unidade::class, "fk_id_unidade_categoria");
-    }
-
 }

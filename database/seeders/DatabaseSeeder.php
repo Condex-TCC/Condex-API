@@ -21,7 +21,6 @@ class DatabaseSeeder extends Seeder
             PorteiroSeeder::class,
             RegrasSeeder::class,
             LaudosSeeder::class,
-            CategoriaUnidadeSeeder::class,
             UnidadeSeeder::class,
             MoradorSeeder::class,
             VisitanteSeeder::class,

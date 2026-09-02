@@ -13,10 +13,7 @@ return new class extends Migration
             $table->id("pk_id_unidades"); //Gera uma chave primária
             $table->string("bloco_unidade", 10); //Campo do bloco da unidade
             $table->string("numero_unidade", 10); //Campo do bloco da unidade
-            $table->unsignedBigInteger("fk_id_unidade_categoria"); //Gera um campo para o relacionamente com categoria
-            
-            //Fazendo o relacionanmento com categoria unidade
-            $table->foreign("fk_id_unidade_categoria")->references("pk_id_categoria_unidade")->on("categoria_unidades");
+            $table->text("descricao_unidade")->nullable(); //Campo para descrição adicional da unidade
 
             $table->timestamps();
         });

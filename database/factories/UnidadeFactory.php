@@ -19,7 +19,7 @@ class UnidadeFactory extends Factory
         return [
             "bloco_unidade" => $this->faker->randomElement($blocos), //Sorteia um elemento aleatorio do array de blocos
             "numero_unidade" => $this->faker->numberBetween(0, 200), //Gera um número aleatorio entre 0 e 200
-            "fk_id_unidade_categoria" => Categoria_unidade::all()->random()->pk_id_categoria_unidade, //Pega um id aleatorio
+            "descricao_unidade" => $this->faker->text(), //Gera um texto aleatório para a descrição
         ];
     }
 }
