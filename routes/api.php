@@ -15,7 +15,7 @@ use App\Http\Controllers\EspacoController;
 use App\Http\Controllers\ComunicadoController;
 use App\Http\Controllers\EnvioController;
 use App\Http\Controllers\ReacaoController;
-
+use App\Http\Controllers\UnidadeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -220,6 +220,28 @@ Route::middleware('auth:sanctum')->group(function () {
                 EnvioController::class,
                 'store'
             ]);
+        });
+
+        // =========================
+        // UNIDADES
+        // =========================
+
+        Route::prefix("/unidades")->group(function() {
+
+            // Recuperar todas as unidades
+            Route::get('/get', [UnidadeController::class, 'index']);
+
+            // Recuperar uma unidade específico
+            Route::get('/show/{id}', [UnidadeController::class, 'show']);
+
+            // Criar uma unidade
+            Route::post('/create', [UnidadeController::class, 'store']);
+
+            // Atualizar uma unidade
+            Route::put('/update/{id}', [UnidadeController::class, 'update']);
+
+            // Deletar uma unidade
+            Route::delete('/delete/{id}', [UnidadeController::class, 'destroy']);
         });
 
     });
