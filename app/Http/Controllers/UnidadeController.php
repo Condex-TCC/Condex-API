@@ -46,8 +46,8 @@ class UnidadeController extends Controller
         //Validando o array mapeado
         $validator = Validator::make($dadosMapeados, [
             "bloco_unidade" => 'required|string|max:50',
-            "numero_unidade" => 'required|numeric|max:10',
-            "descricao_unidade" => 'required|string',
+            "numero_unidade" => 'required|numeric',
+            "descricao_unidade" => 'nullable|string',
         ]);
 
         //Caso os dados não passasem na validação
@@ -111,8 +111,8 @@ class UnidadeController extends Controller
         //Validando o array mapeado
         $validator = Validator::make($dadosMapeados, [
             "bloco_unidade" => 'required|string|max:50',
-            "numero_unidade" => 'required|numeric|max:10',
-            "descricao_unidade" => 'required|string',
+            "numero_unidade" => 'required|numeric',
+            "descricao_unidade" => 'nullable|string',
         ]);
 
          //Caso os dados não passasem na validação

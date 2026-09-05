@@ -47,7 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
     */
 
     Route::middleware('ability:sindico')
-        ->prefix('sindico')
+        ->prefix('/sindico')
         ->group(function () {
 
 
@@ -226,7 +226,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // UNIDADES
         // =========================
 
-        Route::prefix("/unidades")->group(function() {
+        Route::prefix("/unidade")->group(function() {
 
             // Recuperar todas as unidades
             Route::get('/get', [UnidadeController::class, 'index']);
