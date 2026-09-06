@@ -12,10 +12,12 @@ use App\Http\Controllers\AutorizacaoVisitanteController;
 use App\Http\Controllers\RegrasController;
 use App\Http\Controllers\LaudoController;
 use App\Http\Controllers\EspacoController;
+use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\ComunicadoController;
 use App\Http\Controllers\EnvioController;
 use App\Http\Controllers\ReacaoController;
 use App\Http\Controllers\UnidadeController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -398,6 +400,45 @@ Route::middleware('auth:sanctum')->group(function () {
                 'show'
             ]);
         });
+
+
+        // =========================
+        // RESERVAS
+        // =========================
+
+        Route::prefix('reserva')->group(function () {
+
+            // Morador visualiza suas reservas
+            Route::get('/get', [
+                ReservaController::class,
+                'index'
+            ]);
+
+            // Morador visualiza uma reserva específica
+            Route::get('/show/{id}', [
+                ReservaController::class,
+                'show'
+            ]);
+
+            // Morador cria uma reserva
+            Route::post('/create', [
+                ReservaController::class,
+                'store'
+            ]);
+
+            // Morador atualiza uma reserva
+            Route::put('/update/{id}', [
+                ReservaController::class,
+                'update'
+            ]);
+
+            // Morador cancela uma reserva
+            Route::delete('/delete/{id}', [
+                ReservaController::class,
+                'destroy'
+            ]);
+
+});
 
     });
 

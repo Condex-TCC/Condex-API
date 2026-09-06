@@ -52,4 +52,10 @@ class Morador extends Authenticatable
         //Retorna um objeto do model Unidade | Passagem do campo de chave estrangeira personalizada
         return $this->belongsTo(Unidade::class, "fk_id_unidade_morador");
     }
+
+    public function reservas(){
+
+    return $this->hasMany(Reserva::class, 'fk_id_morador');
+    
+    }
 }

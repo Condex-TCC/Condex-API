@@ -22,4 +22,10 @@ class Espaco extends Model
     protected $casts = [
         'autorizacao' => 'boolean'
     ];
+
+    public function reservas(){
+
+    return $this->hasMany(Reserva::class, 'fk_id_espaco');
+    
+    }
 }

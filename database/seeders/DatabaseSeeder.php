@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             ComunicadoSeeder::class,
             RespostaSeeder::class,
             EnvioSeeder::class,
+            ReservaSeeder::class,
         ]);
 
     }
