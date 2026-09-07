@@ -12,8 +12,8 @@ return new class extends Migration
         Schema::create('moradors', function (Blueprint $table) {
             $table->id("pk_id_morador"); //Gera uma chave primária
             $table->string("nome_morador", 100); //Campo de nome do morador
-            $table->string("cpf_morador", 14)->unique(); //Campo de cpf do morador
-            $table->string("email_morador", 150)->unique(); //Campo de email do morador
+            $table->string("cpf_morador", 14); //Campo de cpf do morador
+            $table->string("email_morador", 150); //Campo de email do morador
             $table->string("telefone_morador", 20); //Campo do telefone do morador
             $table->string("senha_morador"); //Campo de senha do morador
             $table->unsignedBigInteger("fk_id_unidade_morador"); //Campo que irá armazenar o relacionanemtno com unidade

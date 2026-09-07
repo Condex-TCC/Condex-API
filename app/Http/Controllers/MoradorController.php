@@ -112,19 +112,31 @@ class MoradorController extends Controller
             "cpf_morador" => $request->input("cpf"), //Pegando o cpf
             "email_morador" => $request->input("email"), //Pegando o email
             "telefone_morador" => $request->input("telefone"), //Pegando o telefone
-            "senha_morador" => Hash::make($request->input("password")), //Pegando a senha e transformando-a em hash
+            // "senha_morador" => Hash::make($request->input("password")), //Pegando a senha e transformando-a em hash
             "fk_id_unidade_morador" => $request->input("id_unidade"), //Pegando o id da unidade
         ];
 
-        //Validando o array mapeado
-        $validator = Validator::make($dadosMapeados, [
+        // Regras de validação base
+        $regrasValidacao = [
             "nome_morador" => 'required|string|max:100',
             "cpf_morador" => 'required|string|min:11',
             "email_morador" => 'required|string|max:150',
             "telefone_morador" => 'required|string|max:20',
-            "senha_morador" => "required",
             "fk_id_unidade_morador" => 'required|numeric',
-        ]);
+        ];
+
+        // Verifica na requisição se o usuário enviou uma nova senha
+        if ($request->filled("password")) {
+
+            //Adiciona a senha no array de dados mapeados
+            $dadosMapeados["senha_morador"] = Hash::make($request->input("password"));
+
+            //Adiciona mais uma regra de validação
+            $regrasValidacao["senha_morador"] = "required|string";
+        }
+
+        // Validando o array mapeado dinamicamente
+        $validator = Validator::make($dadosMapeados, $regrasValidacao);
 
         //Caso os dados não passasem na validação
         if($validator->fails()){
@@ -168,7 +180,7 @@ class MoradorController extends Controller
             //Passando os dados
             [
                 //Passando o morador criado
-                new MoradorResurce($novoMorador->load("unidade"))
+                new MoradorResurce($novoMorador->load("unidade")),
             ]
         );
     }

@@ -88,6 +88,9 @@ Route::middleware('auth:sanctum')->group(function () {
             // Recuperar um morador específico
             Route::get('/show/{id}', [MoradorController::class, 'show']);
 
+            // Verifica se já tem morador cadastrado com apertamento
+            Route::get('/verify/{id}', [MoradorController::class, 'verify']);
+
             // Criar um morador
             Route::post('/create', [MoradorController::class, 'store']);
 
