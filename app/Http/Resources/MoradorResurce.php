@@ -23,6 +23,7 @@ class MoradorResurce extends JsonResource
 
             //Envia outra array com a unidade
             "unidade" => [
+                'id_apertamento' => $this->unidade->pk_id_unidades,
                 "bloco" => $this->unidade->bloco_unidade, //Envia o bloco da unidade
                 'numero' => $this->unidade->numero_unidade, //Envia o número da unidade
                 "descricao" => $this->unidade->descricao_unidade, //Envia a descrição da unidade
