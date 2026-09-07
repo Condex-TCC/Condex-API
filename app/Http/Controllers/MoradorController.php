@@ -6,6 +6,7 @@ use App\Http\Resources\MoradorResurce;
 use App\Models\Morador;
 use Illuminate\Http\Request;
 use App\HttpResposta;
+use App\Models\Unidade;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 
@@ -209,5 +210,38 @@ class MoradorController extends Controller
             "Morador apagado com sucesso!", //Menssagem
             200, //Status code
         );
+    }
+
+    //Função que vai reficiar se tem algum morador já cadastrado com um apertamento expecifico
+    public function verify(string $id){
+
+        //Realiza a busca no banco de dados e busca por algum morador que já tenha o apartemento cadastrado
+        //retorna true e false
+        $exiteMorador = Morador::where('fk_id_unidade_morador', $id)->exists();
+
+        //Verifica o retorno para validar a saida
+        if(!$exiteMorador){
+            
+            //Retornando um json de sucuesso
+            return $this->responseJson(
+                "Não tem morador cadastrado com esse apertamento!", //Menssagem
+                200, //Status code
+                //Passando os dados
+                [
+                    "exite" => $exiteMorador,
+                ]
+            );
+
+        }else{
+
+            //Retorna um Json de erro
+            return $this->errorJson(
+                "Já existe morador cadastrado com esse apertamento", //Menssagem
+                400, //Status code
+                [
+                    "exite" => $exiteMorador,
+                ]
+            );
+        }
     }
 }
