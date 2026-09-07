@@ -238,6 +238,7 @@ class MoradorController extends Controller
             return $this->errorJson(
                 "Já existe morador cadastrado com esse apertamento", //Menssagem
                 400, //Status code
+                [],
                 [
                     "exite" => $exiteMorador,
                 ]
