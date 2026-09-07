@@ -551,43 +551,6 @@ Route::middleware('auth:sanctum')->group(function () {
         });
 
 
-        // =========================
-        // REGRAS
-        // =========================
-
-        Route::prefix('regras')->group(function () {
-
-            // Porteiro pode consultar as regras
-            Route::get('/get', [
-                RegrasController::class,
-                'index'
-            ]);
-
-            Route::get('/show/{id}', [
-                RegrasController::class,
-                'show'
-            ]);
-        });
-
-
-        // =========================
-        // LAUDOS
-        // =========================
-
-        Route::prefix('laudos')->group(function () {
-
-            // Porteiro pode consultar os laudos
-            Route::get('/get', [
-                LaudoController::class,
-                'index'
-            ]);
-
-            Route::get('/show/{id}', [
-                LaudoController::class,
-                'show'
-            ]);
-        });
-
     });
 
 });
