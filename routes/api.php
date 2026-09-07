@@ -54,29 +54,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
         // =========================
-        // CRUD SÍNDICO
-        // =========================
-
-        Route::prefix('gerenciar')->group(function () {
-
-            // Recuperar todos os síndicos
-            Route::get('/get', [SindicoController::class, 'index']);
-
-            // Recuperar um síndico específico
-            Route::get('/show/{id}', [SindicoController::class, 'show']);
-
-            // Criar um síndico
-            Route::post('/create', [SindicoController::class, 'store']);
-
-            // Atualizar um síndico
-            Route::put('/update/{id}', [SindicoController::class, 'update']);
-
-            // Deletar um síndico
-            Route::delete('/delete/{id}', [SindicoController::class, 'destroy']);
-        });
-
-
-        // =========================
         // MORADORES
         // =========================
 
@@ -200,12 +177,20 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('comunicado')->group(function () {
 
+            // Síndico visualiza todos os comunicados
+             Route::get('/get', [
+                ComunicadoController::class,
+                'index'
+            ]);
+
             // Síndico cadastra um comunicado
             Route::post('/create', [
                 ComunicadoController::class,
                 'store'
             ]);
         });
+
+            
 
 
         // =========================
@@ -568,43 +553,6 @@ Route::middleware('auth:sanctum')->group(function () {
             ]);
         });
 
-
-        // =========================
-        // REGRAS
-        // =========================
-
-        Route::prefix('regras')->group(function () {
-
-            // Porteiro pode consultar as regras
-            Route::get('/get', [
-                RegrasController::class,
-                'index'
-            ]);
-
-            Route::get('/show/{id}', [
-                RegrasController::class,
-                'show'
-            ]);
-        });
-
-
-        // =========================
-        // LAUDOS
-        // =========================
-
-        Route::prefix('laudos')->group(function () {
-
-            // Porteiro pode consultar os laudos
-            Route::get('/get', [
-                LaudoController::class,
-                'index'
-            ]);
-
-            Route::get('/show/{id}', [
-                LaudoController::class,
-                'show'
-            ]);
-        });
 
     });
 
