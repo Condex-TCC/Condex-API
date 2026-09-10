@@ -320,17 +320,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('encomenda')->group(function () {
 
-            // Morador pode ver suas encomendas
-            Route::get('/get', [
-                EncomendaController::class,
-                'index'
-            ]);
+    // Morador pode ver apenas suas encomendas
+    Route::get('/get', [
+        EncomendaController::class,
+        'indexMorador'
+    ]);
 
-            Route::get('/show/{id}', [
-                EncomendaController::class,
-                'show'
-            ]);
-        });
+    // Morador pode ver apenas uma de suas encomendas
+    Route::get('/show/{id}', [
+        EncomendaController::class,
+        'showMorador'
+    ]);
+
+});
 
 
         // =========================
@@ -428,6 +430,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
 });
 
+            // =========================
+            // VISITANTES
+            // =========================
+
+            Route::prefix('visitante')->group(function () {
+
+            // Morador cadastra um visitante
+            Route::post('/create', [
+                VisitanteController::class,
+                'storeMorador'
+            ]);
+});
+
     });
 
 
@@ -468,23 +483,6 @@ Route::middleware('auth:sanctum')->group(function () {
         });
 
 
-        // =========================
-        // MORADORES
-        // =========================
-
-        Route::prefix('morador')->group(function () {
-
-            // Consultar moradores
-            Route::get('/get', [
-                MoradorController::class,
-                'index'
-            ]);
-
-            Route::get('/show/{id}', [
-                MoradorController::class,
-                'show'
-            ]);
-        });
 
 
         // =========================

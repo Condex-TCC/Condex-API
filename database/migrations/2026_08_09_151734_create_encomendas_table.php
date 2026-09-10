@@ -6,30 +6,36 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    //Função que cria as migrations
+    // Função que cria a migration
     public function up(): void
     {
         Schema::create('encomenda', function (Blueprint $table) {
-    $table->id("pk_id_encomenda");
+            $table->id("pk_id_encomenda");
 
-    $table->string("nome_encomenda", 255);
-    $table->text("descricao_encomenda");
+            $table->string("nome_encomenda", 255);
+            $table->text("descricao_encomenda");
 
-    $table->unsignedBigInteger("fk_id_porteiro_encomenda");
+            $table->unsignedBigInteger("fk_id_porteiro_encomenda");
 
-    $table->foreign("fk_id_porteiro_encomenda")
-          ->references("pk_id_porteiro")
-          ->on("porteiros");
+            $table->foreign("fk_id_porteiro_encomenda")
+                  ->references("pk_id_porteiro")
+                  ->on("porteiros");
 
-    $table->timestamp("data_retirada")->nullable();
+            // FK do morador
+            $table->unsignedBigInteger("fk_id_morador_encomenda");
 
-    $table->timestamps();
-});
+            $table->foreign("fk_id_morador_encomenda")
+                  ->references("pk_id_morador")
+                  ->on("moradors");
 
+            $table->timestamp("data_retirada")->nullable();
+
+            $table->timestamps();
+        });
     }
 
     /**
-     * Reverse the migrations.
+     * Reverse the migration.
      */
     public function down(): void
     {

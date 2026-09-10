@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('nome_visitante', 100);
 
             $table->unsignedBigInteger('fk_morador');
-            $table->unsignedBigInteger('fk_funcionario');
+            $table->unsignedBigInteger('fk_funcionario')->nullable();
 
             // Relationship with resident
             $table->foreign('fk_morador')

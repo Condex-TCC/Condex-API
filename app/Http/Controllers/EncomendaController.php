@@ -31,6 +31,71 @@ class EncomendaController extends Controller
         );
     }
 
+// Função que pega apenas as encomendas do morador logado
+public function indexMorador(Request $request)
+{
+    // Pegando o morador logado através do token Sanctum
+    $morador = $request->user();
+
+    // Pegando o ID do morador
+    $idMorador = $morador->pk_id_morador;
+
+    // Buscando somente as encomendas pertencentes ao morador logado
+    $encomendas = Encomenda::where(
+        'fk_id_morador_encomenda',
+        $idMorador
+    )->get();
+
+    // Aplicando resource para tratar o JSON
+    $jsonTratado = EncomendaResources::collection($encomendas);
+
+    // Retornando as encomendas do morador
+    return $this->responseJson(
+        "Encomendas do morador recuperadas com sucesso!",
+        200,
+        [$jsonTratado]
+    );
+}
+
+
+// Função que pega uma encomenda específica do morador logado
+public function showMorador(Request $request, string $id)
+{
+    // Pegando o morador logado através do token Sanctum
+    $morador = $request->user();
+
+    // Pegando o ID do morador
+    $idMorador = $morador->pk_id_morador;
+
+    // Buscando a encomenda pelo ID e verificando se pertence ao morador
+    $encomenda = Encomenda::where(
+        'pk_id_encomenda',
+        $id
+    )->where(
+        'fk_id_morador_encomenda',
+        $idMorador
+    )->first();
+
+    // Caso a encomenda não pertença ao morador
+    if (!$encomenda) {
+        return $this->errorJson(
+            "Encomenda não encontrada.",
+            404
+        );
+    }
+
+    // Retornando a encomenda encontrada
+    return $this->responseJson(
+        "Encomenda recuperada com sucesso!",
+        200,
+        [
+            new EncomendaResources($encomenda)
+        ]
+    );
+}
+
+
+
    //Função que cria uma encomenda
     public function store(Request $request)
     {

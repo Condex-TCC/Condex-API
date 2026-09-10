@@ -74,6 +74,54 @@ class VisitanteController extends Controller
         );
     }
 
+// Morador cadastra um visitante
+public function storeMorador(Request $request)
+{
+    // Pegando o morador logado através do token Sanctum
+    $morador = $request->user();
+
+    // Pegando o ID do morador
+    $idMorador = $morador->pk_id_morador;
+
+    // Validando os dados enviados
+    $validator = Validator::make($request->all(), [
+        'nome' => 'required|string|max:100',
+        'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante',
+    ]);
+
+    // Caso os dados não passem na validação
+    if ($validator->fails()) {
+        return $this->errorJson(
+            "The provided data is invalid!",
+            400,
+            [
+                $validator->errors()
+            ]
+        );
+    }
+
+    // Mapeando os dados para os campos do banco
+    $dadosMapeados = [
+        'nome_visitante' => $request->input('nome'),
+        'cpf_visitante' => $request->input('cpf'),
+        'fk_morador' => $idMorador,
+        'fk_funcionario' => null,
+    ];
+
+    // Criando o visitante
+    $novoVisitante = Visitante::create($dadosMapeados);
+
+    // Retornando o visitante criado
+    return $this->responseJson(
+        "Visitante criado com sucesso!",
+        201,
+        [
+            new VisitanteResources($novoVisitante)
+        ]
+    );
+}
+
+
     // Get a specific visitor
     public function show(string $id)
     {
