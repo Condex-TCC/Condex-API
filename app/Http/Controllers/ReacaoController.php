@@ -27,7 +27,7 @@ class ReacaoController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'tipo_reacao' => 'required|string|in:curtir,amei,triste,importante',
+                'tipo' => 'required|string|in:curtir,amei,triste,importante',
             ]
         );
 
@@ -77,7 +77,7 @@ class ReacaoController extends Controller
         $reacao = Reacao::create([
             'fk_id_morador' => $morador->pk_id_morador,
             'fk_id_comunicado' => $id,
-            'tipo_reacao' => $request->input('tipo_reacao'),
+            'tipo_reacao' => $request->input('tipo'),
         ]);
 
         // Carregando os relacionamentos

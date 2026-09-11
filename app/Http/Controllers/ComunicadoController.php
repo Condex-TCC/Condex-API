@@ -62,47 +62,45 @@ class ComunicadoController extends Controller
     // =========================================================
 
     public function store(Request $request)
-    {
-        // Pegando o síndico logado através do Sanctum
-        $sindico = $request->user();
+{
+    // Pegando o síndico logado através do Sanctum
+    $sindico = $request->user();
 
-        // Pegando o ID do síndico
-        $idSindico = $sindico->pk_id_sindico;
+    // Pegando o ID do síndico
+    $idSindico = $sindico->pk_id_sindico;
 
-        // Mapeando os dados recebidos
-        $dadosMapeados = [
-            "descricao_comunicado" => $request->input("descricao_comunicado"),
-            "fk_id_sindico_comunicados" => $idSindico,
-        ];
+    // Mapeando os dados recebidos para os campos do banco
+    $dadosMapeados = [
+        "descricao_comunicado" => $request->input("descricao"),
+        "fk_id_sindico_comunicados" => $idSindico,
+    ];
 
-        // Validando os dados
-        $validator = Validator::make($dadosMapeados, [
-            "descricao_comunicado" => 'required|string|max:255',
-            "fk_id_sindico_comunicados" => 'required|numeric',
-        ]);
+    // Validando os dados recebidos pela API
+    $validator = Validator::make($request->all(), [
+        "descricao" => 'required|string|max:255',
+    ]);
 
-        // Caso a validação falhe
-        if ($validator->fails()) {
-
-            return $this->errorJson(
-                "Os dados passados não estão corretos!",
-                400,
-                [
-                    $validator->errors()
-                ]
-            );
-        }
-
-        // Criando o comunicado
-        $novoComunicado = Comunicado::create($dadosMapeados);
-
-        // Retornando o comunicado criado
-        return $this->responseJson(
-            "Comunicado criado com sucesso!",
-            200,
+    // Caso a validação falhe
+    if ($validator->fails()) {
+        return $this->errorJson(
+            "Os dados passados não estão corretos!",
+            400,
             [
-                new ComunicadoResources($novoComunicado)
+                $validator->errors()
             ]
         );
     }
+
+    // Criando o comunicado
+    $novoComunicado = Comunicado::create($dadosMapeados);
+
+    // Retornando o comunicado criado
+    return $this->responseJson(
+        "Comunicado criado com sucesso!",
+        200,
+        [
+            new ComunicadoResources($novoComunicado)
+        ]
+    );
+}
 }

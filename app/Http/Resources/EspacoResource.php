@@ -10,12 +10,12 @@ class EspacoResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'pk_id_espaco' => $this->pk_id_espaco,
-            'descricao_espaco' => $this->descricao_espaco,
-            'nome_espaco' => $this->nome_espaco,
-            'autorizacao' => $this->autorizacao,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at
+            'id' => $this->pk_id_espaco,
+            'descricao' => $this->descricao_espaco,
+            'nome' => $this->nome_espaco,
+            'disponivel' => $this->autorizacao,
+            'criado_em' => $this->created_at,
+            'atualizado_em' => $this->updated_at,
         ];
     }
 }

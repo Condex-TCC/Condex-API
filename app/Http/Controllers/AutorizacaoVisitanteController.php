@@ -15,66 +15,67 @@ class AutorizacaoVisitanteController extends Controller
 
 
     
-    // MORADOR AUTORIZA UM VISITANTE
-    public function authorizeVisitor(Request $request)
-    {
-        // Pegando o morador que está logado
-        $morador = $request->user();
+// MORADOR AUTORIZA UM VISITANTE
+public function authorizeVisitor(Request $request)
+{
+    // Pegando o morador que está logado
+    $morador = $request->user();
 
-        // Validando os dados enviados
-        $validator = Validator::make($request->all(), [
-            "fk_id_visitante" => "required|exists:visitantes,pk_id_visitante"
-        ]);
+    // Validando os dados enviados
+    $validator = Validator::make($request->all(), [
+        "visitante" => "required|exists:visitantes,pk_id_visitante"
+    ]);
 
-        // Caso a validação falhe
-        if ($validator->fails()) {
+    // Caso a validação falhe
+    if ($validator->fails()) {
 
-            return $this->errorJson(
-                "Os dados passados não estão corretos!",
-                400,
-                [
-                    $validator->errors()
-                ]
-            );
-        }
-
-        // Verificando se esse visitante já possui uma autorização ativa
-        $autorizacaoExistente = AutorizacaoVisitante::where(
-            "fk_id_visitante",
-            $request->input("fk_id_visitante")
-        )
-        ->whereIn("status", [
-            "autorizado",
-            "entrada_realizada"
-        ])
-        ->first();
-
-        // Se já existir uma autorização ativa
-        if ($autorizacaoExistente) {
-
-            return $this->errorJson(
-                "Esse visitante já possui uma autorização ativa!",
-                400
-            );
-        }
-
-        // Criando a autorização
-        $autorizacao = AutorizacaoVisitante::create([
-            "fk_id_visitante" => $request->input("fk_id_visitante"),
-            "fk_id_morador" => $morador->pk_id_morador,
-            "status" => "autorizado",
-            "data_autorizacao" => now()
-        ]);
-
-        // Retornando a autorização criada
-        return $this->responseJson(
-            "Visitante autorizado com sucesso!",
-            201,
+        return $this->errorJson(
+            "Os dados passados não estão corretos!",
+            400,
             [
-                new AutorizacaoResources($autorizacao)
+                $validator->errors()
             ]
         );
     }
+
+    // Verificando se esse visitante já possui uma autorização ativa
+    $autorizacaoExistente = AutorizacaoVisitante::where(
+        "fk_id_visitante",
+        $request->input("visitante")
+    )
+    ->whereIn("status", [
+        "autorizado",
+        "entrada_realizada"
+    ])
+    ->first();
+
+    // Se já existir uma autorização ativa
+    if ($autorizacaoExistente) {
+
+        return $this->errorJson(
+            "Esse visitante já possui uma autorização ativa!",
+            400
+        );
+    }
+
+    // Criando a autorização
+    $autorizacao = AutorizacaoVisitante::create([
+        "fk_id_visitante" => $request->input("visitante"),
+        "fk_id_morador" => $morador->pk_id_morador,
+        "status" => "autorizado",
+        "data_autorizacao" => now()
+    ]);
+
+    // Retornando a autorização criada
+    return $this->responseJson(
+        "Visitante autorizado com sucesso!",
+        201,
+        [
+            new AutorizacaoResources($autorizacao)
+        ]
+    );
+}
+
 
 
     

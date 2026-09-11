@@ -12,7 +12,7 @@ class ReacaoResources extends JsonResource
         return [
             'id' => $this->pk_id_reacao,
 
-            'tipo_reacao' => $this->tipo_reacao,
+            'tipo' => $this->tipo_reacao,
 
             'morador' => $this->morador
                 ? [

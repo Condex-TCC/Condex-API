@@ -7,9 +7,12 @@ use App\Models\Reserva;
 use App\Models\Espaco;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\HttpResposta;
 
 class ReservaController extends Controller
 {
+    use HttpResposta;
+
     // Retorna todas as reservas do morador logado
     public function index(Request $request)
     {
@@ -19,11 +22,15 @@ class ReservaController extends Controller
             ->where('fk_id_morador', $morador->pk_id_morador)
             ->get();
 
-        return ReservaResource::collection($reservas);
+        return $this->responseJson(
+            'Reservas encontradas com sucesso.',
+            200,
+            ReservaResource::collection($reservas)->resolve()
+        );
     }
 
     // Retorna uma reserva específica do morador logado
-    public function show(Request $request, $id)
+    public function show(Request $request, string $id)
     {
         $morador = $request->user();
 
@@ -33,76 +40,81 @@ class ReservaController extends Controller
             ->first();
 
         if (!$reserva) {
-            return response()->json([
-                'message' => 'Reserva não encontrada.'
-            ], 404);
+            return $this->errorJson(
+                'Reserva não encontrada.',
+                404
+            );
         }
 
-        return new ReservaResource($reserva);
+        return $this->responseJson(
+            'Reserva encontrada com sucesso.',
+            200,
+            (new ReservaResource($reserva))->resolve()
+        );
     }
 
-    // Morador solicita uma nova reserva
+    // Cria uma nova reserva
     public function store(Request $request)
     {
+        $morador = $request->user();
+
         $validator = Validator::make($request->all(), [
-            'fk_id_espaco' => 'required|exists:espacos,pk_id_espaco',
-            'data_reserva' => 'required|date',
-            'hora_inicio' => 'required|date_format:H:i',
-            'hora_fim' => 'required|date_format:H:i|after:hora_inicio',
+            'espaco' => 'required|exists:espacos,pk_id_espaco',
+            'data' => 'required|date',
+            'inicio' => 'required|date_format:H:i',
+            'fim' => 'required|date_format:H:i|after:inicio',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Erro de validação.',
-                'errors' => $validator->errors()
-            ], 422);
+            return $this->errorJson(
+                'Erro de validação.',
+                422,
+                $validator->errors()->toArray()
+            );
         }
 
-        $espaco = Espaco::find($request->fk_id_espaco);
+        $espaco = Espaco::find($request->espaco);
 
-        if (!$espaco->autorizacao) {
-            return response()->json([
-                'message' => 'Este espaço não está disponível para reservas.'
-            ], 400);
+        if (!$espaco || !$espaco->autorizacao) {
+            return $this->errorJson(
+                'Este espaço não está disponível para reservas.',
+                400
+            );
         }
 
-        // Verifica se já existe uma reserva ou solicitação conflitante
-        $conflito = Reserva::where('fk_id_espaco', $request->fk_id_espaco)
-            ->where('data_reserva', $request->data_reserva)
-            ->where('status_reserva', '!=', 'cancelada')
+        $conflito = Reserva::where('fk_id_espaco', $request->espaco)
+            ->where('data_reserva', $request->data)
             ->where(function ($query) use ($request) {
-                $query->where('hora_inicio', '<', $request->hora_fim)
-                    ->where('hora_fim', '>', $request->hora_inicio);
+                $query->where('hora_inicio', '<', $request->fim)
+                    ->where('hora_fim', '>', $request->inicio);
             })
             ->exists();
 
         if ($conflito) {
-            return response()->json([
-                'message' => 'Este espaço já possui uma reserva ou solicitação para esse período.'
-            ], 409);
+            return $this->errorJson(
+                'Este espaço já está reservado neste horário.',
+                400
+            );
         }
-
-        $morador = $request->user();
 
         $reserva = Reserva::create([
             'fk_id_morador' => $morador->pk_id_morador,
-            'fk_id_espaco' => $request->fk_id_espaco,
-            'data_reserva' => $request->data_reserva,
-            'hora_inicio' => $request->hora_inicio,
-            'hora_fim' => $request->hora_fim,
+            'fk_id_espaco' => $request->espaco,
+            'data_reserva' => $request->data,
+            'hora_inicio' => $request->inicio,
+            'hora_fim' => $request->fim,
             'status_reserva' => 'pendente',
         ]);
 
-        $reserva->load('espaco');
-
-        return response()->json([
-            'message' => 'Solicitação de reserva realizada com sucesso.',
-            'data' => new ReservaResource($reserva)
-        ], 201);
+        return $this->responseJson(
+            'Reserva solicitada com sucesso.',
+            201,
+            (new ReservaResource($reserva->load('espaco')))->resolve()
+        );
     }
 
-    // Atualiza uma reserva do morador
-    public function update(Request $request, $id)
+    // Atualiza uma reserva
+    public function update(Request $request, string $id)
     {
         $morador = $request->user();
 
@@ -111,72 +123,64 @@ class ReservaController extends Controller
             ->first();
 
         if (!$reserva) {
-            return response()->json([
-                'message' => 'Reserva não encontrada.'
-            ], 404);
-        }
-
-        if ($reserva->status_reserva === 'cancelada') {
-            return response()->json([
-                'message' => 'Não é possível alterar uma reserva cancelada.'
-            ], 400);
+            return $this->errorJson(
+                'Reserva não encontrada.',
+                404
+            );
         }
 
         $validator = Validator::make($request->all(), [
-            'fk_id_espaco' => 'sometimes|exists:espacos,pk_id_espaco',
-            'data_reserva' => 'sometimes|date',
-            'hora_inicio' => 'sometimes|date_format:H:i',
-            'hora_fim' => 'sometimes|date_format:H:i',
+            'espaco' => 'sometimes|exists:espacos,pk_id_espaco',
+            'data' => 'sometimes|date',
+            'inicio' => 'sometimes|date_format:H:i',
+            'fim' => 'sometimes|date_format:H:i',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Erro de validação.',
-                'errors' => $validator->errors()
-            ], 422);
+            return $this->errorJson(
+                'Erro de validação.',
+                422,
+                $validator->errors()->toArray()
+            );
         }
 
-        $espaco = $request->fk_id_espaco ?? $reserva->fk_id_espaco;
-        $data = $request->data_reserva ?? $reserva->data_reserva;
-        $inicio = $request->hora_inicio ?? $reserva->hora_inicio;
-        $fim = $request->hora_fim ?? $reserva->hora_fim;
-
-        if ($fim <= $inicio) {
-            return response()->json([
-                'message' => 'O horário final deve ser posterior ao horário inicial.'
-            ], 422);
-        }
+        $espaco = $request->espaco ?? $reserva->fk_id_espaco;
+        $data = $request->data ?? $reserva->data_reserva;
+        $horaInicio = $request->inicio ?? $reserva->hora_inicio;
+        $horaFim = $request->fim ?? $reserva->hora_fim;
 
         $conflito = Reserva::where('fk_id_espaco', $espaco)
             ->where('data_reserva', $data)
-            ->where('status_reserva', '!=', 'cancelada')
             ->where('pk_id_reserva', '!=', $reserva->pk_id_reserva)
-            ->where(function ($query) use ($inicio, $fim) {
-                $query->where('hora_inicio', '<', $fim)
-                    ->where('hora_fim', '>', $inicio);
+            ->where(function ($query) use ($horaInicio, $horaFim) {
+                $query->where('hora_inicio', '<', $horaFim)
+                    ->where('hora_fim', '>', $horaInicio);
             })
             ->exists();
 
         if ($conflito) {
-            return response()->json([
-                'message' => 'Este espaço já possui uma reserva ou solicitação para esse período.'
-            ], 409);
+            return $this->errorJson(
+                'Este espaço já está reservado neste horário.',
+                400
+            );
         }
 
         $reserva->update([
             'fk_id_espaco' => $espaco,
             'data_reserva' => $data,
-            'hora_inicio' => $inicio,
-            'hora_fim' => $fim,
+            'hora_inicio' => $horaInicio,
+            'hora_fim' => $horaFim,
         ]);
 
-        $reserva->load('espaco');
-
-        return new ReservaResource($reserva);
+        return $this->responseJson(
+            'Reserva atualizada com sucesso.',
+            200,
+            (new ReservaResource($reserva->load('espaco')))->resolve()
+        );
     }
 
-    // Cancela uma reserva
-    public function destroy(Request $request, $id)
+    // Remove uma reserva
+    public function destroy(Request $request, string $id)
     {
         $morador = $request->user();
 
@@ -185,17 +189,17 @@ class ReservaController extends Controller
             ->first();
 
         if (!$reserva) {
-            return response()->json([
-                'message' => 'Reserva não encontrada.'
-            ], 404);
+            return $this->errorJson(
+                'Reserva não encontrada.',
+                404
+            );
         }
 
-        $reserva->update([
-            'status_reserva' => 'cancelada'
-        ]);
+        $reserva->delete();
 
-        return response()->json([
-            'message' => 'Reserva cancelada com sucesso.'
-        ]);
+        return $this->responseJson(
+            'Reserva excluída com sucesso.',
+            200
+        );
     }
 }

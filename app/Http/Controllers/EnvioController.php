@@ -53,7 +53,7 @@ class EnvioController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'descricao_contra_resposta' => 'required|string|max:255',
+                'descricao' => 'required|string|max:255',
             ]
         );
 
@@ -83,7 +83,7 @@ class EnvioController extends Controller
 
         // Criando a contra-resposta
         $contraResposta = ContraResposta::create([
-            'descricao_contra_resposta' => $request->input('descricao_contra_resposta'),
+            'descricao_contra_resposta' => $request->input('descricao'),
         ]);
 
         // Atualizando o envio com a contra-resposta
@@ -122,7 +122,7 @@ public function respond(Request $request, string $id)
     $validator = Validator::make(
         $request->all(),
         [
-            'descricao_resposta' => 'required|string|max:255',
+            'descricao' => 'required|string|max:255',
         ]
     );
 
@@ -175,7 +175,7 @@ public function respond(Request $request, string $id)
     // Criando a resposta
     $resposta = Resposta::create([
         'fk_id_morador' => $morador->pk_id_morador,
-        'descricao_resposta' => $request->input('descricao_resposta'),
+        'descricao_resposta' => $request->input('descricao'),
     ]);
 
     // Criando o envio da resposta para o comunicado

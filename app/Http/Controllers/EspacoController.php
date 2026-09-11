@@ -6,15 +6,22 @@ use App\Http\Resources\EspacoResource;
 use App\Models\Espaco;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\HttpResposta;
 
 class EspacoController extends Controller
 {
+    use HttpResposta;
+
     // Retorna todos os espaços
     public function index()
     {
         $espacos = Espaco::all();
 
-        return EspacoResource::collection($espacos);
+        return $this->responseJson(
+            'Espaços encontrados com sucesso.',
+            200,
+            EspacoResource::collection($espacos)->resolve()
+        );
     }
 
     // Retorna um espaço específico
@@ -23,37 +30,49 @@ class EspacoController extends Controller
         $espaco = Espaco::find($id);
 
         if (!$espaco) {
-            return response()->json([
-                'message' => 'Espaço não encontrado.'
-            ], 404);
+            return $this->errorJson(
+                'Espaço não encontrado.',
+                404
+            );
         }
 
-        return new EspacoResource($espaco);
+        return $this->responseJson(
+            'Espaço encontrado com sucesso.',
+            200,
+            (new EspacoResource($espaco))->resolve()
+        );
     }
 
     // Cadastra um novo espaço
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'descricao_espaco' => 'required|string',
-            'nome_espaco' => 'required|string|max:255',
-            'autorizacao' => 'required|boolean'
+            'descricao' => 'required|string',
+            'nome' => 'required|string|max:255',
+            'disponivel' => 'required|boolean',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Erro de validação.',
-                'errors' => $validator->errors()
-            ], 422);
+            return $this->errorJson(
+                'Erro de validação.',
+                422,
+                $validator->errors()->toArray()
+            );
         }
 
-        $espaco = Espaco::create([
-            'descricao_espaco' => $request->descricao_espaco,
-            'nome_espaco' => $request->nome_espaco,
-            'autorizacao' => $request->autorizacao
-        ]);
+        $dadosMapeados = [
+            'descricao_espaco' => $request->input('descricao'),
+            'nome_espaco' => $request->input('nome'),
+            'autorizacao' => $request->input('disponivel'),
+        ];
 
-        return new EspacoResource($espaco);
+        $espaco = Espaco::create($dadosMapeados);
+
+        return $this->responseJson(
+            'Espaço cadastrado com sucesso.',
+            201,
+            (new EspacoResource($espaco))->resolve()
+        );
     }
 
     // Atualiza um espaço
@@ -62,31 +81,47 @@ class EspacoController extends Controller
         $espaco = Espaco::find($id);
 
         if (!$espaco) {
-            return response()->json([
-                'message' => 'Espaço não encontrado.'
-            ], 404);
+            return $this->errorJson(
+                'Espaço não encontrado.',
+                404
+            );
         }
 
         $validator = Validator::make($request->all(), [
-            'descricao_espaco' => 'sometimes|string',
-            'nome_espaco' => 'sometimes|string|max:255',
-            'autorizacao' => 'sometimes|boolean'
+            'descricao' => 'sometimes|string',
+            'nome' => 'sometimes|string|max:255',
+            'disponivel' => 'sometimes|boolean',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Erro de validação.',
-                'errors' => $validator->errors()
-            ], 422);
+            return $this->errorJson(
+                'Erro de validação.',
+                422,
+                $validator->errors()->toArray()
+            );
         }
 
-        $espaco->update($request->only([
-            'descricao_espaco',
-            'nome_espaco',
-            'autorizacao'
-        ]));
+        $dadosMapeados = [];
 
-        return new EspacoResource($espaco);
+        if ($request->has('descricao')) {
+            $dadosMapeados['descricao_espaco'] = $request->input('descricao');
+        }
+
+        if ($request->has('nome')) {
+            $dadosMapeados['nome_espaco'] = $request->input('nome');
+        }
+
+        if ($request->has('disponivel')) {
+            $dadosMapeados['autorizacao'] = $request->input('disponivel');
+        }
+
+        $espaco->update($dadosMapeados);
+
+        return $this->responseJson(
+            'Espaço atualizado com sucesso.',
+            200,
+            (new EspacoResource($espaco))->resolve()
+        );
     }
 
     // Exclui um espaço
@@ -95,15 +130,17 @@ class EspacoController extends Controller
         $espaco = Espaco::find($id);
 
         if (!$espaco) {
-            return response()->json([
-                'message' => 'Espaço não encontrado.'
-            ], 404);
+            return $this->errorJson(
+                'Espaço não encontrado.',
+                404
+            );
         }
 
         $espaco->delete();
 
-        return response()->json([
-            'message' => 'Espaço excluído com sucesso.'
-        ]);
+        return $this->responseJson(
+            'Espaço excluído com sucesso.',
+            200
+        );
     }
 }

@@ -42,7 +42,7 @@ class MoradorController extends Controller
             "email_morador" => $request->input("email"), //Pegando o email
             "telefone_morador" => $request->input("telefone"), //Pegando o telefone
             "senha_morador" => Hash::make($request->input("password")), //Pegando a senha e transformando-a em hash
-            "fk_id_unidade_morador" => $request->input("id_unidade"), //Pegando o id da unidade
+            "fk_id_unidade_morador" => $request->input("unidade"), //Pegando o id da unidade
         ];
 
         //Validando o array mapeado
@@ -114,7 +114,7 @@ class MoradorController extends Controller
             "email_morador" => $request->input("email"), //Pegando o email
             "telefone_morador" => $request->input("telefone"), //Pegando o telefone
             // "senha_morador" => Hash::make($request->input("password")), //Pegando a senha e transformando-a em hash
-            "fk_id_unidade_morador" => $request->input("id_unidade"), //Pegando o id da unidade
+            "fk_id_unidade_morador" => $request->input("unidade"), //Pegando o id da unidade
         ];
 
         // Regras de validação base

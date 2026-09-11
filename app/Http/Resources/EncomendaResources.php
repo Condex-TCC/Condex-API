@@ -18,7 +18,7 @@ class EncomendaResources extends JsonResource
             "nome" => $this->nome_encomenda,
             "descricao" => $this->descricao_encomenda,
             "porteiro" => $this->fk_id_porteiro_encomenda,
-            "data_retirada" => $this->data_retirada,
+            "data" => $this->data_retirada,
         ];
     }
 }

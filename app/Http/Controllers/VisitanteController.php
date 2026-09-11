@@ -39,7 +39,7 @@ class VisitanteController extends Controller
         $validator = Validator::make($request->all(), [
             'nome' => 'required|string|max:100',
             'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante',
-            'fk_morador' => 'required|integer',
+            'morador' => 'required|integer',
         ]);
 
         // Caso os dados não passem na validação
@@ -57,7 +57,7 @@ class VisitanteController extends Controller
         $dadosMapeados = [
             'nome_visitante' => $request->input('nome'),
             'cpf_visitante' => $request->input('cpf'),
-            'fk_morador' => $request->input('fk_morador'),
+            'fk_morador' => $request->input('morador'),
             'fk_funcionario' => $idPorteiro,
         ];
 
@@ -146,7 +146,7 @@ public function storeMorador(Request $request)
         $validator = Validator::make($request->all(), [
             'nome' => 'required|string|max:100',
             'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante,' . $id . ',pk_id_visitante',
-            'fk_morador' => 'required|integer',
+            'morador' => 'required|integer',
         ]);
 
         // Caso os dados não passem na validação
@@ -164,7 +164,7 @@ public function storeMorador(Request $request)
         $dadosMapeados = [
             'nome_visitante' => $request->input('nome'),
             'cpf_visitante' => $request->input('cpf'),
-            'fk_morador' => $request->input('fk_morador'),
+            'fk_morador' => $request->input('morador'),
         ];
 
         // Atualizando o visitante

@@ -6,15 +6,23 @@ use App\Models\Sindico;
 use App\Http\Resources\SindicoResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use App\HttpResposta;
 
 class SindicoController extends Controller
 {
+    use HttpResposta;
+
     // Recupera todos os síndicos
     public function index()
     {
         $sindicos = Sindico::all();
 
-        return SindicoResource::collection($sindicos);
+        return $this->responseJson(
+            'Síndicos encontrados com sucesso.',
+            200,
+            SindicoResource::collection($sindicos)->resolve()
+        );
     }
 
     // Recupera um síndico específico
@@ -23,32 +31,49 @@ class SindicoController extends Controller
         $sindico = Sindico::find($id);
 
         if (!$sindico) {
-            return response()->json([
-                "message" => "Síndico não encontrado."
-            ], 404);
+            return $this->errorJson(
+                'Síndico não encontrado.',
+                404
+            );
         }
 
-        return new SindicoResource($sindico);
+        return $this->responseJson(
+            'Síndico encontrado com sucesso.',
+            200,
+            (new SindicoResource($sindico))->resolve()
+        );
     }
 
     // Cria um novo síndico
     public function store(Request $request)
     {
-        $request->validate([
-            "nome_sindico" => "required|string|max:150",
-            "telefone_sindico" => "required|string|max:20",
-            "email_sindico" => "required|email|max:200|unique:sindicos,email_sindico",
-            "senha_sindico" => "required|string|min:6"
+        $validator = Validator::make($request->all(), [
+            "nome" => "required|string|max:150",
+            "telefone" => "required|string|max:20",
+            "email" => "required|email|max:200|unique:sindicos,email_sindico",
+            "senha" => "required|string|min:6"
         ]);
+
+        if ($validator->fails()) {
+            return $this->errorJson(
+                'Erro de validação.',
+                422,
+                $validator->errors()->toArray()
+            );
+        }
 
         $sindico = Sindico::create([
-            "nome_sindico" => $request->nome_sindico,
-            "telefone_sindico" => $request->telefone_sindico,
-            "email_sindico" => $request->email_sindico,
-            "senha_sindico" => Hash::make($request->senha_sindico)
+            "nome_sindico" => $request->input("nome"),
+            "telefone_sindico" => $request->input("telefone"),
+            "email_sindico" => $request->input("email"),
+            "senha_sindico" => Hash::make($request->input("senha"))
         ]);
 
-        return new SindicoResource($sindico);
+        return $this->responseJson(
+            'Síndico cadastrado com sucesso.',
+            201,
+            (new SindicoResource($sindico))->resolve()
+        );
     }
 
     // Atualiza um síndico
@@ -57,37 +82,50 @@ class SindicoController extends Controller
         $sindico = Sindico::find($id);
 
         if (!$sindico) {
-            return response()->json([
-                "message" => "Síndico não encontrado."
-            ], 404);
+            return $this->errorJson(
+                'Síndico não encontrado.',
+                404
+            );
         }
 
-        $request->validate([
-            "nome_sindico" => "sometimes|string|max:150",
-            "telefone_sindico" => "sometimes|string|max:20",
-            "email_sindico" => "sometimes|email|max:200|unique:sindicos,email_sindico," . $id . ",pk_id_sindico",
-            "senha_sindico" => "sometimes|string|min:6"
+        $validator = Validator::make($request->all(), [
+            "nome" => "sometimes|string|max:150",
+            "telefone" => "sometimes|string|max:20",
+            "email" => "sometimes|email|max:200|unique:sindicos,email_sindico," . $id . ",pk_id_sindico",
+            "senha" => "sometimes|string|min:6"
         ]);
 
-        if ($request->has("nome_sindico")) {
-            $sindico->nome_sindico = $request->nome_sindico;
+        if ($validator->fails()) {
+            return $this->errorJson(
+                'Erro de validação.',
+                422,
+                $validator->errors()->toArray()
+            );
         }
 
-        if ($request->has("telefone_sindico")) {
-            $sindico->telefone_sindico = $request->telefone_sindico;
+        if ($request->has("nome")) {
+            $sindico->nome_sindico = $request->input("nome");
         }
 
-        if ($request->has("email_sindico")) {
-            $sindico->email_sindico = $request->email_sindico;
+        if ($request->has("telefone")) {
+            $sindico->telefone_sindico = $request->input("telefone");
         }
 
-        if ($request->has("senha_sindico")) {
-            $sindico->senha_sindico = Hash::make($request->senha_sindico);
+        if ($request->has("email")) {
+            $sindico->email_sindico = $request->input("email");
+        }
+
+        if ($request->has("senha")) {
+            $sindico->senha_sindico = Hash::make($request->input("senha"));
         }
 
         $sindico->save();
 
-        return new SindicoResource($sindico);
+        return $this->responseJson(
+            'Síndico atualizado com sucesso.',
+            200,
+            (new SindicoResource($sindico))->resolve()
+        );
     }
 
     // Deleta um síndico
@@ -96,15 +134,17 @@ class SindicoController extends Controller
         $sindico = Sindico::find($id);
 
         if (!$sindico) {
-            return response()->json([
-                "message" => "Síndico não encontrado."
-            ], 404);
+            return $this->errorJson(
+                'Síndico não encontrado.',
+                404
+            );
         }
 
         $sindico->delete();
 
-        return response()->json([
-            "message" => "Síndico deletado com sucesso."
-        ]);
+        return $this->responseJson(
+            'Síndico deletado com sucesso.',
+            200
+        );
     }
 }

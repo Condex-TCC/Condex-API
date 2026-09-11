@@ -27,12 +27,12 @@ class AutorizacaoResources extends JsonResource
             ],
 
             "status" => $this->status,
-            "data_autorizacao" => $this->data_autorizacao,
-            "entrada_em" => $this->entrada_em,
-            "saida_em" => $this->saida_em,
+            "data" => $this->data_autorizacao,
+            "entrada" => $this->entrada_em,
+            "saida" => $this->saida_em,
 
-            "created_at" => $this->created_at,
-            "updated_at" => $this->updated_at,
+            "criado_em" => $this->created_at,
+            "atualizado_em" => $this->updated_at,
         ];
     }
 }
