@@ -13,7 +13,7 @@ class EspacoResource extends JsonResource
             'id' => $this->pk_id_espaco,
             'descricao' => $this->descricao_espaco,
             'nome' => $this->nome_espaco,
-            'disponivel' => $this->autorizacao,
+            'autorizacao' => $this->autorizacao,
             'criado_em' => $this->created_at,
             'atualizado_em' => $this->updated_at,
         ];
