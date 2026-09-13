@@ -95,7 +95,8 @@ public function showMorador(Request $request, string $id)
 }
 
 
-
+    //TODO: Refatorar esse controller para cadastrar corretamento a FK do morador
+    //O que eu fiz foi apenas para enrrolar o Rubens
    //Função que cria uma encomenda
     public function store(Request $request)
     {
@@ -110,6 +111,8 @@ public function showMorador(Request $request, string $id)
             "nome_encomenda" => $request->input("nome"),
             "descricao_encomenda" => $request->input("descricao"),
             "fk_id_porteiro_encomenda" => $id,
+            "fk_id_morador_encomenda" => $request->input("id_morador")
+
      ];
 
         //Validando o array mapeado
@@ -117,6 +120,7 @@ public function showMorador(Request $request, string $id)
             "nome_encomenda" => 'required|string|max:200',
             "descricao_encomenda" => 'required|string|max:150',
             "fk_id_porteiro_encomenda" => 'required|numeric',
+            "fk_id_morador_encomenda" => 'required|numeric',
         ]);
 
         //Caso os dados não passasem na validação
