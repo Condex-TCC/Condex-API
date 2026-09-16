@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Comunicado;
 use App\Models\Envio;
-use App\Models\Resposta;
+use App\Models\Morador;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class EnvioFactory extends Factory
@@ -18,9 +18,11 @@ class EnvioFactory extends Factory
                 ->first()
                 ->pk_id_comunicados,
 
-            'fk_id_resposta' => Resposta::inRandomOrder()
+            'fk_id_morador' => Morador::inRandomOrder()
                 ->first()
-                ->pk_id_resposta,
+                ->pk_id_morador,
+
+            'fk_id_resposta' => null,
 
             'fk_id_contra_resposta' => null,
         ];

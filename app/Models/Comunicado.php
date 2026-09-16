@@ -26,4 +26,13 @@ class Comunicado extends Model
             'pk_id_sindico'
         );
     }
+
+    public function envios()
+    {
+        return $this->hasMany(
+            Envio::class,
+            'fk_id_comunicados',
+            'pk_id_comunicados'
+        );
+    }
 }

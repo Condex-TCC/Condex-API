@@ -15,6 +15,7 @@ class Envio extends Model
 
     protected $fillable = [
         'fk_id_comunicados',
+        'fk_id_morador',
         'fk_id_resposta',
         'fk_id_contra_resposta',
     ];
@@ -25,6 +26,15 @@ class Envio extends Model
             Comunicado::class,
             'fk_id_comunicados',
             'pk_id_comunicados'
+        );
+    }
+
+    public function morador()
+    {
+        return $this->belongsTo(
+            Morador::class,
+            'fk_id_morador',
+            'pk_id_morador'
         );
     }
 

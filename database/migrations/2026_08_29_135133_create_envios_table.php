@@ -14,7 +14,10 @@ return new class extends Migration
 
             $table->unsignedBigInteger('fk_id_comunicados');
 
-            $table->unsignedBigInteger('fk_id_resposta');
+            $table->unsignedBigInteger('fk_id_morador');
+
+            $table->unsignedBigInteger('fk_id_resposta')
+                ->nullable();
 
             $table->unsignedBigInteger('fk_id_contra_resposta')
                 ->nullable();
@@ -22,6 +25,11 @@ return new class extends Migration
             $table->foreign('fk_id_comunicados')
                 ->references('pk_id_comunicados')
                 ->on('comunicados')
+                ->onDelete('cascade');
+
+            $table->foreign('fk_id_morador')
+                ->references('pk_id_morador')
+                ->on('moradors')
                 ->onDelete('cascade');
 
             $table->foreign('fk_id_resposta')

@@ -6,6 +6,8 @@ use App\Http\Resources\ComunicadoResources;
 use Illuminate\Http\Request;
 use App\HttpResposta;
 use App\Models\Comunicado;
+use App\Models\Envio;
+use App\Models\Morador;
 use Illuminate\Support\Facades\Validator;
 
 class ComunicadoController extends Controller
@@ -58,22 +60,16 @@ class ComunicadoController extends Controller
 
 
     // =========================================================
-    // CADASTRAR UM COMUNICADO
-    // =========================================================
+// CADASTRAR UM COMUNICADO
+// =========================================================
 
-    public function store(Request $request)
+public function store(Request $request)
 {
     // Pegando o síndico logado através do Sanctum
     $sindico = $request->user();
 
     // Pegando o ID do síndico
     $idSindico = $sindico->pk_id_sindico;
-
-    // Mapeando os dados recebidos para os campos do banco
-    $dadosMapeados = [
-        "descricao_comunicado" => $request->input("descricao"),
-        "fk_id_sindico_comunicados" => $idSindico,
-    ];
 
     // Validando os dados recebidos pela API
     $validator = Validator::make($request->all(), [
@@ -91,13 +87,33 @@ class ComunicadoController extends Controller
         );
     }
 
+    // Mapeando os dados recebidos para os campos do banco
+    $dadosMapeados = [
+        "descricao_comunicado" => $request->input("descricao"),
+        "fk_id_sindico_comunicados" => $idSindico,
+    ];
+
     // Criando o comunicado
     $novoComunicado = Comunicado::create($dadosMapeados);
 
+    // Buscando todos os moradores
+    $moradores = Morador::all();
+
+    // Criando um envio para cada morador
+    foreach ($moradores as $morador) {
+
+        Envio::create([
+            "fk_id_comunicados" => $novoComunicado->pk_id_comunicados,
+            "fk_id_morador" => $morador->pk_id_morador,
+            "fk_id_resposta" => null,
+            "fk_id_contra_resposta" => null,
+        ]);
+    }
+
     // Retornando o comunicado criado
     return $this->responseJson(
-        "Comunicado criado com sucesso!",
-        200,
+        "Comunicado criado e enviado aos moradores com sucesso!",
+        201,
         [
             new ComunicadoResources($novoComunicado)
         ]

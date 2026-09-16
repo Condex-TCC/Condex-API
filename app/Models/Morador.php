@@ -3,27 +3,27 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
-//Classe responsavel por criar os objetos do meu programa
-//Os atributos dessa classe são os campos do banco de dados
+// Classe responsável por criar os objetos do meu programa
+// Os atributos dessa classe são os campos do banco de dados
 
-//Essa classa herda de Authenticatable, porque a classe que herda apenas o model, interaje apenas com
-//o banco de dados, já a classe herda Authenticatable pode trabalhar com autenticação
+// Essa classe herda de Authenticatable, porque a classe que herda apenas o model,
+// interage apenas com o banco de dados, já a classe que herda Authenticatable
+// pode trabalhar com autenticação
 class Morador extends Authenticatable
 {
-    //Permite gerar dados falsos, e gerar dados tokens para as APIs
+    // Permite gerar dados falsos e gerar dados de tokens para as APIs
     use HasFactory, HasApiTokens;
 
-    //Associando uma tabela ao model
+    // Associando uma tabela ao model
     protected $table = "moradors";
 
-    //Define uma chave primário personalizada
+    // Define uma chave primária personalizada
     protected $primaryKey = 'pk_id_morador';
 
-    //Mostra qual campos podem ser preenchidos em massa
+    // Mostra quais campos podem ser preenchidos em massa
     protected $fillable = [
         "nome_morador",
         "cpf_morador",
@@ -34,28 +34,43 @@ class Morador extends Authenticatable
     ];
 
     /**
-     * Sobrescreve o método padrão do Laravel para indicar 
-     * que a coluna de senha na base de dados é 'senha_sindico',
-     * permtino assim que na autenticação o laravel utiize esse campo para validar a senha
+     * Sobrescreve o método padrão do Laravel para indicar
+     * que a coluna de senha na base de dados é 'senha_morador',
+     * permitindo assim que na autenticação o Laravel utilize
+     * esse campo para validar a senha.
      */
     public function getAuthPassword()
     {
-        //Na autenticação se chama esse campo
         return $this->senha_morador;
     }
 
-    //Adicionando aos relacionanementos
-    
-    //Função que repesenta a relacioanamento da tabela Morador com unidade
-    public function unidade(){
-        
-        //Retorna um objeto do model Unidade | Passagem do campo de chave estrangeira personalizada
-        return $this->belongsTo(Unidade::class, "fk_id_unidade_morador");
+    // Adicionando aos relacionamentos
+
+    // Relacionamento da tabela Morador com Unidade
+    public function unidade()
+    {
+        return $this->belongsTo(
+            Unidade::class,
+            "fk_id_unidade_morador"
+        );
     }
 
-    public function reservas(){
+    // Relacionamento da tabela Morador com Reserva
+    public function reservas()
+    {
+        return $this->hasMany(
+            Reserva::class,
+            'fk_id_morador'
+        );
+    }
 
-    return $this->hasMany(Reserva::class, 'fk_id_morador');
-    
+    // Relacionamento da tabela Morador com Envio
+    public function envios()
+    {
+        return $this->hasMany(
+            Envio::class,
+            'fk_id_morador',
+            'pk_id_morador'
+        );
     }
 }

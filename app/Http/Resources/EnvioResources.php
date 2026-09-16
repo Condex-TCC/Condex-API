@@ -12,6 +12,13 @@ class EnvioResources extends JsonResource
         return [
             'id' => $this->pk_id_envio,
 
+            'morador' => $this->morador
+                ? [
+                    'id' => $this->morador->pk_id_morador,
+                    'nome' => $this->morador->nome_morador,
+                ]
+                : null,
+
             'comunicado' => $this->comunicado
                 ? [
                     'id' => $this->comunicado->pk_id_comunicados,
@@ -23,13 +30,6 @@ class EnvioResources extends JsonResource
                 ? [
                     'id' => $this->resposta->pk_id_resposta,
                     'descricao' => $this->resposta->descricao_resposta,
-
-                    'morador' => $this->resposta->morador
-                        ? [
-                            'id' => $this->resposta->morador->pk_id_morador,
-                            'nome' => $this->resposta->morador->nome_morador,
-                        ]
-                        : null,
                 ]
                 : null,
 

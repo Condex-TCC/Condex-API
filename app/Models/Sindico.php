@@ -41,4 +41,12 @@ class Sindico extends Authenticatable
         //Na autenticação se chama esse campo
         return $this->senha_sindico;
     }
+
+    public function comunicados(){
+    return $this->hasMany(
+        Comunicado::class,
+        'fk_id_sindico_comunicados',
+        'pk_id_sindico'
+    );
+}
 }
