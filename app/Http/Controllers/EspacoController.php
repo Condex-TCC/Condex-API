@@ -49,7 +49,7 @@ class EspacoController extends Controller
         $validator = Validator::make($request->all(), [
             'descricao' => 'required|string',
             'nome' => 'required|string|max:255',
-            'disponivel' => 'required|boolean',
+            'autorizacao' => 'required|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -63,7 +63,7 @@ class EspacoController extends Controller
         $dadosMapeados = [
             'descricao_espaco' => $request->input('descricao'),
             'nome_espaco' => $request->input('nome'),
-            'autorizacao' => $request->input('disponivel'),
+            'autorizacao' => $request->input('autorizacao'),
         ];
 
         $espaco = Espaco::create($dadosMapeados);
@@ -90,7 +90,7 @@ class EspacoController extends Controller
         $validator = Validator::make($request->all(), [
             'descricao' => 'sometimes|string',
             'nome' => 'sometimes|string|max:255',
-            'disponivel' => 'sometimes|boolean',
+            'autorizacao' => 'sometimes|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -111,8 +111,8 @@ class EspacoController extends Controller
             $dadosMapeados['nome_espaco'] = $request->input('nome');
         }
 
-        if ($request->has('disponivel')) {
-            $dadosMapeados['autorizacao'] = $request->input('disponivel');
+        if ($request->has('autorizacao')) {
+            $dadosMapeados['autorizacao'] = $request->input('autorizacao');
         }
 
         $espaco->update($dadosMapeados);

@@ -23,6 +23,7 @@ class Encomenda extends Model
         "nome_encomenda",
         "descricao_encomenda",
         "fk_id_porteiro_encomenda",
+        'fk_id_morador_encomenda',
         "data_retirada"
     ];
 
