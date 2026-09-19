@@ -12,13 +12,13 @@ class VisitanteController extends Controller
 {
     use HttpResposta;
 
-    // Get all visitors
+    // Retorna todos os visitantes
     public function index()
     {
         $visitantes = Visitante::all();
 
         return $this->responseJson(
-            "Visitors retrieved successfully!",
+            "Visitantes recuperados com sucesso!",
             200,
             [
                 VisitanteResources::collection($visitantes)
@@ -26,26 +26,20 @@ class VisitanteController extends Controller
         );
     }
 
-    // Create a visitor
+    // Porteiro cadastra um visitante
     public function store(Request $request)
     {
-        // Pegando o porteiro logado através do token Sanctum
         $porteiro = $request->user();
 
-        // Pegando o ID do porteiro
-        $idPorteiro = $porteiro->pk_id_porteiro;
-
-        // Validando os dados enviados
         $validator = Validator::make($request->all(), [
             'nome' => 'required|string|max:100',
             'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante',
-            'morador' => 'required|integer',
+            'morador' => 'required|exists:moradors,pk_id_morador',
         ]);
 
-        // Caso os dados não passem na validação
         if ($validator->fails()) {
             return $this->errorJson(
-                "The provided data is invalid!",
+                "Os dados passados não estão corretos!",
                 400,
                 [
                     $validator->errors()
@@ -53,18 +47,15 @@ class VisitanteController extends Controller
             );
         }
 
-        // Mapeando os dados para os campos do banco
         $dadosMapeados = [
             'nome_visitante' => $request->input('nome'),
             'cpf_visitante' => $request->input('cpf'),
             'fk_morador' => $request->input('morador'),
-            'fk_funcionario' => $idPorteiro,
+            'fk_funcionario' => $porteiro->pk_id_porteiro,
         ];
 
-        // Criando o visitante
         $novoVisitante = Visitante::create($dadosMapeados);
 
-        // Retornando o visitante criado
         return $this->responseJson(
             "Visitante criado com sucesso!",
             201,
@@ -74,55 +65,45 @@ class VisitanteController extends Controller
         );
     }
 
-// Morador cadastra um visitante
-public function storeMorador(Request $request)
-{
-    // Pegando o morador logado através do token Sanctum
-    $morador = $request->user();
+    // Morador cadastra um visitante
+    public function storeMorador(Request $request)
+    {
+        $morador = $request->user();
 
-    // Pegando o ID do morador
-    $idMorador = $morador->pk_id_morador;
+        $validator = Validator::make($request->all(), [
+            'nome' => 'required|string|max:100',
+            'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante',
+        ]);
 
-    // Validando os dados enviados
-    $validator = Validator::make($request->all(), [
-        'nome' => 'required|string|max:100',
-        'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante',
-    ]);
+        if ($validator->fails()) {
+            return $this->errorJson(
+                "Os dados passados não estão corretos!",
+                400,
+                [
+                    $validator->errors()
+                ]
+            );
+        }
 
-    // Caso os dados não passem na validação
-    if ($validator->fails()) {
-        return $this->errorJson(
-            "The provided data is invalid!",
-            400,
+        $dadosMapeados = [
+            'nome_visitante' => $request->input('nome'),
+            'cpf_visitante' => $request->input('cpf'),
+            'fk_morador' => $morador->pk_id_morador,
+            'fk_funcionario' => null,
+        ];
+
+        $novoVisitante = Visitante::create($dadosMapeados);
+
+        return $this->responseJson(
+            "Visitante criado com sucesso!",
+            201,
             [
-                $validator->errors()
+                new VisitanteResources($novoVisitante)
             ]
         );
     }
 
-    // Mapeando os dados para os campos do banco
-    $dadosMapeados = [
-        'nome_visitante' => $request->input('nome'),
-        'cpf_visitante' => $request->input('cpf'),
-        'fk_morador' => $idMorador,
-        'fk_funcionario' => null,
-    ];
-
-    // Criando o visitante
-    $novoVisitante = Visitante::create($dadosMapeados);
-
-    // Retornando o visitante criado
-    return $this->responseJson(
-        "Visitante criado com sucesso!",
-        201,
-        [
-            new VisitanteResources($novoVisitante)
-        ]
-    );
-}
-
-
-    // Get a specific visitor
+    // Retorna um visitante específico
     public function show(string $id)
     {
         $visitante = Visitante::findOrFail($id);
@@ -136,23 +117,20 @@ public function storeMorador(Request $request)
         );
     }
 
-    // Update a visitor
+    // Atualiza um visitante
     public function update(Request $request, string $id)
     {
-        // Pegando o visitante
         $visitante = Visitante::findOrFail($id);
 
-        // Validando apenas os dados que podem ser alterados
         $validator = Validator::make($request->all(), [
             'nome' => 'required|string|max:100',
             'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante,' . $id . ',pk_id_visitante',
-            'morador' => 'required|integer',
+            'morador' => 'required|exists:moradors,pk_id_morador',
         ]);
 
-        // Caso os dados não passem na validação
         if ($validator->fails()) {
             return $this->errorJson(
-                "The provided data is invalid!",
+                "Os dados passados não estão corretos!",
                 400,
                 [
                     $validator->errors()
@@ -160,25 +138,21 @@ public function storeMorador(Request $request)
             );
         }
 
-        // Mapeando apenas os dados que podem ser atualizados
         $dadosMapeados = [
             'nome_visitante' => $request->input('nome'),
             'cpf_visitante' => $request->input('cpf'),
             'fk_morador' => $request->input('morador'),
         ];
 
-        // Atualizando o visitante
         $atualizado = $visitante->update($dadosMapeados);
 
-        // Caso não seja possível atualizar
         if (!$atualizado) {
             return $this->errorJson(
-                "Could not update the visitor.",
+                "Não foi possível atualizar o visitante.",
                 400
             );
         }
 
-        // Pegando o visitante atualizado
         $visitanteAtualizado = Visitante::findOrFail($id);
 
         return $this->responseJson(
@@ -190,7 +164,7 @@ public function storeMorador(Request $request)
         );
     }
 
-    // Delete a visitor
+    // Remove um visitante
     public function destroy(string $id)
     {
         $visitante = Visitante::findOrFail($id);
@@ -199,7 +173,7 @@ public function storeMorador(Request $request)
 
         if (!$deletado) {
             return $this->errorJson(
-                "Could not delete the visitor.",
+                "Não foi possível deletar o visitante.",
                 400
             );
         }

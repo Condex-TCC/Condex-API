@@ -12,23 +12,28 @@ use Illuminate\Support\Facades\Validator;
 
 class ComunicadoController extends Controller
 {
-    // Adiciona a trait com as respostas padrões para APIs
     use HttpResposta;
 
-
     // =========================================================
-    // VISUALIZAR TODOS OS COMUNICADOS
+    // MORADOR VISUALIZA OS COMUNICADOS ENVIADOS PARA ELE
     // =========================================================
 
-    public function index()
+    public function index(Request $request)
     {
-        // Pegando todos os comunicados do banco de dados
-        $comunicados = Comunicado::all();
+        // Recuperando o morador logado
+        $morador = $request->user();
 
-        // Aplicando o Resource para tratar o JSON
+        // Recuperando somente os comunicados enviados para o morador
+        $comunicados = Comunicado::whereHas('envios', function ($query) use ($morador) {
+            $query->where(
+                'fk_id_morador',
+                $morador->pk_id_morador
+            );
+        })->get();
+
+        // Tratando os dados com Resource
         $jsonTratado = ComunicadoResources::collection($comunicados);
 
-        // Retornando os comunicados
         return $this->responseJson(
             "Comunicados recuperados com sucesso!",
             200,
@@ -38,17 +43,38 @@ class ComunicadoController extends Controller
         );
     }
 
-
     // =========================================================
-    // VISUALIZAR UM COMUNICADO ESPECÍFICO
+    // MORADOR VISUALIZA UM COMUNICADO ESPECÍFICO
     // =========================================================
 
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
-        // Recuperando o comunicado pelo ID
-        $comunicado = Comunicado::findOrFail($id);
+        // Recuperando o morador logado
+        $morador = $request->user();
 
-        // Retornando o comunicado
+        // Recuperando o comunicado somente se ele foi enviado
+        // para o morador logado
+        $comunicado = Comunicado::where(
+            'pk_id_comunicados',
+            $id
+        )
+        ->whereHas('envios', function ($query) use ($morador) {
+            $query->where(
+                'fk_id_morador',
+                $morador->pk_id_morador
+            );
+        })
+        ->first();
+
+        // Caso o comunicado não exista ou não tenha sido enviado
+        // para o morador
+        if (!$comunicado) {
+            return $this->errorJson(
+                "Comunicado não encontrado!",
+                404
+            );
+        }
+
         return $this->responseJson(
             "Comunicado recuperado com sucesso!",
             200,
@@ -58,65 +84,54 @@ class ComunicadoController extends Controller
         );
     }
 
-
     // =========================================================
-// CADASTRAR UM COMUNICADO
-// =========================================================
+    // SÍNDICO CADASTRA E ENVIA UM COMUNICADO
+    // =========================================================
 
-public function store(Request $request)
-{
-    // Pegando o síndico logado através do Sanctum
-    $sindico = $request->user();
+    public function store(Request $request)
+    {
+        $sindico = $request->user();
 
-    // Pegando o ID do síndico
-    $idSindico = $sindico->pk_id_sindico;
+        $idSindico = $sindico->pk_id_sindico;
 
-    // Validando os dados recebidos pela API
-    $validator = Validator::make($request->all(), [
-        "descricao" => 'required|string|max:255',
-    ]);
+        $validator = Validator::make($request->all(), [
+            "descricao" => 'required|string|max:255',
+        ]);
 
-    // Caso a validação falhe
-    if ($validator->fails()) {
-        return $this->errorJson(
-            "Os dados passados não estão corretos!",
-            400,
+        if ($validator->fails()) {
+            return $this->errorJson(
+                "Os dados passados não estão corretos!",
+                400,
+                [
+                    $validator->errors()
+                ]
+            );
+        }
+
+        $dadosMapeados = [
+            "descricao_comunicado" => $request->input("descricao"),
+            "fk_id_sindico_comunicados" => $idSindico,
+        ];
+
+        $novoComunicado = Comunicado::create($dadosMapeados);
+
+        $moradores = Morador::all();
+
+        foreach ($moradores as $morador) {
+            Envio::create([
+                "fk_id_comunicados" => $novoComunicado->pk_id_comunicados,
+                "fk_id_morador" => $morador->pk_id_morador,
+                "fk_id_resposta" => null,
+                "fk_id_contra_resposta" => null,
+            ]);
+        }
+
+        return $this->responseJson(
+            "Comunicado criado e enviado aos moradores com sucesso!",
+            201,
             [
-                $validator->errors()
+                new ComunicadoResources($novoComunicado)
             ]
         );
     }
-
-    // Mapeando os dados recebidos para os campos do banco
-    $dadosMapeados = [
-        "descricao_comunicado" => $request->input("descricao"),
-        "fk_id_sindico_comunicados" => $idSindico,
-    ];
-
-    // Criando o comunicado
-    $novoComunicado = Comunicado::create($dadosMapeados);
-
-    // Buscando todos os moradores
-    $moradores = Morador::all();
-
-    // Criando um envio para cada morador
-    foreach ($moradores as $morador) {
-
-        Envio::create([
-            "fk_id_comunicados" => $novoComunicado->pk_id_comunicados,
-            "fk_id_morador" => $morador->pk_id_morador,
-            "fk_id_resposta" => null,
-            "fk_id_contra_resposta" => null,
-        ]);
-    }
-
-    // Retornando o comunicado criado
-    return $this->responseJson(
-        "Comunicado criado e enviado aos moradores com sucesso!",
-        201,
-        [
-            new ComunicadoResources($novoComunicado)
-        ]
-    );
-}
 }
