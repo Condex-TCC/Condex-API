@@ -227,4 +227,33 @@ public function respond(Request $request, string $id)
         ]
     );
 }
+
+// Retorna o histórico de respostas do morador logado
+public function indexRespostasMorador(Request $request)
+{
+    // Pegando o morador logado
+    $morador = $request->user();
+
+    // Buscando os envios relacionados ao morador
+    $envios = Envio::with([
+        "comunicado",
+        "resposta",
+        "contraResposta"
+    ])
+        ->where('fk_id_morador', $morador->pk_id_morador)
+        ->whereNotNull('fk_id_resposta')
+        ->get();
+
+    // Tratando os dados com Resource
+    $jsonTratado = EnvioResources::collection($envios);
+
+    // Retornando o histórico
+    return $this->responseJson(
+        "Histórico de respostas recuperado com sucesso!",
+        200,
+        [
+            $jsonTratado
+        ]
+    );
+}
 }

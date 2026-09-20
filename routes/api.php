@@ -298,6 +298,11 @@ Route::middleware('auth:sanctum')->group(function () {
                 EnvioController::class,
                 'respond'
             ]);
+
+            Route::get('/resposta/get', [
+                EnvioController::class, 
+                'indexRespostasMorador'
+            ]);
         });
 
         // =========================
@@ -310,6 +315,11 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/create', [
                 AutorizacaoVisitanteController::class,
                 'authorizeVisitor'
+            ]);
+
+            Route::get('/autorizacao/get', [
+                AutorizacaoVisitanteController::class, 
+                'indexMorador'
             ]);
         });
 
@@ -440,6 +450,11 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/create', [
                 VisitanteController::class,
                 'storeMorador'
+            ]);
+
+            Route::get('/visitante/get', [
+                VisitanteController::class, 
+                'indexMorador'
             ]);
 });
 

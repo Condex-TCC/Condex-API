@@ -65,6 +65,26 @@ class VisitanteController extends Controller
         );
     }
 
+    // Retorna os visitantes cadastrados pelo morador logado
+public function indexMorador(Request $request)
+{
+    // Pegando o morador logado através do token Sanctum
+    $morador = $request->user();
+
+    // Buscando somente os visitantes desse morador
+    $visitantes = Visitante::where(
+        'fk_morador',
+        $morador->pk_id_morador
+    )->get();
+
+    // Retornando os visitantes encontrados
+    return $this->responseJson(
+        "Visitantes do morador recuperados com sucesso!",
+        200,
+        [$visitantes]
+    );
+}
+
     // Morador cadastra um visitante
     public function storeMorador(Request $request)
     {

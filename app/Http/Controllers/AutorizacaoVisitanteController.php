@@ -77,6 +77,31 @@ public function authorizeVisitor(Request $request)
 }
 
 
+    // MORADOR CONSULTA SEU HISTÓRICO DE AUTORIZAÇÕES
+public function indexMorador(Request $request)
+{
+    // Pegando o morador logado
+    $morador = $request->user();
+
+    // Buscando somente as autorizações desse morador
+    $autorizacoes = AutorizacaoVisitante::with([
+        "visitante"
+    ])
+        ->where("fk_id_morador", $morador->pk_id_morador)
+        ->get();
+
+    // Tratando os dados com Resource
+    $jsonTratado = AutorizacaoResources::collection($autorizacoes);
+
+    // Retornando o histórico
+    return $this->responseJson(
+        "Histórico de autorizações recuperado com sucesso!",
+        200,
+        [
+            $jsonTratado
+        ]
+    );
+}
 
     
     // PORTEIRO CONSULTA VISITANTES AUTORIZADOS
