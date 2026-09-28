@@ -27,7 +27,6 @@ class DatabaseSeeder extends Seeder
             EspacoSeeder::class,
             EncomendaSeeder::class,
             ComunicadoSeeder::class,
-            RespostaSeeder::class,
             EnvioSeeder::class,
             ReservaSeeder::class,
         ]);

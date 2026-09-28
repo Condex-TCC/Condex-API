@@ -26,19 +26,11 @@ class EnvioResources extends JsonResource
                 ]
                 : null,
 
-            'resposta' => $this->resposta
-                ? [
-                    'id' => $this->resposta->pk_id_resposta,
-                    'descricao' => $this->resposta->descricao_resposta,
-                ]
-                : null,
+            'resposta' => $this->resposta,
 
-            'contra_resposta' => $this->contraResposta
-                ? [
-                    'id' => $this->contraResposta->pk_id_contra_resposta,
-                    'descricao' => $this->contraResposta->descricao_contra_resposta,
-                ]
-                : null,
+            'contra_resposta' => $this->contra_resposta,
+
+            'visualizado' => $this->visualizado,
         ];
     }
 }

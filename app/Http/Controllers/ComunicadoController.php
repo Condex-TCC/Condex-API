@@ -118,13 +118,14 @@ class ComunicadoController extends Controller
         $moradores = Morador::all();
 
         foreach ($moradores as $morador) {
-            Envio::create([
-                "fk_id_comunicados" => $novoComunicado->pk_id_comunicados,
-                "fk_id_morador" => $morador->pk_id_morador,
-                "fk_id_resposta" => null,
-                "fk_id_contra_resposta" => null,
-            ]);
-        }
+    Envio::create([
+        "fk_id_comunicados" => $novoComunicado->pk_id_comunicados,
+        "fk_id_morador" => $morador->pk_id_morador,
+        "resposta" => null,
+        "contra_resposta" => null,
+        "visualizado" => false,
+    ]);
+}
 
         return $this->responseJson(
             "Comunicado criado e enviado aos moradores com sucesso!",

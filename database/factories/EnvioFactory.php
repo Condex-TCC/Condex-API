@@ -22,9 +22,11 @@ class EnvioFactory extends Factory
                 ->first()
                 ->pk_id_morador,
 
-            'fk_id_resposta' => null,
+            'resposta' => null,
 
-            'fk_id_contra_resposta' => null,
+            'contra_resposta' => null,
+
+            'visualizado' => false,
         ];
     }
 }

@@ -16,8 +16,13 @@ class Envio extends Model
     protected $fillable = [
         'fk_id_comunicados',
         'fk_id_morador',
-        'fk_id_resposta',
-        'fk_id_contra_resposta',
+        'resposta',
+        'contra_resposta',
+        'visualizado',
+    ];
+
+    protected $casts = [
+        'visualizado' => 'boolean',
     ];
 
     public function comunicado()
@@ -35,24 +40,6 @@ class Envio extends Model
             Morador::class,
             'fk_id_morador',
             'pk_id_morador'
-        );
-    }
-
-    public function resposta()
-    {
-        return $this->belongsTo(
-            Resposta::class,
-            'fk_id_resposta',
-            'pk_id_resposta'
-        );
-    }
-
-    public function contraResposta()
-    {
-        return $this->belongsTo(
-            ContraResposta::class,
-            'fk_id_contra_resposta',
-            'pk_id_contra_resposta'
         );
     }
 }
