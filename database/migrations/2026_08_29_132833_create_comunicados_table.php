@@ -12,7 +12,9 @@ return new class extends Migration
 
             $table->id('pk_id_comunicados');
 
-            $table->string('descricao_comunicado', 255);
+            $table->string("titulo_comunicado");
+
+            $table->text("descricao_comunicado");
 
             $table->unsignedBigInteger('fk_id_sindico_comunicados');
 

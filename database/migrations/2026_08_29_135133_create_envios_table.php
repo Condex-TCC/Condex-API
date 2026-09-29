@@ -11,36 +11,29 @@ return new class extends Migration
         Schema::create('envios', function (Blueprint $table) {
 
             $table->id('pk_id_envio');
-
+            
             $table->unsignedBigInteger('fk_id_comunicados');
 
             $table->unsignedBigInteger('fk_id_morador');
 
-            $table->unsignedBigInteger('fk_id_resposta')
+            $table->text('resposta')
                 ->nullable();
 
-            $table->unsignedBigInteger('fk_id_contra_resposta')
+            $table->text('contra_resposta')
                 ->nullable();
 
-            $table->foreign('fk_id_comunicados')
-                ->references('pk_id_comunicados')
-                ->on('comunicados')
-                ->onDelete('cascade');
+            $table->boolean('visualizado')
+                ->default(false);
 
             $table->foreign('fk_id_morador')
                 ->references('pk_id_morador')
                 ->on('moradors')
                 ->onDelete('cascade');
 
-            $table->foreign('fk_id_resposta')
-                ->references('pk_id_resposta')
-                ->on('respostas')
+            $table->foreign('fk_id_comunicados')
+                ->references('pk_id_comunicados')
+                ->on('comunicados')
                 ->onDelete('cascade');
-
-            $table->foreign('fk_id_contra_resposta')
-                ->references('pk_id_contra_resposta')
-                ->on('contra_respostas')
-                ->onDelete('set null');
 
             $table->timestamps();
         });

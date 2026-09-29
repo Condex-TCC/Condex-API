@@ -14,6 +14,7 @@ class Comunicado extends Model
     protected $primaryKey = 'pk_id_comunicados';
 
     protected $fillable = [
+        'titulo_comunicado',
         'descricao_comunicado',
         'fk_id_sindico_comunicados',
     ];

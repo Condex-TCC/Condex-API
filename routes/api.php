@@ -174,18 +174,11 @@ Route::middleware('auth:sanctum')->group(function () {
         // =========================
         // COMUNICADOS
         // =========================
-
-        Route::prefix('comunicado')->group(function () {
-
-            // Síndico visualiza todos os comunicados
-             Route::get('/get', [
-                ComunicadoController::class,
-                'index'
-            ]);
+        Route::prefix('/comunicado')->group(function () {
 
             // Síndico cadastra um comunicado
             Route::post('/create', [
-                ComunicadoController::class,
+                EnvioController::class,
                 'store'
             ]);
         });
@@ -247,31 +240,11 @@ Route::middleware('auth:sanctum')->group(function () {
         ->prefix('morador')
         ->group(function () {
 
-        // =========================
-        // REAÇÕES
-        // =========================
-
-        Route::prefix('reacao')->group(function () {
-
-            // Morador reage a um comunicado
-            Route::post('/create/{id}', [
-                ReacaoController::class,
-                'store'
-            ]);
-
-            // Morador visualiza sua reação em um comunicado
-            Route::get('/show/{id}', [
-                ReacaoController::class,
-                'show'
-            ]);
-        });
-   
-
 
         // =========================
         // COMUNICADOS
         // =========================
-
+        //TODO: Refar isso aqui
         Route::prefix('comunicado')->group(function () {
 
             // Morador visualiza todos os comunicados
@@ -304,25 +277,6 @@ Route::middleware('auth:sanctum')->group(function () {
                 'indexRespostasMorador'
             ]);
         });
-
-        // =========================
-        // AUTORIZAÇÃO DE VISITANTES
-        // =========================
-
-        Route::prefix('autorizacao')->group(function () {
-
-            // Morador autoriza um visitante
-            Route::post('/create', [
-                AutorizacaoVisitanteController::class,
-                'authorizeVisitor'
-            ]);
-
-            Route::get('/autorizacao/get', [
-                AutorizacaoVisitanteController::class, 
-                'indexMorador'
-            ]);
-        });
-
 
         // =========================
         // ENCOMENDAS
@@ -438,7 +392,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'destroy'
             ]);
 
-});
+        });
 
             // =========================
             // VISITANTES
@@ -456,7 +410,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 VisitanteController::class, 
                 'indexMorador'
             ]);
-});
+        });
 
     });
 
@@ -470,35 +424,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('ability:porteiro')
         ->prefix('porteiro')
         ->group(function () {
-
-
-        // =========================
-        // AUTORIZAÇÃO DE VISITANTES
-        // =========================
-
-        Route::prefix('autorizacao')->group(function () {
-
-            // Consultar visitantes autorizados
-            Route::get('/authorized', [
-                AutorizacaoVisitanteController::class,
-                'getAuthorizedVisitors'
-            ]);
-
-            // Liberar entrada
-            Route::put('/entry/{id}', [
-                AutorizacaoVisitanteController::class,
-                'allowEntry'
-            ]);
-
-            // Registrar saída
-            Route::put('/exit/{id}', [
-                AutorizacaoVisitanteController::class,
-                'registerExit'
-            ]);
-        });
-
-
-
 
         // =========================
         // VISITANTES

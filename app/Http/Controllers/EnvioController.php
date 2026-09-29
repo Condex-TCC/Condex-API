@@ -2,107 +2,130 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ComunicadoResources;
 use App\Http\Resources\EnvioResources;
 use App\Models\Comunicado;
 use App\Models\Envio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\HttpResposta;
+use App\Models\Morador;
 
 class EnvioController extends Controller
 {
     use HttpResposta;
 
-
-    // =========================================================
-    // SÍNDICO VISUALIZA AS RESPOSTAS DOS MORADORES
-    // =========================================================
-
+    //TODO: Fazer aqui!
     public function index()
     {
-        $envios = Envio::with([
-            'comunicado',
-            'morador'
-        ])->get();
-
-        $jsonTratado = EnvioResources::collection($envios);
-
-        return $this->responseJson(
-            "Respostas recuperadas com sucesso!",
-            200,
-            [
-                $jsonTratado
-            ]
-        );
+        
     }
 
-
-    // =========================================================
-    // SÍNDICO CADASTRA UMA CONTRA-RESPOSTA
-    // =========================================================
-
-    public function store(Request $request, string $id)
+    //Função que cadastra as comunicados e os registros
+    public function store(Request $request)
     {
-        $validator = Validator::make(
-            $request->all(),
-            [
-                'descricao' => 'required|string|max:255',
-            ]
-        );
+       //Pegando o id do sindico
+       $pkSindico = $request->user()->pk_id_sindico;
 
-        if ($validator->fails()) {
+       //Pegando os dados dos da request
+       $dadosMapeadosComunicado = [
+            'titulo_comunicado' => $request->input("titulo"),
+            'descricao_comunicado' => $request->input('descricao'),
+            'fk_id_sindico_comunicados' => $pkSindico
+       ];
 
+       //Pegando os moradores selecionados
+       $arrayDeMoradoresSelecionados = $request->input("moradores_selecionados");
+
+        //Validando o array mapeado
+        $validator = Validator::make($dadosMapeadosComunicado, [
+            'titulo_comunicado' => "required|string",
+            'descricao_comunicado' => "required|string"
+        ]);
+
+        //Caso os dados não passasem na validação
+        if($validator->fails()){
+
+            //Retorna um Json com fotmatação de erro
             return $this->errorJson(
-                "Os dados passados não estão corretos!",
-                400,
+                "Os dados passados não estão corretos!", //Menssagem
+                400, //Status code
+                //Passando os erros
                 [
+                    //Pegando o array de erros dados pelo validator
                     $validator->errors()
                 ]
             );
         }
 
-        $envio = Envio::find($id);
+        //Cadastrando comunicado
+        $comunicado = Comunicado::create($dadosMapeadosComunicado);
 
-        if (!$envio) {
+        //Recuperando o Pk do comunicado
+        $pkComunicado = $comunicado->pk_id_comunicados;
 
-            return $this->errorJson(
-                "Envio não encontrado!",
-                404
+        //Verifica se é para moradores especificos ou para todos
+        if($arrayDeMoradoresSelecionados == null){
+
+            //Recupera todas as Pk dos moradoes
+            $arrayDeTodosMoradores = Morador::all();
+
+            //Fazendo o cadastro dos usuários
+            foreach($arrayDeTodosMoradores as $morador){
+
+                //Mapeando os dados para o cadastro
+                $dadosMapeadosEnvios = [
+                    'fk_id_comunicados' => $pkComunicado,
+                    'fk_id_morador' => $morador->pk_id_morador,
+                    'resposta' => null,
+                    'contra_resposta' => null,
+                    'visualizado' => false,
+                ];
+
+                //Cadastrando o registro
+                $cadastro = Envio::create($dadosMapeadosEnvios);
+            }
+
+            //Retona um Json de sucesso com formatação padrão
+            return $this->responseJson(
+                "O Comunicado foi enviado com sucesso para todos os moradores",
+                200,
+                [
+                    "Comunicado" => new ComunicadoResources($comunicado),
+                    'moradores_enviados' => $arrayDeTodosMoradores
+                ]
             );
+
+        }else{
+
+            //Fazendo o cadastro dos usuários
+            foreach($arrayDeMoradoresSelecionados as $idmorador){
+
+                //Mapeando os dados para o cadastro
+                $dadosMapeadosEnvios = [
+                    'fk_id_comunicados' => $pkComunicado,
+                    'fk_id_morador' => $idmorador,
+                    'resposta' => null,
+                    'contra_resposta' => null,
+                    'visualizado' => false,
+                ];
+
+                //Cadastrando o registro
+                $cadastro = Envio::create($dadosMapeadosEnvios);
+            }
+
+            //Retona um Json de sucesso com formatação padrão
+            return $this->responseJson(
+                "O comunicado foi enviado para os moradores selecionados",
+                200,
+                 [
+                    "Comunicado" => new ComunicadoResources($comunicado),
+                    'moradores_enviados' => $arrayDeMoradoresSelecionados
+                ]
+            );
+
         }
 
-        if ($envio->resposta == null) {
-
-            return $this->errorJson(
-                "Esse comunicado ainda não possui uma resposta!",
-                400
-            );
-        }
-
-        if ($envio->contra_resposta != null) {
-
-            return $this->errorJson(
-                "Essa resposta já possui uma contra-resposta!",
-                400
-            );
-        }
-
-        $envio->update([
-            'contra_resposta' => $request->input('descricao')
-        ]);
-
-        $envio->load([
-            'comunicado',
-            'morador'
-        ]);
-
-        return $this->responseJson(
-            "Contra-resposta cadastrada com sucesso!",
-            200,
-            [
-                new EnvioResources($envio)
-            ]
-        );
     }
 
 
