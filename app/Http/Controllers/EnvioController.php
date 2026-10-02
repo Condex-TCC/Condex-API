@@ -278,4 +278,20 @@ class EnvioController extends Controller
         );
 
     }
+
+    //Função que recupera os dados do registro do envio
+    public function showDetalhesEnvio(string $id){
+
+        //Recuperando os dados do envio
+        $envio = Envio::find($id);
+
+        //Retorna um json com formatação padrão para sucesso
+        return $this->responseJson(
+            "Dados do comunicado foram recuperados com sucesso!", //Menssagem
+            200,
+            [
+                'envio' => new EnvioResources($envio)
+            ]
+        );
+    }
 }

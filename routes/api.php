@@ -185,6 +185,9 @@ Route::middleware('auth:sanctum')->group(function () {
             //O sindico consegue ver os moradores e as suas interações com os envios
             Route::get("/show/{id}", [EnvioController::class, 'showEnvios']);
 
+            //O Sindico recupera os dados do envio espefico do moarador
+            Route::get('/show/detalhes/{id}', [EnvioController::class, 'showDetalhesEnvio']);
+
             //O Sindico recupera as duvidas dos moradores ainda sem resposta
             Route::get('/perguntas', [EnvioController::class, 'showSemResposta']);
 
