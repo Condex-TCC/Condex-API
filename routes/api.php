@@ -17,7 +17,7 @@ use App\Http\Controllers\ComunicadoController;
 use App\Http\Controllers\EnvioController;
 use App\Http\Controllers\ReacaoController;
 use App\Http\Controllers\UnidadeController;
-
+use App\Models\Envio;
 
 /*
 |--------------------------------------------------------------------------
@@ -176,34 +176,22 @@ Route::middleware('auth:sanctum')->group(function () {
         // =========================
         Route::prefix('/comunicado')->group(function () {
 
-            // Síndico cadastra um comunicado
-            Route::post('/create', [
-                EnvioController::class,
-                'store'
-            ]);
+            //Pegando todos os comunicados do sindico
+            Route::get('/get', [ComunicadoController::class, 'indexSindico']);
+
+            // Síndico cadastra um comunicado e realiza o envio para os moradores
+            Route::post('/create', [EnvioController::class,'store']);
+
+            //O sindico consegue ver os moradores e as suas interações com os envios
+            Route::get("/show/{id}", [EnvioController::class, 'showEnvios']);
+
+            //O Sindico recupera as duvidas dos moradores ainda sem resposta
+            Route::get('/perguntas', [EnvioController::class, 'showSemResposta']);
+
+            //O Sindico realiza um updade na tabela de envios para cadastrar a contra resposta
+            Route::put('/contraResposta/{id}', [EnvioController::class, 'updadeContraResposta']);
         });
 
-            
-
-
-        // =========================
-        // RESPOSTAS DOS MORADORES
-        // =========================
-
-        Route::prefix('respostas')->group(function () {
-
-            // Síndico visualiza as respostas dos moradores
-            Route::get('/get', [
-                EnvioController::class,
-                'index'
-            ]);
-
-            // Síndico cadastra uma contra-resposta
-            Route::post('/create/{id}', [
-                EnvioController::class,
-                'store'
-            ]);
-        });
 
         // =========================
         // UNIDADES
@@ -244,59 +232,40 @@ Route::middleware('auth:sanctum')->group(function () {
         // =========================
         // COMUNICADOS
         // =========================
-        //TODO: Refar isso aqui
-        Route::prefix('comunicado')->group(function () {
+        Route::prefix('/comunicado')->group(function () {
 
-            // Morador visualiza todos os comunicados
-            Route::get('/get', [
-                ComunicadoController::class,
-                'index'
-            ]);
+            //Pegando todos os comunicados do morador | Histórico
+            Route::get('/historico/get', [EnvioController::class, 'indexMorador']);
 
-            // Morador visualiza um comunicado específico
-            Route::get('/show/{id}', [
-                ComunicadoController::class,
-                'show'
-            ]);
+            //Pegando todos os comunicados não visualidos do morador
+            Route::get('/get', [EnvioController::class, 'indexMoradorNaoVisualizado']);
+
+            //Pegando os dados do envio | Merca como visualizado
+            Route::post("/show/{id}", [EnvioController::class, 'showMorador']);
+
+            //O Sindico realiza um updade na tabela de envios para cadastrar a contra resposta
+            Route::put('/resposta/{id}', [EnvioController::class, 'updadeResposta']);
         });
 
-        // =========================
-        // RESPOSTAS DOS COMUNICADOS
-        // =========================
-
-        Route::prefix('resposta')->group(function () {
-
-            // Morador responde um comunicado
-            Route::post('/create/{id}', [
-                EnvioController::class,
-                'respond'
-            ]);
-
-            Route::get('/resposta/get', [
-                EnvioController::class, 
-                'indexRespostasMorador'
-            ]);
-        });
 
         // =========================
         // ENCOMENDAS
         // =========================
-
         Route::prefix('encomenda')->group(function () {
 
-    // Morador pode ver apenas suas encomendas
-    Route::get('/get', [
-        EncomendaController::class,
-        'indexMorador'
-    ]);
+            // Morador pode ver apenas suas encomendas
+            Route::get('/get', [
+                EncomendaController::class,
+                'indexMorador'
+            ]);
 
-    // Morador pode ver apenas uma de suas encomendas
-    Route::get('/show/{id}', [
-        EncomendaController::class,
-        'showMorador'
-    ]);
+            // Morador pode ver apenas uma de suas encomendas
+            Route::get('/show/{id}', [
+                EncomendaController::class,
+                'showMorador'
+            ]);
 
-});
+        });
 
 
         // =========================

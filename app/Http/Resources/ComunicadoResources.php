@@ -13,7 +13,6 @@ class ComunicadoResources extends JsonResource
             'id' => $this->pk_id_comunicados,
             'titulo' => $this->titulo_comunicado,
             'descricao' => $this->descricao_comunicado,
-            'id_sindico' => $this->fk_id_sindico_comunicados,
             'criado_em' => $this->created_at,
             'atualizado_em' => $this->updated_at,
         ];

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ComunicadoResources;
 use App\Http\Resources\EnvioResources;
+use App\Http\Resources\MoradorResurce;
 use App\Models\Comunicado;
 use App\Models\Envio;
 use Illuminate\Http\Request;
@@ -15,13 +16,7 @@ class EnvioController extends Controller
 {
     use HttpResposta;
 
-    //TODO: Fazer aqui!
-    public function index()
-    {
-        
-    }
-
-    //Função que cadastra as comunicados e os registros
+    //Função do sindico que cadastra as comunicados e os registros
     public function store(Request $request)
     {
        //Pegando o id do sindico
@@ -92,7 +87,7 @@ class EnvioController extends Controller
                 200,
                 [
                     "Comunicado" => new ComunicadoResources($comunicado),
-                    'moradores_enviados' => $arrayDeTodosMoradores
+                    'moradores_enviados' => MoradorResurce::collection($arrayDeTodosMoradores)
                 ]
             );
 
@@ -120,122 +115,167 @@ class EnvioController extends Controller
                 200,
                  [
                     "Comunicado" => new ComunicadoResources($comunicado),
-                    'moradores_enviados' => $arrayDeMoradoresSelecionados
+                    'moradores_enviados' => MoradorResurce::collection(Morador::find($arrayDeMoradoresSelecionados))
                 ]
             );
 
         }
-
     }
 
-
-    // =========================================================
-    // MORADOR RESPONDE UM COMUNICADO
-    // =========================================================
-
-    public function respond(Request $request, string $id)
-    {
-        $morador = $request->user();
-
-        $validator = Validator::make(
-            $request->all(),
-            [
-                'descricao' => 'required|string|max:255',
-            ]
-        );
-
-        if ($validator->fails()) {
-
-            return $this->errorJson(
-                "Os dados passados não estão corretos!",
-                400,
-                [
-                    $validator->errors()
-                ]
-            );
-        }
-
+    //Função que recupera todos os envios com o comunicado
+    public function showEnvios(string $id){
+            
+        //Recupera o comunicado
         $comunicado = Comunicado::find($id);
 
-        if (!$comunicado) {
+        //Recuperando os envios desse comunicado
+        $envios = Envio::where('fk_id_comunicados', $id)->get();
 
-            return $this->errorJson(
-                "Comunicado não encontrado!",
-                404
-            );
-        }
+        //Aplicando formatação comum os envios
+        $enviosTratados = EnvioResources::collection($envios);
 
-        $envio = Envio::where(
-            'fk_id_comunicados',
-            $id
-        )
-        ->where(
-            'fk_id_morador',
-            $morador->pk_id_morador
-        )
-        ->first();
-
-        if (!$envio) {
-
-            return $this->errorJson(
-                "Esse comunicado não foi enviado para você!",
-                404
-            );
-        }
-
-        if ($envio->resposta != null) {
-
-            return $this->errorJson(
-                "Você já respondeu esse comunicado!",
-                400
-            );
-        }
-
-        $envio->update([
-            'resposta' => $request->input('descricao')
-        ]);
-
-        $envio->load([
-            'comunicado',
-            'morador'
-        ]);
-
+        //Retorando o json com formatação padrão para sucesso
         return $this->responseJson(
-            "Resposta cadastrada com sucesso!",
-            201,
+            "Envios recuperados com sucesso!", //Menssagem
+            200, //Status
+            //Dados
             [
-                new EnvioResources($envio)
+                'comunicado' => new ComunicadoResources($comunicado),
+                "envios_moradores" => $enviosTratados
             ]
         );
     }
 
+    //TODO: Conferir depois
+    //Função que recupera os registros que estão com resposta mas sem contra resposta
+    public function showSemResposta(){
+        
+        //Pegando os envios com resposta e sem contra resposta
+        $perguntas = $perguntas = Envio::whereNotNull('resposta')->whereNull('contra_resposta')->get();
 
-    // =========================================================
-    // MORADOR VISUALIZA SEU HISTÓRICO DE RESPOSTAS
-    // =========================================================
-
-    public function indexRespostasMorador(Request $request)
-    {
-        $morador = $request->user();
-
-        $envios = Envio::with([
-            'comunicado'
-        ])
-            ->where(
-                'fk_id_morador',
-                $morador->pk_id_morador
-            )
-            ->whereNotNull('resposta')
-            ->get();
-
-        $jsonTratado = EnvioResources::collection($envios);
-
+        //Retornando formatação com sucesso
         return $this->responseJson(
-            "Histórico de respostas recuperado com sucesso!",
-            200,
+            "Duvidas recuperadas com sucesso!", //Menssagem
+            200, //Status
+            //Dados
             [
-                $jsonTratado
+                "perguntas" => EnvioResources::collection($perguntas)
             ]
         );
+    }
+
+    //Função que o sindico cadastra a contra resonsta no registro do envio
+    public function updadeContraResposta(Request $request, string $id){
+
+        //Pega da request a contra responta
+        $contraResposta = $request->input("contra_resposta");
+
+        //Pegando o envio
+        $envio = Envio::find($id);
+
+        //Atualiza a contra resposta
+        $envio->contra_resposta = $contraResposta;
+
+        //Realiza a atualização 
+        $envio->save();
+
+        //Retorna um json com formatação padrão
+        return $this->responseJson(
+            "Contra resposta cadastrada com sucesso!", //Menssagem
+            200, //Status
+            [
+                "envio" => new EnvioResources(Envio::find($id))
+            ]
+        );
+
+    }
+
+    //Função que recupera todos os comunicados do morador
+    public function indexMorador(Request $request){
+
+        //Pega a pk do morador
+        $pkMorador = $request->User()->pk_id_morador;
+
+        //Pega todos os envios do morador
+        $envios = Envio::where('fk_id_morador', $pkMorador)->get();
+
+        //Retorna um JSON com formatação padrão de sucesso
+        return $this->responseJson(
+            "Comunicados recuperados com sucesso!", //Menssagem
+            200,
+            [
+                'envios' => EnvioResources::collection($envios)
+            ]
+        );
+    }
+
+    //Função que recupera os comunicados do morador não visualizados
+    public function indexMoradorNaoVisualizado(Request $request){
+
+        //Pega a pk do morador
+        $pkMorador = $request->User()->pk_id_morador;
+
+        //Pega todos os envios do morador
+        $envios = Envio::where('fk_id_morador', $pkMorador)
+            ->where('visualizado', false);
+
+        //Retorna um JSON com formatação padrão de sucesso
+        return $this->responseJson(
+            "Comunicados recuperados com sucesso!", //Menssagem
+            200,
+            [
+                'envios' => EnvioResources::collection($envios)
+            ]
+        );
+    }
+
+    //Pegando os detalhes do envio que o morador selecionar
+    public function showMorador(string $id){
+
+        //Pega o envio do morador
+        $envio = Envio::find($id);
+
+        //Verifica se o envio já foi visualizado
+        if($envio->visualizado == false){
+
+            //Atualiza o envio para indicar que o morador visualizou
+            $envio->visualizado = true;
+            $envio->save();
+        }
+
+        //Retorna os dados do JSON com formatação padrão
+        return $this->responseJson(
+            "Pegando dados do comunicado com sucesso!",
+            200,
+            [
+                'envio' => new EnvioResources($envio)
+            ]
+        );
+    }
+
+     //Função que o morador cadastra a  resonsta no registro do envio
+    public function updadeResposta(Request $request, string $id){
+
+        //Pega da request a resposta
+        $resposta = $request->input("resposta");
+
+        //Pegando o envio
+        $envio = Envio::find($id);
+
+        //Atualiza a resposta
+        $envio->resposta = $resposta;
+
+        //Realiza a atualização 
+        $envio->save();
+
+        //Retorna um json com formatação padrão
+        return $this->responseJson(
+            "Pergunta ao sindico cadastrada com sucesso!", //Menssagem
+            200, //Status
+            [
+                "envio" => new EnvioResources(Envio::find($id))
+            ]
+        );
+
     }
 }

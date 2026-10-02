@@ -12,19 +12,10 @@ class EnvioResources extends JsonResource
         return [
             'id' => $this->pk_id_envio,
 
-            'morador' => $this->morador
-                ? [
-                    'id' => $this->morador->pk_id_morador,
-                    'nome' => $this->morador->nome_morador,
-                ]
-                : null,
+            'comunicado' => new ComunicadoResources($this->comunicado),
 
-            'comunicado' => $this->comunicado
-                ? [
-                    'id' => $this->comunicado->pk_id_comunicados,
-                    'descricao' => $this->comunicado->descricao_comunicado,
-                ]
-                : null,
+            //Puxa a formatação do resource do morador
+            'morador' => new MoradorResurce($this->morador),
 
             'resposta' => $this->resposta,
 
