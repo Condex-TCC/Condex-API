@@ -217,7 +217,7 @@ class EnvioController extends Controller
 
         //Pega todos os envios do morador
         $envios = Envio::where('fk_id_morador', $pkMorador)
-            ->where('visualizado', false);
+            ->where('visualizado', false)->get();
 
         //Retorna um JSON com formatação padrão de sucesso
         return $this->responseJson(
