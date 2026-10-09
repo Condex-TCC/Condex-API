@@ -14,22 +14,24 @@ class EncomendaController extends Controller
     //Adiciona a trait com as respotas padrões para APIs
     use HttpResposta;
 
-    //Função que pega todas as encomendas
-    public function index()
-    {
-        //Pegando todas as encomendas
-        $encomendas = Encomenda::all();
+//Função que pega todas as encomendas 
+public function index()
+{
+    $encomendas = Encomenda::with([
+        'morador',
+        'porteiro'
+    ])->get();
 
-        //Aplicando resurce para tratar a o json com os dados de encomendas
-        $jsonTratadado = EncomendaResources::collection($encomendas);
+    $jsonTratado = EncomendaResources::collection(
+        $encomendas
+    );
 
-        //Retorna o json com os moradores filtrados
-        return $this->responseJson(
-            "Encomendas recuperadas com sucesso!", //Menssagem
-            200, //Status code
-            [$jsonTratadado], //Envia o json tratado nos dados da requisição 
-        );
-    }
+    return $this->responseJson(
+        'Encomendas recuperadas com sucesso!',
+        200,
+        $jsonTratado
+    );
+}
 
 // Função que pega apenas as encomendas do morador logado
 public function indexMorador(Request $request)
@@ -95,80 +97,66 @@ public function showMorador(Request $request, string $id)
 }
 
 
-    //TODO: Refatorar esse controller para cadastrar corretamento a FK do morador
-    //O que eu fiz foi apenas para enrrolar o Rubens
-   //Função que cria uma encomenda
-    public function store(Request $request)
-    {
-        //Pegando o usuário logado | Atravez de auth:sanctun, que ingeja o porteiro na requisição
-        $porteiro = $request->user();
+    
+public function store(Request $request)
+{
+    $porteiro = $request->user();
 
-        //Pegando o id do porteiro
-        $id = $porteiro->pk_id_porteiro;
+    $dadosMapeados = [
+        'nome_encomenda' => $request->input('nome'),
+        'descricao_encomenda' => $request->input('descricao'),
+        'fk_id_morador_encomenda' => $request->input('id_morador'),
+        'fk_id_porteiro_encomenda' => $porteiro->pk_id_porteiro,
+    ];
 
-        //Pegando os dados do corpo da requisição e montando um array com os campos do banco de dados
-        $dadosMapeados = [
-            "nome_encomenda" => $request->input("nome"),
-            "descricao_encomenda" => $request->input("descricao"),
-            "fk_id_porteiro_encomenda" => $id,
-            "fk_id_morador_encomenda" => $request->input("id_morador")
+    $validator = Validator::make($dadosMapeados, [
+        'nome_encomenda' => 'required|string|max:255',
+        'descricao_encomenda' => 'required|string',
+        'fk_id_morador_encomenda' => 'required|integer|exists:moradors,pk_id_morador',
+        'fk_id_porteiro_encomenda' => 'required|integer|exists:porteiros,pk_id_porteiro',
+    ]);
 
-     ];
-
-        //Validando o array mapeado
-        $validator = Validator::make($dadosMapeados, [
-            "nome_encomenda" => 'required|string|max:200',
-            "descricao_encomenda" => 'required|string|max:150',
-            "fk_id_porteiro_encomenda" => 'required|numeric',
-            "fk_id_morador_encomenda" => 'required|numeric',
-        ]);
-
-        //Caso os dados não passasem na validação
-        if($validator->fails()){
-
-            //Retorna um Json com fotmatação de erro
-            return $this->errorJson(
-                "Os dados passados não estão corretos!", //Menssagem
-                400, //Status code
-                //Passando os erros
-                [
-                    //Pegando o array de erros dados pelo validator
-                    $validator->errors()
-                ]
-            );
-        }
-
-        //Crinado o nova encomenda
-        $novaEncomenda = Encomenda::create($dadosMapeados);
-
-        //Retornando um json de sucuesso
-        return $this->responseJson(
-            "Encomenda criada com sucesso!", //Menssagem
-            201, //Status code
-            //Passando os dados
-            [
-                //Passando a encomenda criada
-                new EncomendaResources($novaEncomenda)
-            ]
+    if ($validator->fails()) {
+        return $this->errorJson(
+            'Os dados passados não estão corretos!',
+            422,
+            $validator->errors()
         );
     }
 
+    $novaEncomenda = Encomenda::create($dadosMapeados);
 
-    // Função que pega uma encomenda específica
-    public function show(string $id)
-    {
-        // Pegando a encomenda pelo ID
-        $encomenda = Encomenda::findOrFail($id);
+    $novaEncomenda->load(['morador', 'porteiro']);
 
-        // Retornando a encomenda encontrada
-        return $this->responseJson(
-            "Encomenda recuperada com sucesso!",
-            200,
-            [
-                new EncomendaResources($encomenda)
-            ]
+    return $this->responseJson(
+        'Encomenda criada com sucesso!',
+        201,
+        new EncomendaResources($novaEncomenda)
+    );
+}
+
+
+    
+public function show(string $id)
+{
+    $encomenda = Encomenda::with([
+        'morador',
+        'porteiro'
+    ])->find($id);
+
+    if (!$encomenda) {
+        return $this->errorJson(
+            'Encomenda não encontrada!',
+            404
         );
     }
+
+    return $this->responseJson(
+        'Encomenda recuperada com sucesso!',
+        200,
+        new EncomendaResources($encomenda)
+    );
+}
 
 
     //Função que atuiliza o registro

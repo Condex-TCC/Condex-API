@@ -19,4 +19,23 @@ class Visitante extends Model
         'fk_morador',
         'fk_funcionario',
     ];
+
+    
+public function morador()
+{
+    return $this->belongsTo(
+        Morador::class,
+        'fk_morador',
+        'pk_id_morador'
+    );
+}
+
+public function porteiro()
+{
+    return $this->belongsTo(
+        Porteiro::class,
+        'fk_funcionario',
+        'pk_id_porteiro'
+    );
+}
 }

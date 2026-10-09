@@ -211,4 +211,25 @@ public function indexMorador(Request $request)
             ]
         );
     }
+
+    
+public function getVisitHistory()
+{
+    $visitas = AutorizacaoVisitante::with([
+        'visitante',
+        'morador'
+    ])
+        ->orderByDesc('created_at')
+        ->get();
+
+    $visitasTratadas = AutorizacaoResources::collection(
+        $visitas
+    );
+
+    return $this->responseJson(
+        'Histórico de visitas recuperado com sucesso!',
+        200,
+        [$visitasTratadas]
+    );
+}
 }

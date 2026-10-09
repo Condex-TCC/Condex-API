@@ -471,6 +471,26 @@ Route::middleware('auth:sanctum')->group(function () {
         ->prefix('porteiro')
         ->group(function () {
 
+        // =========================
+        // MORADORES
+        // =========================
+
+    Route::prefix('morador')->group(function () {
+
+       // Recuperar todos os moradores
+        Route::get('/get', [
+            MoradorController::class,
+            'index'
+        ]);
+
+        // Recuperar um morador específico
+        Route::get('/show/{id}', [
+            MoradorController::class,
+            'show'
+        ]);
+
+    });
+
 
         // =========================
         // AUTORIZAÇÃO DE VISITANTES
@@ -501,7 +521,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
         // =========================
-        // VISITANTES
+        // VISITANTES E VISITAS
         // =========================
 
         Route::prefix('visitante')->group(function () {
@@ -532,6 +552,16 @@ Route::middleware('auth:sanctum')->group(function () {
             ]);
         });
 
+            // Histórico de visitas
+            Route::prefix('visita')->group(function () {
+
+            Route::get('/get', [
+                AutorizacaoVisitanteController::class,
+                'getVisitHistory'
+            ]);
+
+        });
+
 
         // =========================
         // ENCOMENDAS
@@ -539,32 +569,43 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('encomenda')->group(function () {
 
-            Route::get('/get', [
-                EncomendaController::class,
-                'index'
-            ]);
+        // Listar todas as encomendas
+        Route::get('/get', [
+            EncomendaController::class,
+            'index'
+        ]);
 
-            Route::post('/create', [
-                EncomendaController::class,
-                'store'
-            ]);
+        // Consultar uma encomenda
+        Route::get('/show/{id}', [
+            EncomendaController::class,
+            'show'
+        ]);
 
-            Route::put('/update/{id}', [
-                EncomendaController::class,
-                'update'
-            ]);
+        // Cadastrar uma encomenda
+        Route::post('/create', [
+            EncomendaController::class,
+            'store'
+        ]);
 
-            Route::delete('/delete/{id}', [
-                EncomendaController::class,
-                'destroy'
-            ]);
+        // Atualizar uma encomenda
+        Route::put('/update/{id}', [
+            EncomendaController::class,
+            'update'
+        ]);
 
-            // Registrar retirada de uma encomenda
-            Route::put('/withdraw/{id}', [
-                EncomendaController::class,
-                'registerWithdrawal'
-            ]);
-        });
+        // Registrar retirada
+        Route::put('/withdraw/{id}', [
+            EncomendaController::class,
+            'registerWithdrawal'
+        ]);
+
+        // Excluir uma encomenda
+        Route::delete('/delete/{id}', [
+            EncomendaController::class,
+            'destroy'
+        ]);
+
+      });
 
 
     });
