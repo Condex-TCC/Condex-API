@@ -17,7 +17,7 @@ use App\Http\Controllers\ComunicadoController;
 use App\Http\Controllers\EnvioController;
 use App\Http\Controllers\ReacaoController;
 use App\Http\Controllers\UnidadeController;
-
+use App\Models\Envio;
 
 /*
 |--------------------------------------------------------------------------
@@ -174,43 +174,27 @@ Route::middleware('auth:sanctum')->group(function () {
         // =========================
         // COMUNICADOS
         // =========================
+        Route::prefix('/comunicado')->group(function () {
 
-        Route::prefix('comunicado')->group(function () {
+            //Pegando todos os comunicados do sindico
+            Route::get('/get', [ComunicadoController::class, 'indexSindico']);
 
-            // Síndico visualiza todos os comunicados
-             Route::get('/get', [
-                ComunicadoController::class,
-                'index'
-            ]);
+            // Síndico cadastra um comunicado e realiza o envio para os moradores
+            Route::post('/create', [EnvioController::class,'store']);
 
-            // Síndico cadastra um comunicado
-            Route::post('/create', [
-                ComunicadoController::class,
-                'store'
-            ]);
+            //O sindico consegue ver os moradores e as suas interações com os envios
+            Route::get("/show/{id}", [EnvioController::class, 'showEnvios']);
+
+            //O Sindico recupera os dados do envio espefico do moarador
+            Route::get('/show/detalhes/{id}', [EnvioController::class, 'showDetalhesEnvio']);
+
+            //O Sindico recupera as duvidas dos moradores ainda sem resposta
+            Route::get('/perguntas', [EnvioController::class, 'showSemResposta']);
+
+            //O Sindico realiza um updade na tabela de envios para cadastrar a contra resposta
+            Route::put('/contraResposta/{id}', [EnvioController::class, 'updadeContraResposta']);
         });
 
-            
-
-
-        // =========================
-        // RESPOSTAS DOS MORADORES
-        // =========================
-
-        Route::prefix('respostas')->group(function () {
-
-            // Síndico visualiza as respostas dos moradores
-            Route::get('/get', [
-                EnvioController::class,
-                'index'
-            ]);
-
-            // Síndico cadastra uma contra-resposta
-            Route::post('/create/{id}', [
-                EnvioController::class,
-                'store'
-            ]);
-        });
 
         // =========================
         // UNIDADES
@@ -247,102 +231,44 @@ Route::middleware('auth:sanctum')->group(function () {
         ->prefix('morador')
         ->group(function () {
 
-        // =========================
-        // REAÇÕES
-        // =========================
-
-        Route::prefix('reacao')->group(function () {
-
-            // Morador reage a um comunicado
-            Route::post('/create/{id}', [
-                ReacaoController::class,
-                'store'
-            ]);
-
-            // Morador visualiza sua reação em um comunicado
-            Route::get('/show/{id}', [
-                ReacaoController::class,
-                'show'
-            ]);
-        });
-   
-
 
         // =========================
         // COMUNICADOS
         // =========================
+        Route::prefix('/comunicado')->group(function () {
 
-        Route::prefix('comunicado')->group(function () {
+            //Pegando todos os comunicados do morador | Histórico
+            Route::get('/historico/get', [EnvioController::class, 'indexMorador']);
 
-            // Morador visualiza todos os comunicados
-            Route::get('/get', [
-                ComunicadoController::class,
-                'index'
-            ]);
+            //Pegando todos os comunicados não visualidos do morador
+            Route::get('/get', [EnvioController::class, 'indexMoradorNaoVisualizado']);
 
-            // Morador visualiza um comunicado específico
-            Route::get('/show/{id}', [
-                ComunicadoController::class,
-                'show'
-            ]);
-        });
+            //Pegando os dados do envio | Merca como visualizado
+            Route::post("/show/{id}", [EnvioController::class, 'showMorador']);
 
-        // =========================
-        // RESPOSTAS DOS COMUNICADOS
-        // =========================
-
-        Route::prefix('resposta')->group(function () {
-
-            // Morador responde um comunicado
-            Route::post('/create/{id}', [
-                EnvioController::class,
-                'respond'
-            ]);
-
-            Route::get('/resposta/get', [
-                EnvioController::class, 
-                'indexRespostasMorador'
-            ]);
-        });
-
-        // =========================
-        // AUTORIZAÇÃO DE VISITANTES
-        // =========================
-
-        Route::prefix('autorizacao')->group(function () {
-
-            // Morador autoriza um visitante
-            Route::post('/create', [
-                AutorizacaoVisitanteController::class,
-                'authorizeVisitor'
-            ]);
-
-            Route::get('/autorizacao/get', [
-                AutorizacaoVisitanteController::class, 
-                'indexMorador'
-            ]);
+            //O Sindico realiza um updade na tabela de envios para cadastrar a contra resposta
+            Route::put('/resposta/{id}', [EnvioController::class, 'updadeResposta']);
         });
 
 
         // =========================
         // ENCOMENDAS
         // =========================
-
         Route::prefix('encomenda')->group(function () {
 
-    // Morador pode ver apenas suas encomendas
-    Route::get('/get', [
-        EncomendaController::class,
-        'indexMorador'
-    ]);
+            // Morador pode ver apenas suas encomendas
+            Route::get('/get', [
+                EncomendaController::class,
+                'indexMorador'
+            ]);
 
-    // Morador pode ver apenas uma de suas encomendas
-    Route::get('/show/{id}', [
-        EncomendaController::class,
-        'showMorador'
-    ]);
+            // Morador pode ver apenas uma de suas encomendas
+            Route::get('/show/{id}', [
+                EncomendaController::class,
+                'showMorador'
+            ]);
 
-});
+        });
 
 
         // =========================
@@ -438,7 +364,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'destroy'
             ]);
 
-});
+        });
 
             // =========================
             // VISITANTES
@@ -456,7 +382,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 VisitanteController::class, 
                 'indexMorador'
             ]);
-});
+        });
 
     });
 
@@ -471,26 +397,26 @@ Route::middleware('auth:sanctum')->group(function () {
         ->prefix('porteiro')
         ->group(function () {
 
+
         // =========================
         // MORADORES
         // =========================
 
-    Route::prefix('morador')->group(function () {
+        Route::prefix('morador')->group(function () {
 
-       // Recuperar todos os moradores
-        Route::get('/get', [
-            MoradorController::class,
-            'index'
-        ]);
+            // Recuperar todos os moradores
+            Route::get('/get', [
+                MoradorController::class,
+                'index'
+            ]);
 
-        // Recuperar um morador específico
-        Route::get('/show/{id}', [
-            MoradorController::class,
-            'show'
-        ]);
+            // Recuperar um morador específico
+            Route::get('/show/{id}', [
+                MoradorController::class,
+                'show'
+            ]);
 
-    });
-
+        });
 
         // =========================
         // AUTORIZAÇÃO DE VISITANTES
@@ -515,11 +441,9 @@ Route::middleware('auth:sanctum')->group(function () {
                 AutorizacaoVisitanteController::class,
                 'registerExit'
             ]);
+
         });
-
-
-
-
+        
         // =========================
         // VISITANTES E VISITAS
         // =========================
