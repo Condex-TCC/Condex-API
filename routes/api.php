@@ -15,8 +15,8 @@ use App\Http\Controllers\EspacoController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\ComunicadoController;
 use App\Http\Controllers\EnvioController;
-use App\Http\Controllers\ReacaoController;
 use App\Http\Controllers\UnidadeController;
+use App\Http\Resources\ReservaResource;
 use App\Models\Envio;
 
 /*
@@ -218,6 +218,23 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/delete/{id}', [UnidadeController::class, 'destroy']);
         });
 
+        // =========================
+        // RESERVAS
+        // =========================
+
+        Route::prefix("/reservas")->group(function() {
+
+            //Rota para o sindico exibir todas as reservas que estão pendentes
+            Route::get('/pendentes/get', [ReservaController::class, 'indexSindico']);
+
+            //Rota para o sindico aprovar a reserva do morador
+            Route::put("/aproved/{id}", [ReservaController::class, 'aprovedRervation']);
+
+            //Rota que recupera todas as reservas de um determinado dia
+            Route::post('/reservation/date', [ReservaController::class, 'getReservationsDate']);
+        });
+
+
     });
 
 
@@ -228,7 +245,7 @@ Route::middleware('auth:sanctum')->group(function () {
     */
 
     Route::middleware('ability:morador')
-        ->prefix('morador')
+        ->prefix('/morador')
         ->group(function () {
 
 
@@ -313,7 +330,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // ESPAÇOS
         // =========================
 
-        Route::prefix('espaco')->group(function () {
+        Route::prefix('/espaco')->group(function () {
 
             // Morador pode visualizar os espaços
             Route::get('/get', [
@@ -332,37 +349,19 @@ Route::middleware('auth:sanctum')->group(function () {
         // RESERVAS
         // =========================
 
-        Route::prefix('reserva')->group(function () {
+        Route::prefix('/reservas')->group(function () {
 
-            // Morador visualiza suas reservas
-            Route::get('/get', [
-                ReservaController::class,
-                'index'
-            ]);
+           //Rota que recupera todas as resevas de um morador logado
+           Route::get('/get', [ReservaController::class, 'indexMorador']);
 
-            // Morador visualiza uma reserva específica
-            Route::get('/show/{id}', [
-                ReservaController::class,
-                'show'
-            ]);
+           //Rota que recupera os detalhes de uma reserva
+           Route::get('/show/{id}', [ReservaController::class, 'showMorador']);
 
-            // Morador cria uma reserva
-            Route::post('/create', [
-                ReservaController::class,
-                'store'
-            ]);
+           //Rota que cadastra uma reserva
+           Route::post('/create', [ReservaController::class, 'store']);
 
-            // Morador atualiza uma reserva
-            Route::put('/update/{id}', [
-                ReservaController::class,
-                'update'
-            ]);
-
-            // Morador cancela uma reserva
-            Route::delete('/delete/{id}', [
-                ReservaController::class,
-                'destroy'
-            ]);
+           //Rota que o morador cancela a sua reserva
+           Route::put('/cancel/{id}', [ReservaController::class, 'cancelReservation']);
 
         });
 
