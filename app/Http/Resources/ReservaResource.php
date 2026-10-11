@@ -15,7 +15,8 @@ class ReservaResource extends JsonResource
         return [
             'id' => $this->pk_id_reserva,
 
-            'morador' => $this->fk_id_morador,
+            'morador' => new MoradorResurce($this->morador),
+            
             'espaco_id' => $this->fk_id_espaco,
 
             'data' => $this->data_reserva,

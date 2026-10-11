@@ -236,6 +236,23 @@ class ReservaController extends Controller
         );
     }
 
+    //Função que pega uma única reserva para o sindico
+    public function showReservationSindico(string $id){
+
+        //Recuperando a reserva selecionada
+        $reserva = Reserva::find($id);
+
+        //Retorna um json de sucesso
+        return $this->responseJson(
+            'Reserva recuperada com sucesso.', //menssagem
+            200, //status
+            //Dados
+            [
+                "reserva" => new ReservaResource($reserva)
+            ]
+        );
+    }
+
    
 
     
