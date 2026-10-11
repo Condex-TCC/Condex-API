@@ -182,16 +182,25 @@ class ReservaController extends Controller
         //Recuperando a reserva do morador
         $reserva = Reserva::find($id);
 
+        //Mensagem que será envia no json
+        $menssagem = "";
+
         //Varificando se a reseva foi aprovada
         if($aprovada == true){
 
             //Muda o status da reserva para comfirmada
             $reserva->status_reserva = "confimada";
 
+            //Adicionando a menssagem
+            $menssagem = 'Reserva autorizada com sucesso!';
+
         }else{
 
             //Muda o status da reserva para comfirmada
             $reserva->status_reserva = "cancelada";
+
+            //Adicionando a menssagem
+            $menssagem = 'Reserva cancelada com sucesso!';
 
         }
 
@@ -200,7 +209,7 @@ class ReservaController extends Controller
 
         //Retorna um json de sucesso
         return $this->responseJson(
-            'Reserva cancelada com sucesso.', //menssagem
+            $menssagem, //menssagem
             200, //status
             //Dados
             [

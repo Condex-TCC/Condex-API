@@ -17,7 +17,7 @@ class ReservaResource extends JsonResource
 
             'morador' => new MoradorResurce($this->morador),
             
-            'espaco_id' => $this->fk_id_espaco,
+            'espaco' => new EspacoResource($this->espaco),
 
             'data' => $this->data_reserva,
             'inicio' => $this->hora_inicio,
