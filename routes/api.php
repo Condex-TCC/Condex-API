@@ -8,7 +8,7 @@ use App\Http\Controllers\MoradorController;
 use App\Http\Controllers\PorteiroController;
 use App\Http\Controllers\VisitanteController;
 use App\Http\Controllers\EncomendaController;
-use App\Http\Controllers\AutorizacaoVisitanteController;
+use App\Http\Controllers\VisitaController;
 use App\Http\Controllers\RegrasController;
 use App\Http\Controllers\LaudoController;
 use App\Http\Controllers\EspacoController;
@@ -417,72 +417,67 @@ Route::middleware('auth:sanctum')->group(function () {
 
         });
 
-        // =========================
-        // AUTORIZAÇÃO DE VISITANTES
-        // =========================
-
-        Route::prefix('autorizacao')->group(function () {
-
-            // Consultar visitantes autorizados
-            Route::get('/authorized', [
-                AutorizacaoVisitanteController::class,
-                'getAuthorizedVisitors'
-            ]);
-
-            // Liberar entrada
-            Route::put('/entry/{id}', [
-                AutorizacaoVisitanteController::class,
-                'allowEntry'
-            ]);
-
-            // Registrar saída
-            Route::put('/exit/{id}', [
-                AutorizacaoVisitanteController::class,
-                'registerExit'
-            ]);
-
-        });
         
         // =========================
-        // VISITANTES E VISITAS
+        // VISITANTES
         // =========================
 
         Route::prefix('visitante')->group(function () {
 
+            // Listar visitantes
             Route::get('/get', [
                 VisitanteController::class,
                 'index'
             ]);
 
+            // Consultar um visitante
             Route::get('/show/{id}', [
                 VisitanteController::class,
                 'show'
             ]);
 
+            // Cadastrar visitante
             Route::post('/create', [
                 VisitanteController::class,
                 'store'
             ]);
 
+            // Atualizar visitante
             Route::put('/update/{id}', [
                 VisitanteController::class,
                 'update'
             ]);
 
+            // Excluir visitante
             Route::delete('/delete/{id}', [
                 VisitanteController::class,
                 'destroy'
             ]);
         });
 
-            // Histórico de visitas
-            Route::prefix('visita')->group(function () {
+        // =========================
+        // ENTRADA, SAÍDA E HISTÓRICO
+        // =========================
 
-            Route::get('/get', [
-                AutorizacaoVisitanteController::class,
-                'getVisitHistory'
+        Route::prefix('visita')->group(function () {
+
+            // Liberar entrada após autorização pelo interfone
+            Route::put('/entry/{id}', [
+                VisitaController::class,
+                'allowEntry'
             ]);
 
+            // Registrar saída
+            Route::put('/exit/{id}', [
+                VisitaController::class,
+                'registerExit'
+            ]);
+
+            // Consultar histórico de visitas
+            Route::get('/get', [
+                VisitaController::class,
+                'index'
+            ]);
         });
 
 
