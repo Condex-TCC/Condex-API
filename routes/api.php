@@ -232,6 +232,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
             //Rota que recupera todas as reservas de um determinado dia
             Route::post('/reservation/date', [ReservaController::class, 'getReservationsDate']);
+
+            //Rota que recupera os detalhes de uma única reserva
+            Route::get("/show/{id}", [ReservaController::class, 'showReservationSindico']);
         });
 
 
