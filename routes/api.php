@@ -29,9 +29,16 @@ use App\Models\Envio;
 Route::post('/login', [LoginController::class, 'login']);
 
 // Rota para deslogar
-Route::post('/logout', [LoginController::class, 'logout'])
-    ->middleware('auth:sanctum');
+Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum');
 
+/*
+|--------------------------------------------------------------------------
+| ATUALIZAR DADOS DO PERFIL
+|--------------------------------------------------------------------------
+*/
+
+//Rotas responsavel por chamar a função que atualiza o perfil
+Route::post("/updade/perfil", [LoginController::class, 'updatePerfil'])->middleware('auth:sanctum');
 
 /*
 |--------------------------------------------------------------------------
@@ -50,8 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('ability:sindico')
         ->prefix('/sindico')
-        ->group(function () {
-
+        ->group(function () {        
 
         // =========================
         // MORADORES
