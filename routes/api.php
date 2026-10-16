@@ -33,12 +33,15 @@ Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:san
 
 /*
 |--------------------------------------------------------------------------
-| ATUALIZAR DADOS DO PERFIL
+| ATUALIZA PERFIL
 |--------------------------------------------------------------------------
 */
 
 //Rotas responsavel por chamar a função que atualiza o perfil
 Route::post("/updade/perfil", [LoginController::class, 'updatePerfil'])->middleware('auth:sanctum');
+
+//Rota responsavel por fazer puxar os dados do usuário logado
+Route::get("update/user/show/{tipoUser}", [LoginController::class, 'showUser'])->middleware('auth:sanctum');
 
 /*
 |--------------------------------------------------------------------------

@@ -300,4 +300,85 @@ class LoginController extends Controller
                 break;
         }
     }
+
+    //Função que recupera os dados do usuário logado
+    public function showUser(Request $request, string $tipoUser){
+
+        //Vericando o tipo se usuário para realizar a busca
+        switch($tipoUser){
+            //Sindico
+            case "Sindico":
+
+                //Pegando a pk
+                $pkSindico = $request->user()->pk_id_sindico;
+                
+                //Buscando os dados do sindico
+                $sindico = Sindico::find($pkSindico);
+
+                //Retorna o registro do sindico em json
+                return $this->responseJson(
+                    "Sindico recuperado com sucesso!", //Menssagem
+                    200, //Status code
+                    //Dados
+                    [
+                        "sindico" => new SindicoResource($sindico)
+                    ]
+                );
+
+                break;
+
+            //Morador
+            case "Morador":
+
+                //Pegando a pk
+                $pkMorador = $request->user()->pk_id_morador;
+                
+                //Buscando os dados do morador
+                $morador = Morador::find($pkMorador);
+
+                //Retorna o registro do moraodor em json
+                return $this->responseJson(
+                    "Morador recuperado com sucesso!", //Menssagem
+                    200, //Status code
+                    //Dados
+                    [
+                        "morador" => new MoradorResurce($morador)
+                    ]
+                );
+
+                break;
+
+            //Porteiro
+            case "Porteiro":
+
+                //Pegando a pk
+                $pkPorteiro = $request->user()->pk_id_porteiro;
+                
+                //Buscando os dados do porteiro
+                $porteiro = Porteiro::find($pkPorteiro);
+
+                //Retorna o registro do porteiro em json
+                return $this->responseJson(
+                    "Portiero recuperado com sucesso!", //Menssagem
+                    200, //Status code
+                    //Dados
+                    [
+                        "porteiro" => new PorteiroResurce($porteiro)
+                    ]
+                );
+
+                break;
+
+            //Caso todos falhem
+            default:
+
+                //Retorna um json com formtação padrão para erro
+                return $this->errorJson(
+                    "Não foi encontrado o usuário para alterar! Digite Sindico, Morador ou Porteiro",
+                    400,
+                );
+
+                break;
+        }
+    }
 }
