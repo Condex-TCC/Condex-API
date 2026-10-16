@@ -53,10 +53,13 @@ public function indexMorador(Request $request)
 
     // Retornando as encomendas do morador
     return $this->responseJson(
-        "Encomendas do morador recuperadas com sucesso!",
-        200,
-        [$jsonTratado]
-    );
+    "Encomendas do morador recuperadas com sucesso!",
+    200,
+    [
+        'encomendas' => $jsonTratado
+    ]
+);
+
 }
 
 
@@ -91,8 +94,8 @@ public function showMorador(Request $request, string $id)
         "Encomenda recuperada com sucesso!",
         200,
         [
-            new EncomendaResources($encomenda)
-        ]
+            'encomenda' => new EncomendaResources($encomenda)
+       ]
     );
 }
 

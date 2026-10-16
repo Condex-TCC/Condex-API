@@ -380,7 +380,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'storeMorador'
             ]);
 
-            Route::get('/visitante/get', [
+            Route::get('/get', [
                 VisitanteController::class, 
                 'indexMorador'
             ]);
