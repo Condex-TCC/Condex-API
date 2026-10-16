@@ -8,7 +8,7 @@ use App\Http\Controllers\MoradorController;
 use App\Http\Controllers\PorteiroController;
 use App\Http\Controllers\VisitanteController;
 use App\Http\Controllers\EncomendaController;
-use App\Http\Controllers\AutorizacaoVisitanteController;
+use App\Http\Controllers\VisitaController;
 use App\Http\Controllers\RegrasController;
 use App\Http\Controllers\LaudoController;
 use App\Http\Controllers\EspacoController;
@@ -389,7 +389,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'storeMorador'
             ]);
 
-            Route::get('/visitante/get', [
+            Route::get('/get', [
                 VisitanteController::class, 
                 'indexMorador'
             ]);
@@ -408,35 +408,87 @@ Route::middleware('auth:sanctum')->group(function () {
         ->prefix('porteiro')
         ->group(function () {
 
+
+        // =========================
+        // MORADORES
+        // =========================
+
+        Route::prefix('morador')->group(function () {
+
+            // Recuperar todos os moradores
+            Route::get('/get', [
+                MoradorController::class,
+                'index'
+            ]);
+
+            // Recuperar um morador específico
+            Route::get('/show/{id}', [
+                MoradorController::class,
+                'show'
+            ]);
+
+        });
+
+        
         // =========================
         // VISITANTES
         // =========================
 
         Route::prefix('visitante')->group(function () {
 
+            // Listar visitantes
             Route::get('/get', [
                 VisitanteController::class,
                 'index'
             ]);
 
+            // Consultar um visitante
             Route::get('/show/{id}', [
                 VisitanteController::class,
                 'show'
             ]);
 
+            // Cadastrar visitante
             Route::post('/create', [
                 VisitanteController::class,
                 'store'
             ]);
 
+            // Atualizar visitante
             Route::put('/update/{id}', [
                 VisitanteController::class,
                 'update'
             ]);
 
+            // Excluir visitante
             Route::delete('/delete/{id}', [
                 VisitanteController::class,
                 'destroy'
+            ]);
+        });
+
+        // =========================
+        // ENTRADA, SAÍDA E HISTÓRICO
+        // =========================
+
+        Route::prefix('visita')->group(function () {
+
+            // Liberar entrada após autorização pelo interfone
+            Route::put('/entry/{id}', [
+                VisitaController::class,
+                'allowEntry'
+            ]);
+
+            // Registrar saída
+            Route::put('/exit/{id}', [
+                VisitaController::class,
+                'registerExit'
+            ]);
+
+            // Consultar histórico de visitas
+            Route::get('/get', [
+                VisitaController::class,
+                'index'
             ]);
         });
 
@@ -447,32 +499,43 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('encomenda')->group(function () {
 
-            Route::get('/get', [
-                EncomendaController::class,
-                'index'
-            ]);
+        // Listar todas as encomendas
+        Route::get('/get', [
+            EncomendaController::class,
+            'index'
+        ]);
 
-            Route::post('/create', [
-                EncomendaController::class,
-                'store'
-            ]);
+        // Consultar uma encomenda
+        Route::get('/show/{id}', [
+            EncomendaController::class,
+            'show'
+        ]);
 
-            Route::put('/update/{id}', [
-                EncomendaController::class,
-                'update'
-            ]);
+        // Cadastrar uma encomenda
+        Route::post('/create', [
+            EncomendaController::class,
+            'store'
+        ]);
 
-            Route::delete('/delete/{id}', [
-                EncomendaController::class,
-                'destroy'
-            ]);
+        // Atualizar uma encomenda
+        Route::put('/update/{id}', [
+            EncomendaController::class,
+            'update'
+        ]);
 
-            // Registrar retirada de uma encomenda
-            Route::put('/withdraw/{id}', [
-                EncomendaController::class,
-                'registerWithdrawal'
-            ]);
-        });
+        // Registrar retirada
+        Route::put('/withdraw/{id}', [
+            EncomendaController::class,
+            'registerWithdrawal'
+        ]);
+
+        // Excluir uma encomenda
+        Route::delete('/delete/{id}', [
+            EncomendaController::class,
+            'destroy'
+        ]);
+
+      });
 
 
     });
