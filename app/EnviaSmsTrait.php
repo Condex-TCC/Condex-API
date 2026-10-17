@@ -53,11 +53,16 @@ trait EnviaSmsTrait
         // Tenta chamar a API; qualquer erro de conexão cairá no catch.
         try {
 
+            //Instancia a classe
+            $smsFacil = new SmsFacilService();
+
             // Pede ao Laravel uma instância do Service e envia o SMS; guarda a resposta crua.
-            $resposta = app(SmsFacilService::class)->enviarSms($telefone, $texto);
+            $resposta = $smsFacil->enviarSms($telefone, $texto);
 
         } catch (Throwable $e) {
-            
+
+            //AQUI TRATA AS FALHAS NO MOMENTO EM QUE SE REALIZA O REQUEST    
+
             // Registra o erro técnico no log (nunca registre usuário/senha).
             Log::error('SMS Fácil: falha ao chamar a API.', ['erro' => $e->getMessage()]);
 
@@ -73,9 +78,12 @@ trait EnviaSmsTrait
 
         // Se o HTTP foi bem-sucedido E o provedor marcou este item como sucesso...
         if ($resposta->successful() && ($item['sucesso'] ?? false) === true) {
+
             // ...devolve sucesso; o recibo é o texto do resultado sem o prefixo "OK ".
             return ['sucesso' => true, 'mensagem' => 'SMS enviado para a fila de envio.', 'status' => 200, 'recibo' => trim(preg_replace('/^OK\s*/i', '', $resultado))];
         }
+
+        //AQUI SE TRATA OS ERROS NAS VINDOS NA RESPONSE
 
         // Daqui para baixo houve falha: registra o status HTTP e o código do provedor no log.
         Log::error('SMS Fácil: envio recusado.', ['http' => $resposta->status(), 'codigo' => $resultado]);
