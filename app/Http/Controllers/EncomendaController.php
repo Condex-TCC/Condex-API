@@ -29,7 +29,9 @@ public function index()
     return $this->responseJson(
         'Encomendas recuperadas com sucesso!',
         200,
-        $jsonTratado
+        [
+            $jsonTratado
+        ]
     );
 }
 
@@ -123,7 +125,9 @@ public function store(Request $request)
         return $this->errorJson(
             'Os dados passados não estão corretos!',
             422,
-            $validator->errors()
+            [
+                $validator->errors()
+            ]
         );
     }
 
@@ -134,7 +138,9 @@ public function store(Request $request)
     return $this->responseJson(
         'Encomenda criada com sucesso!',
         201,
-        new EncomendaResources($novaEncomenda)
+        [
+            new EncomendaResources($novaEncomenda)
+        ]
     );
 }
 
@@ -157,7 +163,9 @@ public function show(string $id)
     return $this->responseJson(
         'Encomenda recuperada com sucesso!',
         200,
-        new EncomendaResources($encomenda)
+        [
+            new EncomendaResources($encomenda)
+        ]
     );
 }
 
