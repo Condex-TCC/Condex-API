@@ -80,9 +80,6 @@ Route::middleware('auth:sanctum')->group(function () {
             // Criar um morador
             Route::post('/create', [MoradorController::class, 'store']);
 
-            // Atualizar um morador
-            Route::put('/update/{id}', [MoradorController::class, 'update']);
-
             // Deletar um morador
             Route::delete('/delete/{id}', [MoradorController::class, 'destroy']);
         });
@@ -102,9 +99,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
             // Criar um porteiro
             Route::post('/create', [PorteiroController::class, 'store']);
-
-            // Atualizar um porteiro
-            Route::put('/update/{id}', [PorteiroController::class, 'update']);
 
             // Deletar um porteiro
             Route::delete('/delete/{id}', [PorteiroController::class, 'destroy']);
