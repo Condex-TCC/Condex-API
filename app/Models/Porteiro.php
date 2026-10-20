@@ -28,7 +28,6 @@ class Porteiro extends Authenticatable
         "nome_porteiro",
         "email_porteiro",
         "senha_porteiro",
-        "nome_porteiro",
         "telefone_porteiro",
         "cpf_porteiro",
         "primeiro_acesso_porteiro",

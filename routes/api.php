@@ -15,6 +15,7 @@ use App\Http\Controllers\EspacoController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\ComunicadoController;
 use App\Http\Controllers\EnvioController;
+use App\Http\Controllers\PerfilUsuarioController;
 use App\Http\Controllers\UnidadeController;
 use App\Http\Resources\ReservaResource;
 use App\Models\Envio;
@@ -37,11 +38,16 @@ Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:san
 |--------------------------------------------------------------------------
 */
 
-//Rotas responsavel por chamar a função que atualiza o perfil
-Route::post("/updade/perfil", [LoginController::class, 'updatePerfil'])->middleware('auth:sanctum');
+//Grupo de rotas responsaveis por autorizar os perfis
+Route::middleware('auth:sanctum')->prefix("/perfil")->group(function(){
 
-//Rota responsavel por fazer puxar os dados do usuário logado
-Route::get("update/user/show/{tipoUser}", [LoginController::class, 'showUser'])->middleware('auth:sanctum');
+    //Rotas responsavel por chamar a função que atualiza o perfil
+    Route::post("/updade", [PerfilUsuarioController::class, 'updatePerfil']);
+
+    //Rota responsavel por fazer puxar os dados do usuário logado
+    Route::get("show/{tipoUser}", [PerfilUsuarioController::class, 'showUser']);
+
+});
 
 /*
 |--------------------------------------------------------------------------
