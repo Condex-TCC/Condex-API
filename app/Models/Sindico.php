@@ -28,7 +28,10 @@ class Sindico extends Authenticatable
         "nome_sindico",
         "telefone_sindico",
         "email_sindico",
-        "senha_sindico"
+        "senha_sindico",
+        "cpf_sindico",
+        "primeiro_acesso_sindico",
+        "codigo_senha_sindico",
     ];
 
     /**

@@ -14,9 +14,9 @@ class SindicoFactory extends Factory
     {
         //Retorna os dados falsos
         return [
-            "nome_sindico" => $this->faker->name(), //Gera um nome falso
-            "telefone_sindico" => $this->faker->phoneNumber(), //Gera um número de telfone falso
-            "email_sindico" => $this->faker->email(), //Gera um email falos
+            "nome_sindico" => "Sindico Condex", //Gera um nome falso
+            "telefone_sindico" => "19999101234", //Gera um número de telfone falso
+            "email_sindico" => "sindico.condex@sistema.com.br", //Gera um email falos
             "senha_sindico" => Hash::make("password") //gera uma hash, mas todas as senhas são password
         ];
     }

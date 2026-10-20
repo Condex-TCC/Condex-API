@@ -16,6 +16,13 @@ return new class extends Migration
             $table->string("email_morador", 150); //Campo de email do morador
             $table->string("telefone_morador", 20); //Campo do telefone do morador
             $table->string("senha_morador"); //Campo de senha do morador
+
+            //Campo que verifica se foi o primeiro acesso do usuário
+            $table->boolean("primeiro_acesso_morador")->default(false);
+
+            //Campo que armazena o código para redefinir a senha do moraodor
+            $table->boolean("codigo_senha_morador")->nullable()->default(null);
+
             $table->unsignedBigInteger("fk_id_unidade_morador"); //Campo que irá armazenar o relacionanemtno com unidade
 
             //Fazendo o relacionamento com a unidade

@@ -31,6 +31,8 @@ class Morador extends Authenticatable
         "telefone_morador",
         "senha_morador",
         "fk_id_unidade_morador",
+        "primeiro_acesso_morador",
+        "codigo_senha_morador",
     ];
 
     /**

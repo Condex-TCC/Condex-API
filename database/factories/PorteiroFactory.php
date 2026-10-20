@@ -14,7 +14,6 @@ class PorteiroFactory extends Factory
     {
         //Retorna os dados falsos
         return [
-            'nome_porteiro' => $this->faker->name(), //Gera um nome falso
             'email_porteiro' => $this->faker->email(), //Gera um email falso
             'senha_porteiro' => Hash::make('password') //Gera um hash, onde a senha sempre será password
         ];

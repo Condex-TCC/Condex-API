@@ -27,7 +27,12 @@ class Porteiro extends Authenticatable
     protected $fillable = [
         "nome_porteiro",
         "email_porteiro",
-        "senha_porteiro"
+        "senha_porteiro",
+        "nome_porteiro",
+        "telefone_porteiro",
+        "cpf_porteiro",
+        "primeiro_acesso_porteiro",
+        "codigo_senha_porterio"
     ];
 
     /**
