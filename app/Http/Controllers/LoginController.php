@@ -29,6 +29,9 @@ class LoginController extends Controller
         //Variável que irá guardar o token
         $token = "";
 
+        //Variável que irá garudar se já realizou o primeiro login
+        $primerioLogin = false;
+
         //Pegando os dados do corpo da requisição
         $email = $request->input("email");
         $senha = $request->input("password");
@@ -41,6 +44,9 @@ class LoginController extends Controller
 
             //Pegando o sindico logado
             $sindico = $request->user('sindico');
+
+            //Pegando se esse usuário já realizou o primeiro login
+            $primerioLogin = $sindico->primeiro_acesso_sindico;
 
             //Criando um token para o sindico que logou no sistema
             //O nome do token é sindico | As habilidades passadas são de sindico
@@ -56,6 +62,9 @@ class LoginController extends Controller
             //Pegando o morador logado
             $morador = $request->user('morador');
 
+            //Pegando se esse usuário já realizou o primeiro login
+            $primerioLogin = $morador->primeiro_acesso_morador;
+
             //Criando um token para o morador que logou no sistema
             //O nome do token é morador | As habilidades passadas são de morador
             $token = $morador->createToken("morador", ["morador"])->plainTextToken;
@@ -69,6 +78,9 @@ class LoginController extends Controller
 
             //Pegando o porteiro logado
             $porteiro = $request->user('porteiro');
+
+            //Pegando se esse usuário já realizou o primeiro login
+            $primerioLogin = $porteiro->primeiro_acesso_porteiro;
 
             //Criando um token para o porteiro que logou no sistema
             //O nome do token é porteiro | As habilidades passadas são de porteiro
@@ -94,6 +106,7 @@ class LoginController extends Controller
             [
                 "tipo_usuario" => $tipoUsuario, //Realiza a passagem do tipo de usuário
                 "token" => $token, //Realiza a passagem do token
+                "primeiro_acesso" => $primerioLogin === 1 ? true : false, //Realiza a passagen se o usuário já realizou o primeiro login
             ]
         );
     }
