@@ -37,14 +37,12 @@ class PorteiroController extends Controller
     {
         //Pegando os dados do corpo da requisição e montando um array com os campos do banco de dados
         $dadosMapeados = [
-            "nome_porteiro" => $request->input("nome"),
             "email_porteiro" => $request->input("email"),
-            "senha_porteiro" => Hash::make($request->input("password")),
+            "senha_porteiro" => Hash::make("password"),
         ];
 
         //Validando o array mapeado
         $validator = Validator::make($dadosMapeados, [
-            "nome_porteiro" => 'required|string|max:100',
             "email_porteiro" => 'required|string|max:150',
             "senha_porteiro" => "required",
         ]);

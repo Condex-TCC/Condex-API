@@ -16,7 +16,8 @@ class SindicoResource extends JsonResource
             "id" => $this->pk_id_sindico,
             "nome" => $this->nome_sindico,
             "telefone" => $this->telefone_sindico,
-            "email" => $this->email_sindico
+            "email" => $this->email_sindico,
+            "cpf" => $this->cpf_sindico,
         ];
     }
 }

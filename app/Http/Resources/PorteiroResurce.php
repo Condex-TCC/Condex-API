@@ -17,6 +17,8 @@ class PorteiroResurce extends JsonResource
             "id" => $this->pk_id_porteiro, //Envia o id
             "nome" => $this->nome_porteiro, //Envia o nome
             "email" => $this->email_porteiro, //Envia o email
+            "telefone" => $this->telefone_porteiro, //Envia o telefone
+            "cpf" => $this->cpf_porteiro, //Envia o cpf do porteiro
         ];
     }
 }

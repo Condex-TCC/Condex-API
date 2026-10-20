@@ -37,20 +37,14 @@ class MoradorController extends Controller
     {
         //Pegando os dados do corpo da requisição e montando um array com os campos do banco de dados
         $dadosMapeados = [
-            "nome_morador" => $request->input("nome"), //Pegando o nome
-            "cpf_morador" => $request->input("cpf"), //Pegando o cpf
             "email_morador" => $request->input("email"), //Pegando o email
-            "telefone_morador" => $request->input("telefone"), //Pegando o telefone
-            "senha_morador" => Hash::make($request->input("password")), //Pegando a senha e transformando-a em hash
+            "senha_morador" => Hash::make("password"), //Pegando a senha e transformando-a em hash
             "fk_id_unidade_morador" => $request->input("id_unidade"), //Pegando o id da unidade
         ];
 
         //Validando o array mapeado
         $validator = Validator::make($dadosMapeados, [
-            "nome_morador" => 'required|string|max:100',
-            "cpf_morador" => 'required|string|min:14',
             "email_morador" => 'required|string|max:150',
-            "telefone_morador" => 'required|string|max:20',
             "senha_morador" => "required",
             "fk_id_unidade_morador" => 'required|numeric',
         ]);
@@ -75,7 +69,7 @@ class MoradorController extends Controller
 
         //Retornando um json de sucuesso
         return $this->responseJson(
-            "Morador criado com sucesso!", //Menssagem
+            "Morador criado com sucesso! A senha padrão é password", //Menssagem
             200, //Status code
             //Passando os dados
             [
