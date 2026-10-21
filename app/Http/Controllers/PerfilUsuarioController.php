@@ -237,7 +237,7 @@ class PerfilUsuarioController extends Controller
                     200, //Status code
                     //Dados
                     [
-                        "sindico" => new SindicoResource($sindico)
+                        "usuario" => new SindicoResource($sindico)
                     ]
                 );
 
@@ -258,7 +258,7 @@ class PerfilUsuarioController extends Controller
                     200, //Status code
                     //Dados
                     [
-                        "morador" => new MoradorResurce($morador)
+                        "usuario" => new MoradorResurce($morador)
                     ]
                 );
 
@@ -279,7 +279,7 @@ class PerfilUsuarioController extends Controller
                     200, //Status code
                     //Dados
                     [
-                        "porteiro" => new PorteiroResurce($porteiro)
+                        "usuario" => new PorteiroResurce($porteiro)
                     ]
                 );
 
