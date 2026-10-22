@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +43,9 @@ Route::middleware('auth:sanctum')->prefix("/perfil")->group(function(){
 
     //Rotas responsavel por chamar a função que atualiza o perfil
     Route::post("/updade", [PerfilUsuarioController::class, 'updatePerfil']);
+
+    //Rota responsável por chamar a função do primerio acesso ao sistema
+    Route::post("/primeiroAcesso", [PerfilUsuarioController::class, 'primeiroAcesso']);
 
     //Rota responsavel por fazer puxar os dados do usuário logado
     Route::get("show/{tipoUser}", [PerfilUsuarioController::class, 'showUser']);
