@@ -514,7 +514,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('visita')->group(function () {
 
             // Liberar entrada após autorização pelo interfone
-            Route::put('/entry/{id}', [
+            Route::put('/entry', [
                 VisitaController::class,
                 'allowEntry'
             ]);
