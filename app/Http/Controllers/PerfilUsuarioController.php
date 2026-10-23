@@ -11,6 +11,7 @@ use App\Models\Morador;
 use App\Models\Porteiro;
 use App\Models\Sindico;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 
 class PerfilUsuarioController extends Controller
 {
@@ -291,6 +292,218 @@ class PerfilUsuarioController extends Controller
                 //Retorna um json com formtação padrão para erro
                 return $this->errorJson(
                     "Não foi encontrado o usuário para alterar! Digite Sindico, Morador ou Porteiro",
+                    400,
+                );
+
+                break;
+        }
+    }
+
+    //Função que realiza o primeiro acesso ao sistema
+    public function primeiroAcesso(Request $request){
+
+        //Pegando o usuário que realizou a atualização nos dados do perfil
+        $tipoUsuario = $request->input("usuario");
+
+        //Pegando o array com os dados do usuário
+        $dadosUsuario = $request->input("dados");
+
+        //Array que irá armazenar todos os dados dos usuários
+        $dadosMapeados = [];
+
+        //Verifica o nivel de acesso para realizar a atualização dos dados
+        switch($tipoUsuario){
+            //Sindico
+            case "Sindico":
+                
+                //Pegando a pk do sindico
+                $pkSindico = $request->user()->pk_id_sindico;
+                
+                //Pegando os dados do sindico
+                $dadosMapeados = [
+                    "nome_sindico" => $dadosUsuario['nome'],
+                    "telefone_sindico" => $dadosUsuario['telefone'],
+                    "email_sindico" => $dadosUsuario['email'],
+                    "cpf_sindico" => $dadosUsuario["cpf"],
+
+                    //Altera para validar o primeiro acesso
+                    "primeiro_acesso_sindico" => true,
+
+                    //Pega o campo de senha
+                    "senha_sindico" => Hash::make($dadosUsuario["password"])
+                ];
+                //Validando o array mapeado
+                $validator = Validator::make($dadosMapeados, [
+                    "nome_sindico" => 'required|string',
+                    "email_sindico" => 'required|string',
+                    "telefone_sindico" => 'required|numeric',
+                    "cpf_sindico" => 'required',
+                    "senha_sindico" => 'required'
+                ]);
+
+                //Caso os dados não passasem na validação
+                if($validator->fails()){
+
+                    //Retorna um Json com fotmatação de erro
+                    return $this->errorJson(
+                        "Os dados passados não estão corretos!", //Menssagem
+                        400, //Status code
+                        //Passando os erros
+                        [
+                            //Pegando o array de erros dados pelo validator
+                            $validator->errors()
+                        ]
+                    );
+                }
+
+                //Recupera o registro do sindico
+                $sindico = Sindico::find($pkSindico);
+
+                //Atualizando o registro do sindico
+                $sindicoAtualizado = $sindico->update($dadosMapeados);
+
+                //Retorna o registro do sindico em json
+                return $this->responseJson(
+                    "Primeiro acesso reito com sucesso!", //Menssagem
+                    200, //Status code
+                    //Dados
+                    [
+                        "sindico" => new SindicoResource(Sindico::find($pkSindico))
+                    ]
+                );
+
+                break;
+            
+            //Morador
+            case "Morador":
+
+                //Pegando a pk do morador
+                $pkMorador = $request->user()->pk_id_morador;
+
+                //Pegando os dados do sindico
+                $dadosMapeados = [
+                    "nome_morador" => $dadosUsuario['nome'],
+                    "cpf_morador" => $dadosUsuario['cpf'],
+                    "email_morador" => $dadosUsuario['email'],
+                    "telefone_morador" => $dadosUsuario['telefone'],
+
+                    //Altera para validar o primeiro acesso
+                    "primeiro_acesso_morador" => true,
+
+                    //Pega o campo de senha
+                    "senha_morador" => Hash::make($dadosUsuario["password"])
+                ];
+
+                //Validando o array mapeado
+                $validator = Validator::make($dadosMapeados, [
+                    "nome_morador" => "required|string",
+                    "cpf_morador" => "required|string",
+                    "email_morador" => "required|string",
+                    "telefone_morador" => "required|numeric",
+                    "senha_morador" => "required",
+                ]);
+
+                //Caso os dados não passasem na validação
+                if($validator->fails()){
+
+                    //Retorna um Json com fotmatação de erro
+                    return $this->errorJson(
+                        "Os dados passados não estão corretos!", //Menssagem
+                        400, //Status code
+                        //Passando os erros
+                        [
+                            //Pegando o array de erros dados pelo validator
+                            $validator->errors()
+                        ]
+                    );
+                }
+
+                //Recupera o registro do morador logado
+                $morador = Morador::find($pkMorador);
+
+                //Atualizando o registro do morador
+                $moradorAtualizado = $morador->update($dadosMapeados);
+
+                //Retorna o registro do sindico em json
+                return $this->responseJson(
+                    "Perfil do moraodor Atualizado com sucesso!", //Menssagem
+                    200, //Status code
+                    //Dados
+                    [
+                        "morador" => new MoradorResurce(Morador::find($pkMorador))
+                    ]
+                );
+
+                break;
+
+            //Porteiro
+            case  "Porteiro":
+
+                //Pegando a pk do porteiro
+                $pkPorteiro = $request->user()->pk_id_porteiro;
+
+                //Pegando os dados do porteiro
+                $dadosMapeados = [
+                    "nome_porteiro" => $dadosUsuario['nome'],
+                    "email_porteiro" => $dadosUsuario['email'],
+                    "telefone_porteiro" => $dadosUsuario['telefone'],
+                    "cpf_porteiro" => $dadosUsuario['cpf'],
+
+                    //Altera para validar o primeiro acesso
+                    "primeiro_acesso_porteiro" => true,
+
+                    //Pega o campo de senha
+                    "senha_porteiro" => Hash::make($dadosUsuario["password"])
+                ];
+
+                //Validando o array mapeado
+                $validator = Validator::make($dadosMapeados, [
+                    "nome_porteiro" => "required|string",
+                    "email_porteiro"  => "required|string",
+                    "telefone_porteiro" => "required|string",
+                    "cpf_porteiro" => "required|string",
+                    "senha_porteiro" => "required"
+                ]);
+
+                //Caso os dados não passasem na validação
+                if($validator->fails()){
+
+                    //Retorna um Json com fotmatação de erro
+                    return $this->errorJson(
+                        "Os dados passados não estão corretos!", //Menssagem
+                        400, //Status code
+                        //Passando os erros
+                        [
+                            //Pegando o array de erros dados pelo validator
+                            $validator->errors()
+                        ]
+                    );
+                }
+
+                //Recupera o registro do porteiro logado
+                $porteiro = Porteiro::find($pkPorteiro);
+
+                //Atualizando o registro do porteiro
+                $porteiroAtualizado = $porteiro->update($dadosMapeados);
+
+                //Retorna o registro do porteiro em json
+                return $this->responseJson(
+                    "Perfil porteiro Atualizado com sucesso!", //Menssagem
+                    200, //Status code
+                    //Dados
+                    [
+                        "porteiro" => new PorteiroResurce(Porteiro::find($pkPorteiro))
+                    ]
+                );
+
+                break;
+            
+            //Caso todos falhem
+            default:
+
+                //Retorna um json com formtação padrão para erro
+                return $this->errorJson(
+                    "Primeiro acesso negado! Tente mais tarde!",
                     400,
                 );
 
