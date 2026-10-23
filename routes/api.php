@@ -16,6 +16,7 @@ use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\ComunicadoController;
 use App\Http\Controllers\EnvioController;
 use App\Http\Controllers\PerfilUsuarioController;
+use App\Http\Controllers\ReclamacaoesController;
 use App\Http\Controllers\UnidadeController;
 use App\Http\Resources\ReservaResource;
 use App\Models\Envio;
@@ -249,7 +250,25 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get("/show/{id}", [ReservaController::class, 'showReservationSindico']);
         });
 
+        // =========================
+        // RECLAMAÇÕES
+        // =========================
 
+        // Grupo de rotas para reclamação
+        Route::prefix('/reclamacao')->group(function () {
+
+            //Rota que recupera as reclamações dos moradores
+            Route::get('/get', [ReclamacaoesController::class, "indexSindico"]);
+
+            //Rota que recupera todos os registro de reclamações cadastradas no banco de dados
+            Route::get("/historico/get", [ReclamacaoesController::class, "historicoSindico"]);
+
+            //Rota que recupera uma reclamação | Marca como visualizada
+            Route::post('/show/{id}', [ReclamacaoesController::class, "showsindico"]);
+
+            //Rota que cadastra uma resposta para a reclamação
+            Route::put('resposta/{id}', [ReclamacaoesController::class, "resposta"]);
+        });
     });
 
 
@@ -397,6 +416,24 @@ Route::middleware('auth:sanctum')->group(function () {
                 'indexMorador'
             ]);
         });
+
+        // =========================
+        // RECLAMAÇÕES
+        // =========================
+
+        // Grupo de rotas para reclamação
+        Route::prefix('/reclamacao')->group(function () {
+
+            //Rota que recupera as reclamações dos moradores
+            Route::get('/get', [ReclamacaoesController::class, "indexMorador"]);
+
+            //Rota para o morador cadastrar uma nova reclamação
+            Route::post('/create', [ReclamacaoesController::class, 'store']);
+
+            //Rota que deleta uma reclamação do morador
+            Route::delete('/delete/{id}', [ReclamacaoesController::class, 'delete']);
+        });
+
 
     });
 

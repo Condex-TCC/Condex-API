@@ -14,10 +14,10 @@ class ReclamacaoRecource extends JsonResource
     {
         //Esse função retorna um array associativo com os campos filtrados
         return [
-            "id" => $this->pk_id_reclamacao,
+            "id_reclamacao" => $this->pk_id_reclamacao,
             "reclamacao" => $this->reclamacao,
             "resposta" => $this->resposta_reclamacao,
-            "visualizado" => $this->visualizado_reclamacao,
+            "visualizado" => $this->visualizado_reclamacao == 1 ? true : false,
             "morador" => new MoradorResurce($this->morador),
             "sindico" => new SindicoResource($this->sindico),
         ];
