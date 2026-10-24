@@ -510,4 +510,192 @@ class PerfilUsuarioController extends Controller
                 break;
         }
     }
+    
+
+    // Define os campos de cada tipo de usuário
+    private function getUserConfig(string $type): ?array
+    {
+        return match ($type) {
+            'sindico' => [
+                'model' => Sindico::class,
+                'id' => 'pk_id_sindico',
+                'email' => 'email_sindico',
+                'cpf' => 'cpf_sindico',
+                'phone' => 'telefone_sindico',
+                'password' => 'senha_sindico',
+                'code' => 'codigo_senha_sindico',
+                'name' => 'nome_sindico',
+            ],
+            'morador' => [
+                'model' => Morador::class,
+                'id' => 'pk_id_morador',
+                'email' => 'email_morador',
+                'cpf' => 'cpf_morador',
+                'phone' => 'telefone_morador',
+                'password' => 'senha_morador',
+                'code' => 'codigo_senha_morador',
+                'name' => 'nome_morador',
+            ],
+            'porteiro' => [
+                'model' => Porteiro::class,
+                'id' => 'pk_id_porteiro',
+                'email' => 'email_porteiro',
+                'cpf' => 'cpf_porteiro',
+                'phone' => 'telefone_porteiro',
+                'password' => 'senha_porteiro',
+                'code' => 'codigo_senha_porterio',
+                'name' => 'nome_porteiro',
+            ],
+            default => null,
+        };
+    }
+
+    // Etapa 1: verifica os dados e gera o código
+    public function validarContaRedefinicao(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'cpf' => 'required|string',
+            'telefone' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorJson(
+                'Dados inválidos.',
+                422,
+                $validator->errors()->toArray()
+            );
+        }
+
+        $types = ['sindico', 'morador', 'porteiro'];
+
+        foreach ($types as $type) {
+            $config = $this->getUserConfig($type);
+            $model = $config['model'];
+
+            $user = $model::where($config['email'], $request->input('email'))
+                ->where($config['cpf'], $request->input('cpf'))
+                ->where($config['phone'], $request->input('telefone'))
+                ->first();
+
+            if ($user) {
+                $code = (string) random_int(100000, 999999);
+
+                $user->{$config['code']} = $code;
+                $user->save();
+
+                // O envio do SMS será integrado pelo outro desenvolvedor.
+                return $this->responseJson(
+                    'Dados confirmados. Código gerado.',
+                    200,
+                    [
+                        'usuario' => [
+                            'id' => $user->getKey(),
+                            'tipo' => $type,
+                            'nome' => $user->{$config['name']},
+                        ],
+                    ]
+                );
+            }
+        }
+
+        return $this->responseJson(
+            'Não foi possível confirmar os dados informados.',
+            200,
+            ['usuario' => null]
+        );
+    }
+
+    // Etapa 2: verifica o código informado
+    public function validarCodigoRedefinicao(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
+            'tipo' => 'required|string|in:sindico,morador,porteiro',
+            'codigo' => 'required|digits:6',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorJson(
+                'Dados inválidos.',
+                422,
+                $validator->errors()->toArray()
+            );
+        }
+
+        $config = $this->getUserConfig($request->input('tipo'));
+        $model = $config['model'];
+
+        $user = $model::find($request->input('id'));
+
+        $access = $user !== null
+            && $user->{$config['code']} !== null
+            && hash_equals(
+                (string) $user->{$config['code']},
+                (string) $request->input('codigo')
+            );
+
+        return $this->responseJson(
+            $access ? 'Código válido.' : 'Código inválido.',
+            200,
+            ['acesso' => $access]
+        );
+    }
+
+    // Etapa 3: redefine a senha
+    public function redefinirSenha(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
+            'tipo' => 'required|string|in:sindico,morador,porteiro',
+            'codigo' => 'required|digits:6',
+            'nova_senha' => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorJson(
+                'Dados inválidos.',
+                422,
+                $validator->errors()->toArray()
+            );
+        }
+
+        $config = $this->getUserConfig($request->input('tipo'));
+        $model = $config['model'];
+
+        $user = $model::find($request->input('id'));
+
+        if (
+            !$user
+            || $user->{$config['code']} === null
+            || !hash_equals(
+                (string) $user->{$config['code']},
+                (string) $request->input('codigo')
+            )
+        ) {
+            return $this->responseJson(
+                'Não foi possível redefinir a senha.',
+                200,
+                ['alterado' => false]
+            );
+        }
+
+        $user->{$config['password']} = Hash::make(
+            $request->input('nova_senha')
+        );
+
+        $user->{$config['code']} = null;
+
+        $updated = $user->save();
+
+        return $this->responseJson(
+            $updated
+                ? 'Senha alterada com sucesso.'
+                : 'Não foi possível alterar a senha.',
+            200,
+            ['alterado' => $updated]
+        );
+    }
+
+
 }

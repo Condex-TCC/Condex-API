@@ -22,7 +22,7 @@ return new class extends Migration
             $table->boolean("primeiro_acesso_sindico")->default(false);
 
             //Campo que armazena o código para redefinir a senha do sindico
-            $table->boolean("codigo_senha_sindico")->nullable()->default(null);
+            $table->string("codigo_senha_sindico")->nullable()->default(null);
             $table->timestamps();
         });
     }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string("telefone_porteiro")->nullable(); //Campo de telefone
             $table->string("cpf_porteiro")->nullable(); //Campo de cpf
             $table->boolean("primeiro_acesso_porteiro")->default(false);
-            $table->boolean("codigo_senha_porterio")->nullable()->default(null);
+            $table->string("codigo_senha_porteiro")->nullable()->default(null);
             $table->timestamps();
         });
     }

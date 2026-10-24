@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean("primeiro_acesso_morador")->default(false);
 
             //Campo que armazena o código para redefinir a senha do moraodor
-            $table->boolean("codigo_senha_morador")->nullable()->default(null);
+            $table->string("codigo_senha_morador")->nullable()->default(null);
 
             $table->unsignedBigInteger("fk_id_unidade_morador"); //Campo que irá armazenar o relacionanemtno com unidade
 

@@ -53,6 +53,24 @@ Route::middleware('auth:sanctum')->prefix("/perfil")->group(function(){
 
 });
 
+
+
+Route::post(
+    '/redefine/valida/conta',
+    [PerfilUsuarioController::class, 'validarContaRedefinicao']
+);
+
+Route::post(
+    '/redefine/valida/codigo',
+    [PerfilUsuarioController::class, 'validarCodigoRedefinicao']
+);
+
+Route::put(
+    '/redefine/senha',
+    [PerfilUsuarioController::class, 'redefinirSenha']
+);
+
+
 /*
 |--------------------------------------------------------------------------
 | ROTAS PROTEGIDAS
