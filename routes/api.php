@@ -70,7 +70,8 @@ Route::put(
 );
 
 //Rota de teste para o envio do SMS
-Route::middleware('auth:sanctum')->post('/sms-go/teste', [SmsGoTesteController::class, 'enviarTeste']);
+//Route::middleware('auth:sanctum')->post('/sms-go/teste', [SmsGoTesteController::class, 'enviarTeste']);
+
 /*
 |--------------------------------------------------------------------------
 | ROTAS PROTEGIDAS
