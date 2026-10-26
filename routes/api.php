@@ -17,6 +17,7 @@ use App\Http\Controllers\ComunicadoController;
 use App\Http\Controllers\EnvioController;
 use App\Http\Controllers\PerfilUsuarioController;
 use App\Http\Controllers\ReclamacaoesController;
+use App\Http\Controllers\SmsController;
 use App\Http\Controllers\UnidadeController;
 use App\Http\Resources\ReservaResource;
 use App\Models\Envio;
@@ -69,7 +70,6 @@ Route::put(
     '/redefine/senha',
     [PerfilUsuarioController::class, 'redefinirSenha']
 );
-
 
 /*
 |--------------------------------------------------------------------------

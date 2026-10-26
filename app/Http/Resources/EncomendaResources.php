@@ -17,6 +17,8 @@ class EncomendaResources extends JsonResource
             'morador' => [
                 'id' => $this->morador?->pk_id_morador,
                 'nome' => $this->morador?->nome_morador,
+                'cpf' => $this->morador->cpf_morador,
+                'telefone' => $this->morador->telefone_morador,
             ],
 
             'porteiro' => [

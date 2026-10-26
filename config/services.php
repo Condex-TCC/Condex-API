@@ -41,4 +41,9 @@ return [
         'password' => env("SMS_FACIL_PASSWORD"),
     ],
 
+    //Configurando aqui as chaves da api do SMS Go
+    'smsgo' => [
+        'key' => env('SMSGO_KEY'),
+    ],
+
 ];
