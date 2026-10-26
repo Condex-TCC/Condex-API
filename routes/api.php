@@ -17,10 +17,8 @@ use App\Http\Controllers\ComunicadoController;
 use App\Http\Controllers\EnvioController;
 use App\Http\Controllers\PerfilUsuarioController;
 use App\Http\Controllers\ReclamacaoesController;
-use App\Http\Controllers\SmsController;
 use App\Http\Controllers\UnidadeController;
-use App\Http\Resources\ReservaResource;
-use App\Models\Envio;
+use App\Http\Controllers\SmsGoTesteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,6 +69,8 @@ Route::put(
     [PerfilUsuarioController::class, 'redefinirSenha']
 );
 
+//Rota de teste para o envio do SMS
+Route::middleware('auth:sanctum')->post('/sms-go/teste', [SmsGoTesteController::class, 'enviarTeste']);
 /*
 |--------------------------------------------------------------------------
 | ROTAS PROTEGIDAS
