@@ -14,22 +14,36 @@ class ComunicadoController extends Controller
 {
     use HttpResposta;
 
-    //Recupera todos os comunicados
-    public function indexSindico(){
+    
+    // Recupera todos os comunicados, com opção de pesquisa
+    public function indexSindico(Request $request)
+    {
+        // Inicia a consulta
+        $query = Comunicado::query();
 
-        //Pegando todos os comunicados
-        $comunicados = Comunicado::all();
+        // Filtra pela descrição quando o parâmetro for informado
+        if ($request->filled('descricao')) {
+            $query->where(
+                'descricao_comunicado',
+                'LIKE',
+                '%' . $request->input('descricao') . '%'
+            );
+        }
 
-        //Formata para uma formatação padrão o JSON do comunicado
+        // Recupera os comunicados encontrados
+        $comunicados = $query->get();
+
+        // Formata o JSON dos comunicados
         $jsonTratado = ComunicadoResources::collection($comunicados);
 
-        //Retorna uma formatação de json de succeso
+        // Retorna a resposta JSON
         return $this->responseJson(
-            "Os Comunicados foram recuperados com sucesso!", //Menssagem
-            200, //Status code
+            "Os Comunicados foram recuperados com sucesso!",
+            200,
             [
-                'comunicados' => $jsonTratado //Dados
+                'comunicados' => $jsonTratado
             ]
         );
     }
+
 }

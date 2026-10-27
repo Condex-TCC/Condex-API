@@ -14,22 +14,45 @@ class RegrasController extends Controller
     //Adiciona a trait com as respotas padrões para APIs
     use HttpResposta;
 
-    //Função que pega todas as regras
-    public function index()
+    
+    // Função que recupera todas as regras, com opção de pesquisa
+    public function index(Request $request)
     {
-        //Pegando todas as regras
-        $regras = Regras::all();
+        // Inicia a consulta
+        $query = Regras::query();
 
-        //Aplicando resurce para tratar a o json com os dados de regras
+        // Pesquisa pelo nome da regra
+        if ($request->filled('nome')) {
+            $query->where(
+                'nome_regra',
+                'LIKE',
+                '%' . $request->input('nome') . '%'
+            );
+        }
+
+        // Pesquisa pela descrição da regra
+        if ($request->filled('descricao')) {
+            $query->where(
+                'descricao_regra',
+                'LIKE',
+                '%' . $request->input('descricao') . '%'
+            );
+        }
+
+        // Recupera as regras encontradas
+        $regras = $query->get();
+
+        // Formata os dados usando a Resource
         $jsonTratadado = RegrasResources::collection($regras);
 
-        //Retorna o json com os moradores filtrados
+        // Retorna a resposta JSON
         return $this->responseJson(
-            "Regras recuperadas com sucesso!", //Menssagem
-            200, //Status code
-            [$jsonTratadado], //Envia o json tratado nos dados da requisição 
+            "Regras recuperadas com sucesso!",
+            200,
+            [$jsonTratadado]
         );
     }
+
 
    //Função que cria uma regra
     public function store(Request $request)

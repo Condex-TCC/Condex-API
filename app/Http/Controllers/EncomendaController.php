@@ -12,16 +12,35 @@ class EncomendaController extends Controller
 {
     use HttpResposta;
 
+    
     // Função que recupera todas as encomendas para o porteiro
-    public function index()
+    public function index(Request $request)
     {
-        // Busca as encomendas e carrega os dados do morador e do porteiro relacionados
-        $encomendas = Encomenda::with([
-            'morador',
-            'porteiro'
-        ])->get();
+        // Busca as encomendas e carrega os relacionamentos
+        $query = Encomenda::with(['morador', 'porteiro']);
 
-        // Retorna a lista de encomendas no formato definido pelo Resource
+        // Filtra pelo nome da encomenda
+        if ($request->filled('nome')) {
+            $query->where(
+                'nome_encomenda',
+                'LIKE',
+                '%' . $request->input('nome') . '%'
+            );
+        }
+
+        // Filtra pela descrição da encomenda
+        if ($request->filled('descricao')) {
+            $query->where(
+                'descricao_encomenda',
+                'LIKE',
+                '%' . $request->input('descricao') . '%'
+            );
+        }
+
+        // Recupera as encomendas encontradas
+        $encomendas = $query->get();
+
+        // Retorna a lista no formato definido pelo Resource
         return $this->responseJson(
             'Encomendas recuperadas com sucesso!',
             200,
@@ -31,20 +50,41 @@ class EncomendaController extends Controller
         );
     }
 
+
+    
     // Função que recupera as encomendas do morador autenticado
     public function indexMorador(Request $request)
     {
-        // Recupera o morador autenticado na requisição
+        // Recupera o morador autenticado
         $morador = $request->user();
 
-        // Busca somente as encomendas que pertencem ao morador autenticado
-        $encomendas = Encomenda::with([
-            'morador',
-            'porteiro'
-        ])->where(
-            'fk_id_morador_encomenda',
-            $morador->pk_id_morador
-        )->get();
+        // Busca somente as encomendas do morador autenticado
+        $query = Encomenda::with(['morador', 'porteiro'])
+            ->where(
+                'fk_id_morador_encomenda',
+                $morador->pk_id_morador
+            );
+
+        // Filtra pelo nome da encomenda
+        if ($request->filled('nome')) {
+            $query->where(
+                'nome_encomenda',
+                'LIKE',
+                '%' . $request->input('nome') . '%'
+            );
+        }
+
+        // Filtra pela descrição da encomenda
+        if ($request->filled('descricao')) {
+            $query->where(
+                'descricao_encomenda',
+                'LIKE',
+                '%' . $request->input('descricao') . '%'
+            );
+        }
+
+        // Recupera as encomendas encontradas
+        $encomendas = $query->get();
 
         // Retorna as encomendas encontradas
         return $this->responseJson(
@@ -55,6 +95,7 @@ class EncomendaController extends Controller
             ]
         );
     }
+
 
     // Função que recupera uma encomenda específica do morador autenticado
     public function showMorador(Request $request, string $id)

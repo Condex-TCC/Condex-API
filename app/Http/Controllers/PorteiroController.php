@@ -14,23 +14,36 @@ class PorteiroController extends Controller
     //Adiciona a trait com as respotas padrões para APIs
     use HttpResposta;
 
-    //Função que recupera todos os moradores
-    public function index()
+    
+    // Função que recupera todos os porteiros, com opção de pesquisa
+    public function index(Request $request)
     {
-        //Pegando todos os porterios do banco de dados
-        $porteiros = Porteiro::all();
+        // Inicia a consulta
+        $query = Porteiro::query();
 
-        
-        //Aplicando resurce para tratar a o json com os dados dos porteiros
+        // Filtra pelo email quando o parâmetro for informado
+        if ($request->filled('email')) {
+            $query->where(
+                'email_porteiro',
+                'LIKE',
+                '%' . $request->input('email') . '%'
+            );
+        }
+
+        // Recupera os porteiros encontrados
+        $porteiros = $query->get();
+
+        // Aplica a Resource para formatar o JSON
         $jsonTratadado = PorteiroResurce::collection($porteiros);
 
-        //Retorna o json com os moradores filtrados
+        // Retorna a resposta JSON
         return $this->responseJson(
-            "Usuarios recuperados com sucesso!", //Menssagem
-            200, //Status code
-            [$jsonTratadado], //Envia o json tratado nos dados da requisição 
+            "Usuarios recuperados com sucesso!",
+            200,
+            [$jsonTratadado]
         );
     }
+
 
     //Função que cadastra o porteiro
     public function store(Request $request)

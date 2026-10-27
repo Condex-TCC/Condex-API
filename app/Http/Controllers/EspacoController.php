@@ -12,17 +12,42 @@ class EspacoController extends Controller
 {
     use HttpResposta;
 
-    // Retorna todos os espaços
-    public function index()
+    
+    // Retorna os espaços com opção de pesquisa
+    public function index(Request $request)
     {
-        $espacos = Espaco::all();
+        // Inicia a consulta
+        $query = Espaco::query();
 
+        // Pesquisa pelo nome do espaço
+        if ($request->filled('nome')) {
+            $query->where(
+                'nome_espaco',
+                'LIKE',
+                '%' . $request->input('nome') . '%'
+            );
+        }
+
+        // Pesquisa pela descrição do espaço
+        if ($request->filled('descricao')) {
+            $query->where(
+                'descricao_espaco',
+                'LIKE',
+                '%' . $request->input('descricao') . '%'
+            );
+        }
+
+        // Recupera os espaços encontrados
+        $espacos = $query->get();
+
+        // Retorna os espaços formatados
         return $this->responseJson(
             'Espaços encontrados com sucesso.',
             200,
             EspacoResource::collection($espacos)->resolve()
         );
     }
+
 
     // Retorna um espaço específico
     public function show($id)

@@ -15,22 +15,36 @@ class MoradorController extends Controller
     //Adiciona a trait com as respotas padrões para APIs
     use HttpResposta;
 
-    //Função que recupera todos os moradores
-    public function index()
+    
+    // Função que recupera todos os moradores, com opção de pesquisa
+    public function index(Request $request)
     {
-        //Pegando todos os moradores, com os moradores e carregando o relacionamento com unidade
-        $moradores = Morador::with('unidade')->get();
+        // Inicia a consulta carregando o relacionamento com unidade
+        $query = Morador::with('unidade');
 
-        //Aplicando resurce para tratar a o json com os dados das moradores
+        // Filtra pelo email quando o parâmetro for informado
+        if ($request->filled('email')) {
+            $query->where(
+                'email_morador',
+                'LIKE',
+                '%' . $request->input('email') . '%'
+            );
+        }
+
+        // Recupera os moradores encontrados
+        $moradores = $query->get();
+
+        // Formata os dados usando a Resource
         $jsonTratadado = MoradorResurce::collection($moradores);
 
-        //Retorna o json com os moradores filtrados
+        // Retorna a resposta JSON
         return $this->responseJson(
-            "Usuarios recuperados com sucesso!", //Menssagem
-            200, //Status code
-            [$jsonTratadado], //Envia o json tratado nos dados da requisição 
+            "Usuarios recuperados com sucesso!",
+            200,
+            [$jsonTratadado]
         );
     }
+
 
     //Função que cadastra o morador
     public function store(Request $request)

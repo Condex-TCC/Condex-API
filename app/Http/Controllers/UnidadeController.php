@@ -13,25 +13,53 @@ class UnidadeController extends Controller
     //Adiciona a trait com as respotas padrões para APIs
     use HttpResposta;
 
-    //Função que pega todas as regras
-    public function index()
-    {
-        //Pegando todas as unidades
-        $unidades = Unidade::all();
+    
+public function index(Request $request)
+{
+    // Inicia a consulta das unidades
+    $query = Unidade::query();
 
-        //Aplicando resurce para tratar a o json com os dados de regras
-        $jsonTratadado = UnidadeResource::collection($unidades);
-
-        //Retorna o json com os moradores filtrados
-        return $this->responseJson(
-            "Regras recuperadas com sucesso!", //Menssagem
-            200, //Status code
-            [
-                $jsonTratadado
-            ], //Envia o json tratado nos dados da requisição 
+    // Filtra pelo bloco
+    if ($request->filled('bloco')) {
+        $query->where(
+            'bloco_unidade',
+            'LIKE',
+            '%' . $request->input('bloco') . '%'
         );
-
     }
+
+    // Filtra pelo número
+    if ($request->filled('numero')) {
+        $query->where(
+            'numero_unidade',
+            'LIKE',
+            '%' . $request->input('numero') . '%'
+        );
+    }
+
+    // Filtra pela descrição
+    if ($request->filled('descricao')) {
+        $query->where(
+            'descricao_unidade',
+            'LIKE',
+            '%' . $request->input('descricao') . '%'
+        );
+    }
+
+    // Recupera as unidades encontradas
+    $unidades = $query->get();
+
+    // Formata os dados com a Resource
+    $jsonTratadado = UnidadeResource::collection($unidades);
+
+    // Retorna a resposta JSON
+    return $this->responseJson(
+        "Unidades recuperadas com sucesso!",
+        200,
+        [$jsonTratadado]
+    );
+}
+
 
     //Função que cria uma regra
     public function store(Request $request)

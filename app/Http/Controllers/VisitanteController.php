@@ -12,21 +12,43 @@ class VisitanteController extends Controller
 {
     use HttpResposta;
 
-    // Função que retorna todos os visitantes para o porteiro
-    public function index()
-    {
-        // Recupera todos os visitantes cadastrados
-        $visitantes = Visitante::all();
+    
+public function index(Request $request)
+{
+    // Inicia a consulta dos visitantes
+    $query = Visitante::query();
 
-        // Retorna os visitantes no formato definido pelo Resource
-        return $this->responseJson(
-            'Visitantes recuperados com sucesso!',
-            200,
-            [
-                'visitantes' => VisitanteResources::collection($visitantes)
-            ]
+    // Filtra pelo nome do visitante
+    if ($request->filled('nome')) {
+        $query->where(
+            'nome_visitante',
+            'LIKE',
+            '%' . $request->input('nome') . '%'
         );
     }
+
+    // Filtra pelo CPF do visitante
+    if ($request->filled('cpf')) {
+        $query->where(
+            'cpf_visitante',
+            'LIKE',
+            '%' . $request->input('cpf') . '%'
+        );
+    }
+
+    // Recupera os visitantes encontrados
+    $visitantes = $query->get();
+
+    // Retorna os visitantes no formato definido pelo Resource
+    return $this->responseJson(
+        'Visitantes recuperados com sucesso!',
+        200,
+        [
+            'visitantes' => VisitanteResources::collection($visitantes)
+        ]
+    );
+}
+
 
     // Função que permite ao porteiro cadastrar um visitante
     public function store(Request $request)
@@ -71,27 +93,49 @@ class VisitanteController extends Controller
         );
     }
 
-    // Função que retorna somente os visitantes do morador autenticado
-    public function indexMorador(Request $request)
-    {
-        // Recupera o morador autenticado na requisição
-        $morador = $request->user();
+   
+public function indexMorador(Request $request)
+{
+    // Recupera o morador autenticado
+    $morador = $request->user();
 
-        // Busca somente os visitantes vinculados ao morador autenticado
-        $visitantes = Visitante::where(
-            'fk_morador',
-            $morador->pk_id_morador
-        )->get();
+    // Busca somente os visitantes vinculados ao morador
+    $query = Visitante::where(
+        'fk_morador',
+        $morador->pk_id_morador
+    );
 
-        // Retorna a lista de visitantes do morador
-        return $this->responseJson(
-            'Visitantes do morador recuperados com sucesso!',
-            200,
-            [
-                'visitantes' => VisitanteResources::collection($visitantes)
-            ]
+    // Filtra pelo nome do visitante
+    if ($request->filled('nome')) {
+        $query->where(
+            'nome_visitante',
+            'LIKE',
+            '%' . $request->input('nome') . '%'
         );
     }
+
+    // Filtra pelo CPF do visitante
+    if ($request->filled('cpf')) {
+        $query->where(
+            'cpf_visitante',
+            'LIKE',
+            '%' . $request->input('cpf') . '%'
+        );
+    }
+
+    // Recupera os visitantes encontrados
+    $visitantes = $query->get();
+
+    // Retorna a lista de visitantes do morador
+    return $this->responseJson(
+        'Visitantes do morador recuperados com sucesso!',
+        200,
+        [
+            'visitantes' => VisitanteResources::collection($visitantes)
+        ]
+    );
+}
+
 
     // Função que permite ao morador cadastrar um visitante
     public function storeMorador(Request $request)

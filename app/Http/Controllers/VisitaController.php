@@ -11,20 +11,47 @@ class VisitaController extends Controller
 {
     use HttpResposta;
 
-    // Lista o histórico de visitas
-    public function index()
-    {
-        $visitas = Visita::with('visitante')
-            ->orderByDesc('entrada')
-            ->get()
-            ->toArray();
+    
+public function index(Request $request)
+{
+    // Inicia a consulta com o relacionamento do visitante
+    $query = Visita::with('visitante');
 
-        return $this->responseJson(
-            "Histórico de visitas recuperado com sucesso!",
-            200,
-            $visitas
-        );
+    // Filtra pelo nome do visitante
+    if ($request->filled('nome')) {
+        $query->whereHas('visitante', function ($consulta) use ($request) {
+            $consulta->where(
+                'nome_visitante',
+                'LIKE',
+                '%' . $request->input('nome') . '%'
+            );
+        });
     }
+
+    // Filtra pelo CPF do visitante
+    if ($request->filled('cpf')) {
+        $query->whereHas('visitante', function ($consulta) use ($request) {
+            $consulta->where(
+                'cpf_visitante',
+                'LIKE',
+                '%' . $request->input('cpf') . '%'
+            );
+        });
+    }
+
+    // Mantém a ordenação do histórico
+    $visitas = $query
+        ->orderByDesc('entrada')
+        ->get()
+        ->toArray();
+
+    return $this->responseJson(
+        "Histórico de visitas recuperado com sucesso!",
+        200,
+        $visitas
+    );
+}
+
 
 // Registra a entrada de um visitante autorizado pelo interfone
 public function allowEntry(Request $request)

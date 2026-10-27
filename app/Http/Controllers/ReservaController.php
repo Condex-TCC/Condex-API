@@ -14,40 +14,60 @@ class ReservaController extends Controller
 {
     use HttpResposta;
 
-    // Retorna todas as reservas do morador logado
-    public function indexMorador(Request $request)
-    {
-        $morador = $request->user();
+    // Retorna as reservas do morador logado com filtros opcionais
+public function indexMorador(Request $request)
+{
+    $morador = $request->user();
 
-        $reservas = Reserva::with('espaco')
-            ->where('fk_id_morador', $morador->pk_id_morador)
-            ->get();
+    $query = Reserva::with('espaco')
+        ->where('fk_id_morador', $morador->pk_id_morador);
 
-        return $this->responseJson(
-            'Reservas encontradas com sucesso.',
-            200,
-            [
-                "reservas" => ReservaResource::collection($reservas)
-            ]
+    // Filtra pela data da reserva
+    if ($request->filled('data')) {
+        $query->where('data_reserva', $request->input('data'));
+    }
+
+    // Filtra pelo status da reserva
+    if ($request->filled('status')) {
+        $query->where(
+            'status_reserva',
+            'LIKE',
+            '%' . $request->input('status') . '%'
         );
     }
 
-    // Retorna todas as reservas pendentes para o sindico
-    public function indexSindico()
-    {   
-        //Recuperando todas as reservas pendentes
-        $reservas = Reserva::with('espaco')
-            ->where('status_reserva', 'pendente')
-            ->get();
+    $reservas = $query->get();
 
-        return $this->responseJson(
-            'Reservas pendentes encontradas com sucesso.',
-            200,
-            [
-                "reservas" => ReservaResource::collection($reservas)
-            ]
-        );
+    return $this->responseJson(
+        'Reservas encontradas com sucesso.',
+        200,
+        [
+            "reservas" => ReservaResource::collection($reservas)
+        ]
+    );
+}
+
+    // Retorna as reservas pendentes para o síndico, com filtros opcionais
+public function indexSindico(Request $request)
+{
+    $query = Reserva::with('espaco')
+        ->where('status_reserva', 'pendente');
+
+    // Filtra pela data da reserva
+    if ($request->filled('data')) {
+        $query->where('data_reserva', $request->input('data'));
     }
+
+    $reservas = $query->get();
+
+    return $this->responseJson(
+        'Reservas pendentes encontradas com sucesso.',
+        200,
+        [
+            "reservas" => ReservaResource::collection($reservas)
+        ]
+    );
+}
 
     // Retorna uma reserva específica do morador logado
     public function showMorador(Request $request, string $id)

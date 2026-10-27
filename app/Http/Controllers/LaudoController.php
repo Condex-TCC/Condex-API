@@ -13,26 +13,38 @@ class LaudoController extends Controller
     //Adiciona a trait com as respotas padrões para APIs
     use HttpResposta;
 
-    //Função que recupera todos os laudos
-    public function index()
+    
+    // Função que recupera todos os laudos, com opção de pesquisa
+    public function index(Request $request)
     {
-        //Pegando todos os laudos do banco de dados
-        $laudos = Laudos::all();
+        // Inicia a consulta
+        $query = Laudos::query();
 
-        //Filtrando os campos do json do laudo
+        // Pesquisa pelo nome do laudo
+        if ($request->filled('nome')) {
+            $query->where(
+                'nome_laudo',
+                'LIKE',
+                '%' . $request->input('nome') . '%'
+            );
+        }
+
+        // Recupera os laudos encontrados
+        $laudos = $query->get();
+
+        // Formata os campos do JSON
         $jsonFiltrado = LaudoResources::collection($laudos);
 
-        //Retornando os laudos filtrados
+        // Retorna os laudos encontrados
         return $this->responseJson(
-            "Laudo cadastrado com sucesso!", //Menssagem
-            200, //Status code
-            //Passando os dados
+            "Laudos recuperados com sucesso!",
+            200,
             [
-                //Passando o novo laudo criado
                 $jsonFiltrado
             ]
         );
     }
+
 
     //Função que cadastra o morador
     public function store(Request $request)
