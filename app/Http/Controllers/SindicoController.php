@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\HttpResposta;
+use App\Models\Visitante;
+use App\Models\Visita;
 
 class SindicoController extends Controller
 {
@@ -147,4 +149,31 @@ class SindicoController extends Controller
             200
         );
     }
+
+// Recupera todos os visitantes cadastrados
+public function getVisitantes()
+{
+    $visitantes = Visitante::all();
+
+    return $this->responseJson(
+        'Visitantes encontrados com sucesso.',
+        200,
+        $visitantes
+    );
+}
+
+// Recupera o histórico de visitas do condomínio
+public function getVisitas()
+{
+    $visitas = Visita::with('visitante')
+        ->orderByDesc('entrada')
+        ->get();
+
+    return $this->responseJson(
+        'Visitas encontradas com sucesso.',
+        200,
+        $visitas
+    );
+}
+
 }
