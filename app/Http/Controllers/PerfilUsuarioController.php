@@ -649,7 +649,7 @@ class PerfilUsuarioController extends Controller
             'id' => 'required|integer',
             'tipo' => 'required|string|in:sindico,morador,porteiro',
             'codigo' => 'required|digits:6',
-            'nova_senha' => 'required|string|min:8|confirmed',
+            'nova_senha' => 'required|string|min:8',
         ]);
 
         if ($validator->fails()) {
