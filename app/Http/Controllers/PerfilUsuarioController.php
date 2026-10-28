@@ -12,11 +12,16 @@ use App\Models\Porteiro;
 use App\Models\Sindico;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use App\EnviaSms;
 
 class PerfilUsuarioController extends Controller
 {
     //Adiciona a trait com as respotas padrões para APIs
     use HttpResposta;
+
+    //Adiciona a trait que oferece o envio de SMS
+    //Dá acesso ao método enviarSms(). É só isso que o controller precisa saber sobre SMS
+    use EnviaSms;
 
     //Função que atualiza o perfil
     public function updatePerfil(Request $request){
@@ -583,6 +588,25 @@ class PerfilUsuarioController extends Controller
 
                 $user->{$config['code']} = $code;
                 $user->save();
+                
+
+                //Chama a função que envia o código SMS para o celular do morador cadastrado
+                //$resultado = $this->enviarSms($request->input('telefone'), "O código para redefinir sua senha é $code");
+
+                //Se o envio falhou
+                //O "!" inverte o valor: lê-se "se NÃO deu sucesso"
+                // if (!$resultado['sucesso']) {
+
+                //     //Retorna um Json com formatação de erro
+                //     //errorJson() recebe: mensagem, status HTTP, lista de erros (e opcionalmente dados)
+                //     return $this->errorJson(
+                //         "Não foi possível enviar o SMS!", //Menssagem
+                //         //Status 0 (falha de rede) vira 502, o resto mantém o status da API
+                //         //O "?:" é um atalho: se o status_http for 0 (considerado "vazio"), usa 502; senão usa o próprio status_http
+                //         $resultado['status_http'] ?: 502, //Status code
+                //         [$resultado['codigo'], $resultado['mensagem']], //Erros
+                //     );
+                // }
 
                 // O envio do SMS será integrado pelo outro desenvolvedor.
                 return $this->responseJson(

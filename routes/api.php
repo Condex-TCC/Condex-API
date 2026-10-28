@@ -53,6 +53,11 @@ Route::middleware('auth:sanctum')->prefix("/perfil")->group(function(){
 });
 
 
+/*
+|--------------------------------------------------------------------------
+| REDEFINIR SENHA
+|--------------------------------------------------------------------------
+*/
 
 Route::post(
     '/redefine/valida/conta',
@@ -70,7 +75,8 @@ Route::put(
 );
 
 //Rota de teste para o envio do SMS
-//Route::middleware('auth:sanctum')->post('/sms-go/teste', [SmsGoTesteController::class, 'enviarTeste']);
+//Route::middleware('auth:sanctum')
+//->post('/sms-go/teste',[SmsGoTesteController::class, 'enviarTeste']);
 
 /*
 |--------------------------------------------------------------------------
