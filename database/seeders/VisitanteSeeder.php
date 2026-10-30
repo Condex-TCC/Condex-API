@@ -9,6 +9,6 @@ class VisitanteSeeder extends Seeder
 {
     public function run(): void
     {
-        Visitante::factory()->create();
+        Visitante::factory()->count(10)->create();
     }
 }
