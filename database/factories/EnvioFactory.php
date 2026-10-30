@@ -22,8 +22,8 @@ class EnvioFactory extends Factory
                 ->first()
                 ->pk_id_morador,
 
-            'resposta' => "",
-            'contra_resposta' => "",
+            'resposta' => null,
+            'contra_resposta' => null,
             'visualizado' => false,
         ];
     }

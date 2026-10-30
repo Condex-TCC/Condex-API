@@ -590,11 +590,11 @@ class PerfilUsuarioController extends Controller
                 $user->save();
                 
 
-                //Chama a função que envia o código SMS para o celular do morador cadastrado
-                //$resultado = $this->enviarSms($request->input('telefone'), "O código para redefinir sua senha é $code");
+                // //Chama a função que envia o código SMS para o celular do morador cadastrado
+                // $resultado = $this->enviarSms($request->input('telefone'), "O código para redefinir sua senha é $code");
 
-                //Se o envio falhou
-                //O "!" inverte o valor: lê-se "se NÃO deu sucesso"
+                // //Se o envio falhou
+                // //O "!" inverte o valor: lê-se "se NÃO deu sucesso"
                 // if (!$resultado['sucesso']) {
 
                 //     //Retorna um Json com formatação de erro

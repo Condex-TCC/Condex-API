@@ -19,6 +19,7 @@ use App\Http\Controllers\PerfilUsuarioController;
 use App\Http\Controllers\ReclamacaoesController;
 use App\Http\Controllers\UnidadeController;
 use App\Http\Controllers\SmsGoTesteController;
+use App\Http\Controllers\TelaInicialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -95,29 +96,35 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('ability:sindico')
         ->prefix('/sindico')
-        ->group(function () {        
+        ->group(function () {   
+            
+        // =========================
+        // TELA INICIAL
+        // =========================
+        //Rota responsável por buscar exibir os dados da tala inicial do sindico
+        Route::get("/index", [TelaInicialController::class, 'exibeTelaInicialSinicio']);
 
-// =========================
-// VISITANTES E VISITAS
-// =========================
+        // =========================
+        // VISITANTES E VISITAS
+        // =========================
 
-Route::prefix('visitante')->group(function () {
+        Route::prefix('visitante')->group(function () {
 
-    // Recuperar todos os visitantes cadastrados
-    Route::get('/get', [
-        VisitanteController::class,
-        'index'
-    ]);
-});
+            // Recuperar todos os visitantes cadastrados
+            Route::get('/get', [
+                VisitanteController::class,
+                'index'
+            ]);
+        });
 
-Route::prefix('visita')->group(function () {
+        Route::prefix('visita')->group(function () {
 
-    // Recuperar o histórico de visitas do condomínio
-    Route::get('/get', [
-        VisitaController::class,
-        'index'
-    ]);
-});
+            // Recuperar o histórico de visitas do condomínio
+            Route::get('/get', [
+                VisitaController::class,
+                'index'
+            ]);
+        });
 
 
         // =========================
