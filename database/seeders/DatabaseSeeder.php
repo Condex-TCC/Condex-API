@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             UnidadeSeeder::class,
             MoradorSeeder::class,
             VisitanteSeeder::class,
+            VisitaSeeder::class,
             EspacoSeeder::class,
             EncomendaSeeder::class,
             ComunicadoSeeder::class,
@@ -31,6 +32,7 @@ class DatabaseSeeder extends Seeder
             ReservaSeeder::class,
             ReclamacoesSeeder::class,
         ]);
+
 
     }
 }

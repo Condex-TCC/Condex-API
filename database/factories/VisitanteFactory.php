@@ -14,8 +14,6 @@ class VisitanteFactory extends Factory
         return [
             'nome_visitante' => $this->faker->name(),
             'cpf_visitante' => $this->faker->unique()->numerify('###########'),
-            'fk_morador' => 1,
-            'fk_funcionario' => 1,
         ];
     }
 }

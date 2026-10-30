@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -11,21 +12,8 @@ return new class extends Migration
         Schema::create('visitantes', function (Blueprint $table) {
             $table->id('pk_id_visitante');
 
-            $table->string('cpf_visitante', 14)->unique();
             $table->string('nome_visitante', 100);
-
-            $table->unsignedBigInteger('fk_morador');
-            $table->unsignedBigInteger('fk_funcionario')->nullable();
-
-            // Relationship with resident
-            $table->foreign('fk_morador')
-                ->references('pk_id_morador')
-                ->on('moradors');
-
-            // Relationship with doorman
-            $table->foreign('fk_funcionario')
-                ->references('pk_id_porteiro')
-                ->on('porteiros');
+            $table->string('cpf_visitante', 14)->unique();
 
             $table->timestamps();
         });

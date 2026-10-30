@@ -16,10 +16,23 @@ return new class extends Migration
             $table->dateTime('saida')->nullable();
 
             $table->unsignedBigInteger('fk_visitante');
+            $table->unsignedBigInteger('fk_morador');
+            $table->unsignedBigInteger('fk_porteiro');
 
+            // Relationship with visitor
             $table->foreign('fk_visitante')
                 ->references('pk_id_visitante')
                 ->on('visitantes');
+
+            // Relationship with resident
+            $table->foreign('fk_morador')
+                ->references('pk_id_morador')
+                ->on('moradors');
+
+            // Relationship with doorman
+            $table->foreign('fk_porteiro')
+                ->references('pk_id_porteiro')
+                ->on('porteiros');
 
             $table->timestamps();
         });

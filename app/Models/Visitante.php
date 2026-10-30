@@ -16,25 +16,15 @@ class Visitante extends Model
     protected $fillable = [
         'nome_visitante',
         'cpf_visitante',
-        'fk_morador',
-        'fk_funcionario',
     ];
 
-    public function morador()
+    // Relationship with visits
+    public function visitas()
     {
-        return $this->belongsTo(
-            Morador::class,
-            'fk_morador',
-            'pk_id_morador'
-        );
-    }
-
-    public function porteiro()
-    {
-        return $this->belongsTo(
-            Porteiro::class,
-            'fk_funcionario',
-            'pk_id_porteiro'
+        return $this->hasMany(
+            Visita::class,
+            'fk_visitante',
+            'pk_id_visitante'
         );
     }
 }

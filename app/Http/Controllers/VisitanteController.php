@@ -12,58 +12,46 @@ class VisitanteController extends Controller
 {
     use HttpResposta;
 
-    
-public function index(Request $request)
-{
-    // Inicia a consulta dos visitantes
-    $query = Visitante::query();
+    // Returns all visitors
+    public function index(Request $request)
+    {
+        $query = Visitante::query();
 
-    // Filtra pelo nome do visitante
-    if ($request->filled('nome')) {
-        $query->where(
-            'nome_visitante',
-            'LIKE',
-            '%' . $request->input('nome') . '%'
+        if ($request->filled('nome')) {
+            $query->where(
+                'nome_visitante',
+                'LIKE',
+                '%' . $request->input('nome') . '%'
+            );
+        }
+
+        if ($request->filled('cpf')) {
+            $query->where(
+                'cpf_visitante',
+                'LIKE',
+                '%' . $request->input('cpf') . '%'
+            );
+        }
+
+        $visitantes = $query->get();
+
+        return $this->responseJson(
+            'Visitantes recuperados com sucesso!',
+            200,
+            [
+                'visitantes' => VisitanteResources::collection($visitantes)
+            ]
         );
     }
 
-    // Filtra pelo CPF do visitante
-    if ($request->filled('cpf')) {
-        $query->where(
-            'cpf_visitante',
-            'LIKE',
-            '%' . $request->input('cpf') . '%'
-        );
-    }
-
-    // Recupera os visitantes encontrados
-    $visitantes = $query->get();
-
-    // Retorna os visitantes no formato definido pelo Resource
-    return $this->responseJson(
-        'Visitantes recuperados com sucesso!',
-        200,
-        [
-            'visitantes' => VisitanteResources::collection($visitantes)
-        ]
-    );
-}
-
-
-    // Função que permite ao porteiro cadastrar um visitante
+    // Allows the doorman to register a visitor
     public function store(Request $request)
     {
-        // Recupera o porteiro autenticado
-        $porteiro = $request->user();
-
-        // Valida os dados enviados para o cadastro
         $validator = Validator::make($request->all(), [
             'nome' => 'required|string|max:100',
             'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante',
-            'morador' => 'required|integer|exists:moradors,pk_id_morador',
         ]);
 
-        // Retorna os erros caso os dados sejam inválidos
         if ($validator->fails()) {
             return $this->errorJson(
                 'Os dados informados são inválidos.',
@@ -72,18 +60,13 @@ public function index(Request $request)
             );
         }
 
-        // Mapeia os dados recebidos para os campos existentes no banco
         $dadosMapeados = [
             'nome_visitante' => $request->input('nome'),
             'cpf_visitante' => $request->input('cpf'),
-            'fk_morador' => $request->input('morador'),
-            'fk_funcionario' => $porteiro->pk_id_porteiro,
         ];
 
-        // Cadastra o visitante no banco de dados
         $novoVisitante = Visitante::create($dadosMapeados);
 
-        // Retorna os dados do visitante cadastrado
         return $this->responseJson(
             'Visitante criado com sucesso!',
             201,
@@ -93,63 +76,50 @@ public function index(Request $request)
         );
     }
 
-   
-public function indexMorador(Request $request)
-{
-    // Recupera o morador autenticado
-    $morador = $request->user();
-
-    // Busca somente os visitantes vinculados ao morador
-    $query = Visitante::where(
-        'fk_morador',
-        $morador->pk_id_morador
-    );
-
-    // Filtra pelo nome do visitante
-    if ($request->filled('nome')) {
-        $query->where(
-            'nome_visitante',
-            'LIKE',
-            '%' . $request->input('nome') . '%'
-        );
-    }
-
-    // Filtra pelo CPF do visitante
-    if ($request->filled('cpf')) {
-        $query->where(
-            'cpf_visitante',
-            'LIKE',
-            '%' . $request->input('cpf') . '%'
-        );
-    }
-
-    // Recupera os visitantes encontrados
-    $visitantes = $query->get();
-
-    // Retorna a lista de visitantes do morador
-    return $this->responseJson(
-        'Visitantes do morador recuperados com sucesso!',
-        200,
-        [
-            'visitantes' => VisitanteResources::collection($visitantes)
-        ]
-    );
-}
-
-
-    // Função que permite ao morador cadastrar um visitante
-    public function storeMorador(Request $request)
+    // Returns visitors linked to the authenticated resident through visits
+    public function indexMorador(Request $request)
     {
-        // Recupera o morador autenticado na requisição
         $morador = $request->user();
 
-        // Valida os dados enviados pelo morador
+        $query = Visitante::whereHas('visitas', function ($query) use ($morador) {
+            $query->where('fk_morador', $morador->pk_id_morador);
+        });
+
+        if ($request->filled('nome')) {
+            $query->where(
+                'nome_visitante',
+                'LIKE',
+                '%' . $request->input('nome') . '%'
+            );
+        }
+
+        if ($request->filled('cpf')) {
+            $query->where(
+                'cpf_visitante',
+                'LIKE',
+                '%' . $request->input('cpf') . '%'
+            );
+        }
+
+        $visitantes = $query->get();
+
+        return $this->responseJson(
+            'Visitantes recuperados com sucesso!',
+            200,
+            [
+                'visitantes' => VisitanteResources::collection($visitantes)
+            ]
+        );
+    }
+
+    // Allows the resident to register a visitor
+    public function storeMorador(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'nome' => 'required|string|max:100',
             'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante',
         ]);
 
-        // Retorna os erros caso os dados sejam inválidos
         if ($validator->fails()) {
             return $this->errorJson(
                 'Os dados informados são inválidos.',
@@ -158,18 +128,13 @@ public function indexMorador(Request $request)
             );
         }
 
-        // Mapeia os dados e associa o visitante ao morador autenticado
         $dadosMapeados = [
             'nome_visitante' => $request->input('nome'),
             'cpf_visitante' => $request->input('cpf'),
-            'fk_morador' => $morador->pk_id_morador,
-            'fk_funcionario' => null,
         ];
 
-        // Cadastra o visitante no banco de dados
         $novoVisitante = Visitante::create($dadosMapeados);
 
-        // Retorna os dados do visitante cadastrado
         return $this->responseJson(
             'Visitante cadastrado com sucesso!',
             201,
@@ -179,13 +144,11 @@ public function indexMorador(Request $request)
         );
     }
 
-    // Função que retorna um visitante específico
+    // Returns a specific visitor
     public function show(string $id)
     {
-        // Busca o visitante pelo ID
         $visitante = Visitante::findOrFail($id);
 
-        // Retorna os dados do visitante encontrado
         return $this->responseJson(
             'Visitante recuperado com sucesso!',
             200,
@@ -195,20 +158,16 @@ public function indexMorador(Request $request)
         );
     }
 
-    // Função que atualiza os dados de um visitante
+    // Updates visitor information
     public function update(Request $request, string $id)
     {
-        // Busca o visitante que será atualizado
         $visitante = Visitante::findOrFail($id);
 
-        // Valida os dados enviados para a atualização
         $validator = Validator::make($request->all(), [
             'nome' => 'required|string|max:100',
             'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante,' . $id . ',pk_id_visitante',
-            'morador' => 'required|integer|exists:moradors,pk_id_morador',
         ]);
 
-        // Retorna os erros caso os dados sejam inválidos
         if ($validator->fails()) {
             return $this->errorJson(
                 'Os dados informados são inválidos.',
@@ -217,17 +176,13 @@ public function indexMorador(Request $request)
             );
         }
 
-        // Mapeia os dados recebidos para os campos do banco
         $dadosMapeados = [
             'nome_visitante' => $request->input('nome'),
             'cpf_visitante' => $request->input('cpf'),
-            'fk_morador' => $request->input('morador'),
         ];
 
-        // Atualiza o visitante
         $atualizado = $visitante->update($dadosMapeados);
 
-        // Verifica se a atualização foi realizada
         if (!$atualizado) {
             return $this->errorJson(
                 'Não foi possível atualizar o visitante.',
@@ -235,7 +190,6 @@ public function indexMorador(Request $request)
             );
         }
 
-        // Retorna os dados atualizados do visitante
         return $this->responseJson(
             'Visitante atualizado com sucesso!',
             200,
@@ -245,16 +199,21 @@ public function indexMorador(Request $request)
         );
     }
 
-    // Função que remove um visitante
+    // Deletes a visitor
     public function destroy(string $id)
     {
-        // Busca o visitante que será removido
         $visitante = Visitante::findOrFail($id);
 
-        // Remove o visitante do banco de dados
+        // Prevents deletion when the visitor has registered visits
+        if ($visitante->visitas()->exists()) {
+            return $this->errorJson(
+                'Não é possível excluir um visitante que possui visitas registradas.',
+                409
+            );
+        }
+
         $deletado = $visitante->delete();
 
-        // Verifica se a exclusão foi realizada
         if (!$deletado) {
             return $this->errorJson(
                 'Não foi possível excluir o visitante.',
@@ -262,7 +221,6 @@ public function indexMorador(Request $request)
             );
         }
 
-        // Retorna a confirmação da exclusão
         return $this->responseJson(
             'Visitante excluído com sucesso!',
             200
