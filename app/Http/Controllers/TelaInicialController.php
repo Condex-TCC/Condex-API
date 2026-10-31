@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\ComunicadoResources;
 use Illuminate\Http\Request;
 use App\HttpResposta;
+use App\GeraResumoGemini;
 use App\Models\Comunicado;
 use App\Models\Envio;
 use App\Models\Morador;
@@ -17,6 +18,9 @@ class TelaInicialController extends Controller
     //Adiciona a trait com as respotas padrões para APIs
     use HttpResposta;
 
+    //Adiciona a trait que gera o resumo do condomínio com o Gemini
+    use GeraResumoGemini;
+
     //Função que exibe os dados na tala inicial na tala do sindico
     public function exibeTelaInicialSinicio(){
 
@@ -26,7 +30,7 @@ class TelaInicialController extends Controller
         $quantReservasPendentes = 0;
         $top3UltimosComunicados = [];
         $statusCondominio = [];
-        $resumoCondominio = "Ainda não foi implementado";
+        $resumoCondominio = "";
 
         //Pegando os registros de quantidade
         $quantReclamacoesNaoRespondidas = Reclamacoes::where("resposta_reclamacao", null)->count();
@@ -46,6 +50,9 @@ class TelaInicialController extends Controller
             "porteiro" => $porteiro, //Pegando o total
             "total" => $morador + $porteiro, //Realiza a soma total
         ];
+
+        //Gerando o resumo do condomínio com o Gemini
+        $resumoCondominio = $this->gerarResumoCondominio();
 
 
         //Retorna os dados com formatação padrão 
