@@ -35,15 +35,13 @@ return [
         ],
     ],
 
-    //Configurando aqui as chaves da api de sms
-    'smsFacil' => [
-        'user' => env("SMS_FACIL_USER"),
-        'password' => env("SMS_FACIL_PASSWORD"),
-    ],
-
     //Configurando aqui as chaves da api do SMS Go
     'smsgo' => [
         'key' => env('SMSGO_KEY'),
     ],
 
+    // Credencial usada pela ChurrascoIA para falar com o Google Gemini.
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+    ],
 ];
