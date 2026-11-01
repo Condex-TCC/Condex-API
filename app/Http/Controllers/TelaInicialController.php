@@ -69,4 +69,9 @@ class TelaInicialController extends Controller
             ]
         );
     }
+
+    //Função que exibe os dados na tela inicial do morador
+    public function exibeTelaInicialMorador(){
+
+    }
 }

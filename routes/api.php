@@ -337,6 +337,11 @@ Route::middleware('auth:sanctum')->group(function () {
         ->prefix('/morador')
         ->group(function () {
 
+        // =========================
+        // TELA INICIAL
+        // =========================
+        //Rota responsável por buscar exibir os dados da tala inicial do Morador
+        Route::get("/index", [TelaInicialController::class, 'exibeTelaInicialMorador']);
 
         // =========================
         // COMUNICADOS
