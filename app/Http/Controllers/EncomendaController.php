@@ -60,38 +60,34 @@ class EncomendaController extends Controller
 
         // Busca somente as encomendas do morador autenticado
         $query = Encomenda::with(['morador', 'porteiro'])
-            ->where(
-                'fk_id_morador_encomenda',
-                $morador->pk_id_morador
-            );
+            ->where('fk_id_morador_encomenda', $morador->pk_id_morador);
 
         // Filtra pelo nome da encomenda
         if ($request->filled('nome')) {
-            $query->where(
-                'nome_encomenda',
-                'LIKE',
-                '%' . $request->input('nome') . '%'
-            );
+
+            $query->where('nome_encomenda','LIKE','%' . $request->input('nome') . '%');
         }
 
         // Filtra pela descrição da encomenda
         if ($request->filled('descricao')) {
-            $query->where(
-                'descricao_encomenda',
-                'LIKE',
-                '%' . $request->input('descricao') . '%'
-            );
+
+            $query->where('descricao_encomenda', 'LIKE', '%' . $request->input('descricao') . '%');
         }
 
-        // Recupera as encomendas encontradas
-        $encomendas = $query->get();
+        //Recupera todas as encomendas não retiradas
+        $encomendasNaoRetiradas = (clone $query)->whereNull("data_retirada")->get();
+
+        //Recupera todas as encomendas já retiradas
+        $encomendaRetiradas = (clone $query)->whereNotNull("data_retirada")->get();
 
         // Retorna as encomendas encontradas
         return $this->responseJson(
-            'Encomendas do morador recuperadas com sucesso!',
-            200,
+            'Encomendas do morador recuperadas com sucesso!', //Menssagem
+            200, //Status code
+            //Dados
             [
-                'encomendas' => EncomendaResources::collection($encomendas)
+                'encomendas_pendentes' => EncomendaResources::collection($encomendasNaoRetiradas),
+                'encomendas_retiradas' => EncomendaResources::collection($encomendaRetiradas),
             ]
         );
     }

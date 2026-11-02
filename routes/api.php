@@ -361,18 +361,11 @@ Route::middleware('auth:sanctum')->group(function () {
         // =========================
         Route::prefix('encomenda')->group(function () {
 
-            // Morador pode ver apenas suas encomendas
+            // O MOrador consegue visualizar as suas encomendas pendentes e suas encomendonas já retiradas
             Route::get('/get', [
                 EncomendaController::class,
                 'indexMorador'
             ]);
-
-            // Morador pode ver apenas uma de suas encomendas
-            Route::get('/show/{id}', [
-                EncomendaController::class,
-                'showMorador'
-            ]);
-
         });
 
 
