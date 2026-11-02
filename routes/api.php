@@ -111,19 +111,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('visitante')->group(function () {
 
             // Recuperar todos os visitantes cadastrados
-            Route::get('/get', [
-                VisitanteController::class,
-                'index'
-            ]);
+            Route::get('/get', [VisitanteController::class,'index']);
         });
 
         Route::prefix('visita')->group(function () {
 
             // Recuperar o histórico de visitas do condomínio
-            Route::get('/get', [
-                VisitaController::class,
-                'index'
-            ]);
+            Route::get('/get', [VisitaController::class,'index']);
         });
 
 

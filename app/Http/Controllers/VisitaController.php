@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\VisitaResource;
 use App\HttpResposta;
 use App\Models\Visita;
 use App\Models\Visitante;
@@ -41,13 +42,12 @@ class VisitaController extends Controller
 
         $visitas = $query
             ->orderByDesc('entrada')
-            ->get()
-            ->toArray();
+            ->get();
 
         return $this->responseJson(
             'Histórico de visitas recuperado com sucesso!',
             200,
-            $visitas
+            VisitaResource::collection($visitas)->resolve()
         );
     }
 
