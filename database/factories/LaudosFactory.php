@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Laudos;
 use App\Models\Sindico;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -12,11 +11,48 @@ class LaudosFactory extends Factory
     //Função que gera os dados falsos
     public function definition(): array
     {
-        //Retorna os dados falsos
+        //Laudos realistas do condomínio
+        $laudos = [
+            [
+                'nome_laudo' => 'Laudo de vistoria estrutural',
+                'caminho_laudo' => 'laudos/vistoria-estrutural.pdf',
+            ],
+            [
+                'nome_laudo' => 'Laudo de manutenção do elevador',
+                'caminho_laudo' => 'laudos/manutencao-elevador.pdf',
+            ],
+            [
+                'nome_laudo' => 'Laudo de dedetização',
+                'caminho_laudo' => 'laudos/dedetizacao.pdf',
+            ],
+            [
+                'nome_laudo' => 'Laudo de limpeza da caixa d\'água',
+                'caminho_laudo' => 'laudos/limpeza-caixa-dagua.pdf',
+            ],
+            [
+                'nome_laudo' => 'Laudo de inspeção elétrica',
+                'caminho_laudo' => 'laudos/inspecao-eletrica.pdf',
+            ],
+            [
+                'nome_laudo' => 'Laudo de prevenção e combate a incêndio',
+                'caminho_laudo' => 'laudos/prevencao-incendio.pdf',
+            ],
+            [
+                'nome_laudo' => 'Laudo de impermeabilização da laje',
+                'caminho_laudo' => 'laudos/impermeabilizacao-laje.pdf',
+            ],
+            [
+                'nome_laudo' => 'Laudo de acessibilidade das áreas comuns',
+                'caminho_laudo' => 'laudos/acessibilidade.pdf',
+            ],
+        ];
+
+        $laudo = $this->faker->randomElement($laudos);
+
         return [
-            "nome_laudo" => "Laudo do condiminio - N° 777", //Gera um nome do laudo falso, mas é estatico
-            "caminho_laudo" => "teste.pdf", //Gera um caminho para laudo de teste
-            "fk_id_sindico_laudo" => Sindico::all()->random()->pk_id_sindico, //Pega um id aelatorio do sindico
+            'nome_laudo' => $laudo['nome_laudo'],
+            'caminho_laudo' => $laudo['caminho_laudo'],
+            'fk_id_sindico_laudo' => Sindico::inRandomOrder()->firstOrFail()->pk_id_sindico,
         ];
     }
 }

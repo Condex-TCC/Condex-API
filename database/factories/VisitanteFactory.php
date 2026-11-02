@@ -13,7 +13,7 @@ class VisitanteFactory extends Factory
     {
         return [
             'nome_visitante' => $this->faker->name(),
-            'cpf_visitante' => $this->faker->unique()->numerify('###########'),
+            'cpf_visitante' => $this->faker->unique()->numerify('###.###.###-##'),
         ];
     }
 }
