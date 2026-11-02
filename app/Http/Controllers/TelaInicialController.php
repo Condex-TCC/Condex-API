@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ComunicadoResources;
+use App\Http\Resources\EnvioResources;
+use App\Http\Resources\ReservaResource;
 use Illuminate\Http\Request;
 use App\HttpResposta;
 use App\GeraResumoGemini;
 use App\Models\Comunicado;
+use App\Models\Encomenda;
 use App\Models\Envio;
 use App\Models\Morador;
 use App\Models\Porteiro;
@@ -71,7 +74,54 @@ class TelaInicialController extends Controller
     }
 
     //Função que exibe os dados na tela inicial do morador
-    public function exibeTelaInicialMorador(){
+    public function exibeTelaInicialMorador(Request $request){
 
+        //Pegando da requisição a pk do morador
+        $pkMorador = $request->user()->pk_id_morador;
+
+        //Váriavel que vão armazenar as informações vão ser enviadas no json final
+        $quantComunicadosNaoVisualizados = 0;
+        $quantReservasPendentes = 0;
+        $quantEncomendasNaoRetiradas = 0;
+        $top3UltimasReservas = [];
+        $top3UltimosComunicados = [];
+
+        //Pegando os registros de quantidade
+        $quantComunicadosNaoVisualizados = Envio::where("fk_id_morador", $pkMorador)
+            ->where("visualizado", false)->count();
+        $quantReservasPendentes = Reserva::where("fk_id_morador", $pkMorador)
+            ->where("status_reserva", "pendente")->count();
+
+        //Pegando a quantidade de encomendas que ainda não foram retiradas
+        $quantEncomendasNaoRetiradas = Encomenda::where("fk_id_morador_encomenda", $pkMorador)
+            ->where("data_retirada", null)->count();
+
+        //Pegando as 3 últimas reservas do morador
+        $top3UltimasReservas = Reserva::with("espaco")
+            ->where("fk_id_morador", $pkMorador)
+            ->orderBy("created_at", "desc")
+            ->limit(3)
+            ->get();
+
+        //Pegando os 3 últimos comunicados enviados para o morador
+        $top3UltimosComunicados = Envio::with("comunicado")
+            ->where("fk_id_morador", $pkMorador)
+            ->orderBy("created_at", "desc")
+            ->limit(3)
+            ->get();
+
+        //Retorna os dados com formatação padrão
+        return $this->responseJson(
+            "Os dados do morador foram obtidos com sucesso!", //Menssagem
+            200, //Status code
+            //Dados
+            [
+                "quant_comunicados" => $quantComunicadosNaoVisualizados,
+                "quant_reservas" => $quantReservasPendentes,
+                "quant_encomendas" => $quantEncomendasNaoRetiradas,
+                "top_reservas" => ReservaResource::collection($top3UltimasReservas),
+                "top_comunicados" => EnvioResources::collection($top3UltimosComunicados)
+            ]
+        );
     }
 }
