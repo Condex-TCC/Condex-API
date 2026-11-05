@@ -56,6 +56,9 @@ trait EnviaSms
     {
         //A trait não faz nenhuma lógica própria: ela só repassa o pedido ao service e devolve a resposta
         //$this aqui é o próprio controller que está usando a trait
-        return $this->servicoSms()->enviar($telefone, $mensagem);
+        //A linha abaixo foi comenda com o objetivo de envitar que haja dispáros em massa e um gasto des necessário de crétidos
+        //return $this->servicoSms()->enviar($telefone, $mensagem);
+
+        return [];
     }
 }
