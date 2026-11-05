@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\EnviaSms;
 use App\Http\Resources\ReclamacaoRecource;
 use Illuminate\Http\Request;
 use App\HttpResposta;
@@ -13,6 +14,9 @@ class ReclamacaoesController extends Controller
 {
     //Adiciona a trait com as respotas padrões para APIs
     use HttpResposta;
+
+    //Adicioana a trait para o envio de sms
+    use EnviaSms;
 
     //Função que recupera todos as reclamações do morador logado
     public function indexMorador(Request $request){
@@ -191,6 +195,25 @@ class ReclamacaoesController extends Controller
 
         //Atualizando o regsitro no banco de dados
         $reclamacao->save();
+
+        //Chama a função que envia o código SMS para o celular do morador cadastrado
+        $resultado = $this->enviarSms($reclamacao->morador->telefone_morador, "[Condex] Sua reclamacao foi respondida");
+
+        //Se o envio falhou
+        //O "!" inverte o valor: lê-se "se NÃO deu sucesso"
+        if (!$resultado['sucesso']) {
+
+            //Retorna um Json com formatação de erro
+            //errorJson() recebe: mensagem, status HTTP, lista de erros (e opcionalmente dados)
+            return $this->errorJson(
+                "Não foi possível enviar o SMS!", //Menssagem
+                //Status 0 (falha de rede) vira 502, o resto mantém o status da API
+                //O "?:" é um atalho: se o status_http for 0 (considerado "vazio"), usa 502; senão usa o próprio status_http
+                $resultado['status_http'] ?: 502, //Status code
+                [$resultado['codigo'], $resultado['mensagem']], //Erros
+            );
+        }
+
 
         //Retorna um json com formatação padrão
         return $this->responseJson(

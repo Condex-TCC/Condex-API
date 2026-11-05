@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\EnviaSms;
 use App\Http\Resources\ReservaResource;
 use App\Models\Reserva;
 use App\Models\Espaco;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\HttpResposta;
+use App\Models\Morador;
 use Carbon\Carbon;
 
 class ReservaController extends Controller
 {
-    use HttpResposta;
+    use HttpResposta, EnviaSms;
 
     // Retorna as reservas do morador logado com filtros opcionais
 public function indexMorador(Request $request)
@@ -212,7 +214,7 @@ public function indexSindico(Request $request)
             $reserva->status_reserva = "confimada";
 
             //Adicionando a menssagem
-            $menssagem = 'Reserva autorizada com sucesso!';
+            $menssagem = "[Condex] Reserva da " . $reserva->espaco->nome_espaco . " autorizada com sucesso";
 
         }else{
 
@@ -220,12 +222,29 @@ public function indexSindico(Request $request)
             $reserva->status_reserva = "cancelada";
 
             //Adicionando a menssagem
-            $menssagem = 'Reserva cancelada com sucesso!';
-
+            $menssagem = "[Condex] Reserva da " . $reserva->espaco->nome_espaco . "  foi cancelada, entre em contato com sindico";
         }
 
         //Salva a alteração
         $reserva->save();
+
+        // //Chama a função que envia o código SMS para o celular do morador cadastrado
+        $resultado = $this->enviarSms($reserva->morador->telefone_morador, $menssagem);
+
+        //Se o envio falhou
+        //O "!" inverte o valor: lê-se "se NÃO deu sucesso"
+        if (!$resultado['sucesso']) {
+
+            //Retorna um Json com formatação de erro
+            //errorJson() recebe: mensagem, status HTTP, lista de erros (e opcionalmente dados)
+            return $this->errorJson(
+                "Não foi possível enviar o SMS!", //Menssagem
+                //Status 0 (falha de rede) vira 502, o resto mantém o status da API
+                //O "?:" é um atalho: se o status_http for 0 (considerado "vazio"), usa 502; senão usa o próprio status_http
+                $resultado['status_http'] ?: 502, //Status code
+                [$resultado['codigo'], $resultado['mensagem']], //Erros
+            );
+        }
 
         //Retorna um json de sucesso
         return $this->responseJson(
