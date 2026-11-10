@@ -9,7 +9,7 @@ class VisitanteSeeder extends Seeder
 {
     public function run(): void
     {
-        //Visitantes suficientes para variar as visitas registradas
-        Visitante::factory()->count(15)->create();
+        //Dois visitantes por morador, para simular visitas recorrentes e variar o histórico
+        Visitante::factory()->count(20)->create();
     }
 }
