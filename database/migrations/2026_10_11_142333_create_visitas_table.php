@@ -10,29 +10,32 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('visitas', function (Blueprint $table) {
-            $table->id('pk_id_visita');
+            $table->id('pk_id_visita'); //Campo da chave primária
 
-            $table->dateTime('entrada')->nullable();
-            $table->dateTime('saida')->nullable();
+            //Hora de entrada e saida prevista
+            $table->dateTime('hora_entrada_visita');
+            $table->dateTime('hora_saida_visita');
 
-            $table->unsignedBigInteger('fk_visitante');
-            $table->unsignedBigInteger('fk_morador');
-            $table->unsignedBigInteger('fk_porteiro');
+            //Campo de autorização
+            $table->boolean("autorizacao_visita")->nullable()->default(null);
 
-            // Relationship with visitor
-            $table->foreign('fk_visitante')
-                ->references('pk_id_visitante')
-                ->on('visitantes');
+            //Chaves primárias do vitante e morador que irá recever a visita
+            $table->unsignedBigInteger('fk_id_visitante');
+            $table->unsignedBigInteger('fk_id_morador');
 
-            // Relationship with resident
-            $table->foreign('fk_morador')
-                ->references('pk_id_morador')
-                ->on('moradors');
+            //Hora do registro real da entrada do visitante do banco de dados
+            $table->dateTime('hora_registro_entrada_visita')->nullable();
+            $table->unsignedBigInteger("fk_id_porteiro_entrada")->nullable();
 
-            // Relationship with doorman
-            $table->foreign('fk_porteiro')
-                ->references('pk_id_porteiro')
-                ->on('porteiros');
+            $table->dateTime('hora_registro_saida_visita')->nullable();
+            $table->unsignedBigInteger("fk_id_porteiro_saida")->nullable();
+
+            //Ligando os campos tas chaves primárias
+            $table->foreign("fk_id_morador")->references("pk_id_morador")->on('moradors');
+            $table->foreign('fk_id_visitante')->references('pk_id_visitante')->on("visitantes");
+            $table->foreign("fk_id_porteiro_entrada")->references("pk_id_porteiro")->on("porteiros");
+            $table->foreign("fk_id_porteiro_saida")->references("pk_id_porteiro")->on("porteiros");
+           
 
             $table->timestamps();
         });

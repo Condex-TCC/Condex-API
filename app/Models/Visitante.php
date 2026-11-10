@@ -15,6 +15,7 @@ class Visitante extends Model
 
     protected $fillable = [
         'nome_visitante',
+        "rg_morador",
         'cpf_visitante',
     ];
 

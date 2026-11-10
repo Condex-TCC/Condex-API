@@ -12,8 +12,9 @@ return new class extends Migration
         Schema::create('visitantes', function (Blueprint $table) {
             $table->id('pk_id_visitante');
 
-            $table->string('nome_visitante', 100);
+            $table->string('nome_visitante', 150);
             $table->string('cpf_visitante', 14)->unique();
+            $table->string("rg_morador")->unique();
 
             $table->timestamps();
         });
