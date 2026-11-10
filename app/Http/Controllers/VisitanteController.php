@@ -48,186 +48,112 @@ class VisitanteController extends Controller
         );
     }
 
-    // Allows the doorman to register a visitor
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'nome' => 'required|string|max:100',
-            'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante',
-        ]);
+    //Função que verifica se uma determinado visitan já está cadastrado no banco de dados
+    public function consulta(Request $request){
 
-        if ($validator->fails()) {
-            return $this->errorJson(
-                'Os dados informados são inválidos.',
-                422,
-                $validator->errors()->toArray()
-            );
-        }
-
+        //Montando um array com os dados vindos da requisição
         $dadosMapeados = [
-            'nome_visitante' => $request->input('nome'),
-            'cpf_visitante' => $request->input('cpf'),
+            "rg_morador" => $request->input("rg"),
+            "cpf_visitante" => $request->input("cpf")
         ];
 
-        $novoVisitante = Visitante::create($dadosMapeados);
-
-        return $this->responseJson(
-            'Visitante criado com sucesso!',
-            201,
-            [
-                'visitante' => new VisitanteResources($novoVisitante)
-            ]
-        );
-    }
-
-    // Returns visitors linked to the authenticated resident through visits
-    public function indexMorador(Request $request)
-    {
-        $morador = $request->user();
-
-        $query = Visitante::whereHas('visitas', function ($query) use ($morador) {
-            $query->where('fk_morador', $morador->pk_id_morador);
-        });
-
-        if ($request->filled('nome')) {
-            $query->where(
-                'nome_visitante',
-                'LIKE',
-                '%' . $request->input('nome') . '%'
-            );
-        }
-
-        if ($request->filled('cpf')) {
-            $query->where(
-                'cpf_visitante',
-                'LIKE',
-                '%' . $request->input('cpf') . '%'
-            );
-        }
-
-        $visitantes = $query->get();
-
-        return $this->responseJson(
-            'Visitantes recuperados com sucesso!',
-            200,
-            [
-                'visitantes' => VisitanteResources::collection($visitantes)
-            ]
-        );
-    }
-
-    // Allows the resident to register a visitor
-    public function storeMorador(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'nome' => 'required|string|max:100',
-            'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante',
+        //Validando os dados vindos da request
+        $validador = validator($dadosMapeados, [
+            "rg_morador" => "required|string",
+            "cpf_visitante" => "required|string",
         ]);
 
-        if ($validator->fails()) {
+        //Verifica se hove algum erro
+        if($validador->fails()){
+
+            //Retorna o json com os erros
             return $this->errorJson(
-                'Os dados informados são inválidos.',
-                422,
-                $validator->errors()->toArray()
+                "Houve um erro na consulta do visitante",
+                400, //Status code
+                //Erros
+                [
+                    $validador->errors(),
+                ]
             );
         }
 
+        //Realiza a consulta
+        $visitante = Visitante::where("rg_morador", $dadosMapeados["rg_morador"])
+            ->where("cpf_visitante", $dadosMapeados['cpf_visitante'])->first();
+        
+        //Verifica se o visitante existe
+        if($visitante != null){
+
+            //Retorna o json
+            return $this->responseJson(
+                "Visitante econtrado!", //Menssagem
+                200, //Status code
+                //Dados
+                [
+                    "encontrado" => true,
+                    "visitante" => new VisitanteResources($visitante)
+                ]
+            );
+
+        }else{
+
+            //Retorna o json
+            return $this->responseJson(
+                "O visitante não foi encontrado no banco de dados", //Menssagem
+                200, //Status code
+                //Dados
+                [
+                    "encontrado" => false,
+                    "visitante" => null
+                ]
+            );
+        }
+        
+    }
+
+    //Função que cadastrar o visitante no banco de dados
+    public function store(Request $request){
+
+        //Monstando o array com os dados vindos da requisição
         $dadosMapeados = [
-            'nome_visitante' => $request->input('nome'),
-            'cpf_visitante' => $request->input('cpf'),
+            'nome_visitante' => $request->input("nome"),
+            "rg_morador" => $request->input("rg"),
+            'cpf_visitante' => $request->input("cpf"),
         ];
 
-        $novoVisitante = Visitante::create($dadosMapeados);
-
-        return $this->responseJson(
-            'Visitante cadastrado com sucesso!',
-            201,
-            [
-                'visitante' => new VisitanteResources($novoVisitante)
-            ]
-        );
-    }
-
-    // Returns a specific visitor
-    public function show(string $id)
-    {
-        $visitante = Visitante::findOrFail($id);
-
-        return $this->responseJson(
-            'Visitante recuperado com sucesso!',
-            200,
-            [
-                'visitante' => new VisitanteResources($visitante)
-            ]
-        );
-    }
-
-    // Updates visitor information
-    public function update(Request $request, string $id)
-    {
-        $visitante = Visitante::findOrFail($id);
-
-        $validator = Validator::make($request->all(), [
-            'nome' => 'required|string|max:100',
-            'cpf' => 'required|string|max:14|unique:visitantes,cpf_visitante,' . $id . ',pk_id_visitante',
+        //Validando os dados
+        //Validando os dados vindos da request
+        $validador = validator($dadosMapeados, [
+            "nome_visitante" => "required|string",
+            "rg_morador" => "required|string|unique:visitantes,rg_morador",
+            "cpf_visitante" => "required|string|unique:visitantes,cpf_visitante",
         ]);
 
-        if ($validator->fails()) {
+        //Verifica se hove algum erro
+        if($validador->fails()){
+
+            //Retorna o json com os erros
             return $this->errorJson(
-                'Os dados informados são inválidos.',
-                422,
-                $validator->errors()->toArray()
+                "Houve um erro na consulta do visitante",
+                400, //Status code
+                //Erros
+                [
+                    $validador->errors(),
+                ]
             );
         }
 
-        $dadosMapeados = [
-            'nome_visitante' => $request->input('nome'),
-            'cpf_visitante' => $request->input('cpf'),
-        ];
+        //Salvando o visitante no banco de dados
+        $visitante = Visitante::create($dadosMapeados);
 
-        $atualizado = $visitante->update($dadosMapeados);
-
-        if (!$atualizado) {
-            return $this->errorJson(
-                'Não foi possível atualizar o visitante.',
-                400
-            );
-        }
-
+        //Retonra um json com formatação padrão para visitante
         return $this->responseJson(
-            'Visitante atualizado com sucesso!',
-            200,
+            "O visitante foi cadastrado com sucesso!",
+            200, //Status code
+            //Dados
             [
-                'visitante' => new VisitanteResources($visitante->refresh())
+                "Visitante" => new VisitanteResources($visitante)
             ]
-        );
-    }
-
-    // Deletes a visitor
-    public function destroy(string $id)
-    {
-        $visitante = Visitante::findOrFail($id);
-
-        // Prevents deletion when the visitor has registered visits
-        if ($visitante->visitas()->exists()) {
-            return $this->errorJson(
-                'Não é possível excluir um visitante que possui visitas registradas.',
-                409
-            );
-        }
-
-        $deletado = $visitante->delete();
-
-        if (!$deletado) {
-            return $this->errorJson(
-                'Não foi possível excluir o visitante.',
-                400
-            );
-        }
-
-        return $this->responseJson(
-            'Visitante excluído com sucesso!',
-            200
         );
     }
 }

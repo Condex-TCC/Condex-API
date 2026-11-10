@@ -133,6 +133,23 @@ class VisitaController extends Controller
         );
     }
 
+    //Função que recupera os dados de uma única visita
+    public function show(string $id){
+
+        //Buscando a visita
+        $visita = Visita::findOrFail($id);
+
+        //realiza o retorno da com json padronozado
+        return $this->responseJson(
+            "Dados da pesquisa recuperda com sucesso!",
+            200, //Status code
+            //Dados
+            [
+                "visitas" => new VisitaResource($visita)
+            ]
+        );
+    }
+
     // Registers the visitor's entry
     public function allowEntry(Request $request)
     {
