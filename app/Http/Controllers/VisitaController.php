@@ -9,40 +9,32 @@ use App\Models\Visitante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
+//Classe que intermedia as requisições
 class VisitaController extends Controller
 {
+    //Chama o pacote de funções reutilizadas para o envio padronizado se JSON de retorno
     use HttpResposta;
 
-    // Returns the visit history
+    //Função que retorna todas as visitas realizadas no consominio
     public function index(Request $request)
-    {
-        $query = Visita::with(['visitante', 'morador', 'porteiro']);
+    {   
+        //Comando que cria um construtor flexivel para montar as consulta
+        $query = Visita::query();
 
-        // Filters by visitor name
-        if ($request->filled('nome')) {
-            $query->whereHas('visitante', function ($consulta) use ($request) {
-                $consulta->where(
-                    'nome_visitante',
-                    'LIKE',
-                    '%' . $request->input('nome') . '%'
-                );
+        //Carrega os relacionamentos
+        $query->with(['visitante', 'morador', 'porteiroEntrda', 'porteiroSaida']);
+
+       if ($request->query("nome") != null) {
+        $termo = $request->query("nome");
+        
+            // Faz a busca na tabela relacionada 'visitante'
+            $query->whereHas('visitante', function ($q) use ($termo) {
+                $q->where('nome_visitante', 'LIKE', "%" . $termo . "%"); // Ajuste 'nome' se a coluna na tabela visitantes tiver outro nome (ex: 'name')
             });
         }
 
-        // Filters by visitor CPF
-        if ($request->filled('cpf')) {
-            $query->whereHas('visitante', function ($consulta) use ($request) {
-                $consulta->where(
-                    'cpf_visitante',
-                    'LIKE',
-                    '%' . $request->input('cpf') . '%'
-                );
-            });
-        }
-
-        $visitas = $query
-            ->orderByDesc('entrada')
-            ->get();
+        //Chama a função que realiza a consulta com as cluasulas adicionadas, além de estabelecer a ordem da consutla
+        $visitas = $query->orderByDesc('created_at')->get();
 
         return $this->responseJson(
             'Histórico de visitas recuperado com sucesso!',

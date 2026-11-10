@@ -8,36 +8,40 @@ use Illuminate\Http\Request;
 use App\HttpResposta;
 use Illuminate\Support\Facades\Validator;
 
+//Classe que intermedia as requisições
 class VisitanteController extends Controller
 {
+    //Chama o pacote de funções reutilizadas para o envio padronizado se JSON de retorno
     use HttpResposta;
 
-    // Returns all visitors
+    //Retorna todos os visitatnes
     public function index(Request $request)
-    {
+    {   
+        //Comando que cria um construtor flexivel para montar as consulta
         $query = Visitante::query();
 
-        if ($request->filled('nome')) {
-            $query->where(
-                'nome_visitante',
-                'LIKE',
-                '%' . $request->input('nome') . '%'
-            );
+        //Verifica se o parametro existe na requisição
+        if ($request->query("nome") != null) {
+
+            //Adiciona o filtro na consulta ao banco de dados
+            $query->where('nome_visitante', 'LIKE', '%' . $request->input('nome') . '%');
         }
 
-        if ($request->filled('cpf')) {
-            $query->where(
-                'cpf_visitante',
-                'LIKE',
-                '%' . $request->input('cpf') . '%'
-            );
+        //Verifica se o parametro existe na requisição
+        if ($request->query('cpf') != null) {
+
+            //Adiciona o filtro na consulta ao banco de dados
+            $query->where('cpf_visitante', 'LIKE', '%' . $request->input('cpf') . '%');
         }
 
+        //Comando que realiza a consulta, recuperadando todos os registros com as clausulas adicionadas
         $visitantes = $query->get();
 
+        //Retorna um json com formatação padrão
         return $this->responseJson(
-            'Visitantes recuperados com sucesso!',
-            200,
+            'Visitantes recuperados com sucesso!', //Menssagem
+            200, //Status code
+            //Dados
             [
                 'visitantes' => VisitanteResources::collection($visitantes)
             ]

@@ -14,7 +14,7 @@ class VisitaResource extends JsonResource
     {
         //Esse função retorna um array associativo com os campos filtrados
         return [
-            "id" => $this->pk_id_visita, //Envia o ID
+            "id_visita" => $this->pk_id_visita, //Envia o ID
             "visitante" => new VisitanteResources($this->visitante), //Envia o json do visitante
             "morador" => new MoradorResurce($this->morador), //Envia o json do morador
             "entrada_prevista" => $this->hora_entrada_visita, //Envia a hora prevista de entrada
