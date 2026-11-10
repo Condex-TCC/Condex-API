@@ -6,7 +6,6 @@ use App\Http\Resources\VisitaResource;
 use App\HttpResposta;
 use App\Models\Visita;
 use App\Models\Visitante;
-use GuzzleHttp\Psr7\Query;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -146,6 +145,80 @@ class VisitaController extends Controller
             //Dados
             [
                 "visitas" => new VisitaResource($visita)
+            ]
+        );
+    }
+
+    //Função que cadastra um visita
+    public function storeMorador(Request $request){
+
+        //Pegando o morador logado
+        $pkMorador = $request->user()->pk_id_morador;
+
+        //Monstando um array com os dados da requisição
+        $dadosMapeados = [
+            'hora_entrada_visita' => $request->input("hora_entrada"),
+            'hora_saida_visita' => $request->input("hora_saida"),
+            "autorizacao_visita" => 1, //Já deixa a visita autorizada
+            'fk_id_visitante' => $request->input("id_visitante"),
+            'fk_id_morador' => $pkMorador,
+        ];
+
+        //Validando os dados
+        $validador = validator($dadosMapeados, [
+            'hora_entrada_visita' => "required|date_format:Y-m-d\TH:i",
+            'hora_saida_visita' => "required|date_format:Y-m-d\TH:i",
+            'fk_id_visitante' => "required",
+        ]);
+
+        //Verifica se hove algum erro
+        if($validador->fails()){
+
+            //Retorna o json com os erros
+            return $this->errorJson(
+                "Houve um erro no cadastro da visita",
+                400, //Status code
+                //Erros
+                [
+                    $validador->errors(),
+                ]
+            );
+        }
+
+        // Realiza uma consulta para verificar se o morador já está em outra visita no mesmo período
+        $outraVisita = Visita::where("fk_id_visitante", $dadosMapeados["fk_id_visitante"])
+            // Lógica correta de sobreposição de intervalos de tempo
+            ->where("hora_entrada_visita", "<=", $dadosMapeados["hora_saida_visita"])
+            ->where("hora_saida_visita", ">=", $dadosMapeados["hora_entrada_visita"])
+            // Agrupamento (Closure) para garantir que a checagem de status ocorra apenas para este visitante e período
+            ->where(function ($query) {
+                $query->where("autorizacao_visita", 1) // Autorizado
+                      ->orWhere("autorizacao_visita", null); // Pendente
+            })
+            ->first();
+        
+        //Verifica se já existe outra visita nesse horario selecionado
+        if($outraVisita != null){
+
+            //Retorna um json de erro
+            return $this->errorJson(
+                "Esse visitante já está agendado para outra visita! Por favor, agenda para outro horario", //Menssagem
+                400, //Status code
+                //Dados
+                []
+            );
+        }
+
+        //Salva o visitante no banco de dados
+        $visita = Visita::create($dadosMapeados);
+
+        //Retorna um json com formatação padrão
+        return $this->responseJson(
+            "Visita agendada com sucesso!", //Menssagem
+            200, //Status code
+            //Dados
+            [
+                "visita" => new VisitaResource($visita)
             ]
         );
     }

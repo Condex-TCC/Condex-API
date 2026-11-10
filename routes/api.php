@@ -460,6 +460,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
             //Rota que busca os dados de uma visista
             Route::get("/show/{id}", [VisitaController::class, "show"]);
+
+            //Rota que cadastrar uma visita
+            Route::post("/create", [VisitaController::class, "storeMorador"]);
         });
 
         // =========================
