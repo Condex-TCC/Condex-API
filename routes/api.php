@@ -446,22 +446,26 @@ Route::middleware('auth:sanctum')->group(function () {
 
         });
 
-            // =========================
-            // VISITANTES
-            // =========================
+        // =========================
+        // VISITANTES
+        // =========================
+        //Grupe de todas do visitante para o morador
+        Route::prefix('visitante')->group(function () {
 
-            Route::prefix('visitante')->group(function () {
+            //TODO: Será adicionado aqui
+        });
 
-            // Morador cadastra um visitante
-            Route::post('/create', [
-                VisitanteController::class,
-                'storeMorador'
-            ]);
+        // =========================
+        // VISITANTES
+        // =========================
+        //Grupo de rotas que irão lidar com as visitas
+        Route::prefix('/visita')->group(function(){
 
-            Route::get('/get', [
-                VisitanteController::class, 
-                'indexMorador'
-            ]);
+            //Rota que utiliza da exibir todas as visitas do morador logado
+            Route::get('/get', [VisitaController::class, 'indexMorador']);
+
+            //Rota que recupera todo os histórico de visitas do morador logado
+            Route::get("/historico", [VisitaController::class, "historicoMorador"]);
         });
 
         // =========================

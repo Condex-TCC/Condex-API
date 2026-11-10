@@ -6,6 +6,7 @@ use App\Http\Resources\VisitaResource;
 use App\HttpResposta;
 use App\Models\Visita;
 use App\Models\Visitante;
+use GuzzleHttp\Psr7\Query;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -40,6 +41,95 @@ class VisitaController extends Controller
             'Histórico de visitas recuperado com sucesso!',
             200,
             VisitaResource::collection($visitas)->resolve()
+        );
+    }
+
+    //Função que retorna todas as visirtas do morador logado
+    public function indexMorador(Request $request){
+
+        //Pega a fk do morador logado
+        $pkMorador = $request->user()->pk_id_morador;
+
+        //Comando que cria um construtor flexivel para montar as consulta
+        $query = Visita::query();
+
+        //Comando que filtra os dados baseados na pk do morador
+        $query->where("fk_id_morador", $pkMorador);
+
+        //Carrega os relacionamentos
+        $query->with(['visitante', 'morador', 'porteiroEntrda', 'porteiroSaida']);
+
+        //Verifica se foi enviado o nome do morador
+        if($request->query("nome") != null){
+            $termo = $request->query("nome");
+
+            //Adiciona na consulta a clausula de conlsulta que filtra pelo nome do morador
+            $query->whereHas("visitante", function ($q) use ($termo) {
+                $q->where('nome_visitante', 'LIKE', "%" . $termo . "%");
+            });
+        }
+        
+        //Realizando a conuslta das visitas pendentes
+        $visitasPendentes = $query->clone()->where("autorizacao_visita", null)->get();
+
+        //Realizando a consulta das visitas ativas
+        $visitasAtivas = $query->clone()->where("autorizacao_visita", true)
+            ->where("hora_registro_entrada_visita", "!=", null)
+            ->where("hora_registro_saida_visita", null)->get();
+        
+        //Realizando a consulta das vistas que vão acontecer
+        $visitaFuturas = $query->clone()->where("autorizacao_visita", true)
+            ->where("hora_registro_entrada_visita", null)
+            ->where("hora_registro_saida_visita", null)->get();
+
+        //Retona os dados com uma formatação padrão
+        return $this->responseJson(
+            "As visitas do morador forma recuperadas com sucesso!", //Menssagem
+            200, //Status code
+            [
+                "visitas_ativas" => VisitaResource::collection($visitasAtivas),
+                "visitas_pendentes" => VisitaResource::collection($visitasPendentes),
+                "visitas_futuras" => VisitaResource::collection($visitaFuturas)
+            ]
+        );
+    }
+
+    //Função que retorna o histórico das visitas do morador logado
+    public function historicoMorador(Request $request){
+
+        //Pega a fk do morador logado
+        $pkMorador = $request->user()->pk_id_morador;
+
+        //Comando que cria um construtor flexivel para montar as consulta
+        $query = Visita::query();
+
+        //Comando que filtra os dados baseados na pk do morador
+        $query->where("fk_id_morador", $pkMorador);
+
+        //Carrega os relacionamentos
+        $query->with(['visitante', 'morador', 'porteiroEntrda', 'porteiroSaida']);
+
+        //Verifica se foi enviado o nome do morador
+        if($request->query("nome") != null){
+            $termo = $request->query("nome");
+
+            //Adiciona na consulta a clausula de conlsulta que filtra pelo nome do morador
+            $query->whereHas("visitante", function ($q) use ($termo) {
+                $q->where('nome_visitante', 'LIKE', "%" . $termo . "%");
+            });
+        }
+
+        //Recupera todos os registros
+        $visitas = $query->orderByDesc('created_at')->get();
+
+        //realiza o retorno da com json padronozado
+        return $this->responseJson(
+            "Histórico de visitas do morador recuperdado com sucesso!",
+            200, //Status code
+            //Dados
+            [
+                "visitas" => VisitaResource::collection($visitas)
+            ]
         );
     }
 
