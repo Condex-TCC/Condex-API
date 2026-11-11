@@ -523,17 +523,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('morador')->group(function () {
 
             // Recuperar todos os moradores
-            Route::get('/get', [
-                MoradorController::class,
-                'index'
-            ]);
+            Route::get('/get', [MoradorController::class, 'index']);
 
             // Recuperar um morador específico
-            Route::get('/show/{id}', [
-                MoradorController::class,
-                'show'
-            ]);
-
+            Route::get('/show/{id}', [MoradorController::class, 'show']);
         });
 
         
