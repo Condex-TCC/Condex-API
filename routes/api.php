@@ -563,6 +563,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
             //Rota que delete uma visita cadastrada pelo porterio
             Route::delete('/delete/{id}', [VisitaController::class, 'delete']);
+
+            //Rota que registra a entrada do visitante no condominio
+            Route::put("/entrada/{id}", [VisitaController::class, 'entrada']);
+
+            //Rota que registra a saida do visitante do condominio
+            Route::put("/saida/{id}", [VisitaController::class, 'saida']);
         });
 
 

@@ -65,7 +65,9 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // Definindo a hora para que pega a hora do estado se são paulo
+    'timezone' => 'America/Sao_Paulo',
+
 
     /*
     |--------------------------------------------------------------------------

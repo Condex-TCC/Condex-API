@@ -472,115 +472,91 @@ class VisitaController extends Controller
         }
     }
 
-    // Registers the visitor's entry
-    public function allowEntry(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'fk_porteiro' => 'required|integer|exists:porteiros,pk_id_porteiro',
-            'fk_morador' => 'required|integer|exists:moradors,pk_id_morador',
-            'fk_visitante' => 'required|integer|exists:visitantes,pk_id_visitante',
-        ]);
+    //Função que registra a entrada do visitante no condominio
+    public function entrada(Request $request, string $id){
 
-        if ($validator->fails()) {
+        //Pegando a pk do porteiro
+        $pkPorteiro = $request->user()->pk_id_porteiro;
+
+        //Pegando a visita
+        $visita = Visita::findOrFail($id);
+
+        //Verifica se o morador autorizou a entrada
+        if($visita->autorizacao_visita === 1){
+
+            //Adicioandan os novos dados
+            $visita->fk_id_porteiro_entrada = $pkPorteiro;
+            $visita->hora_registro_entrada_visita = now();
+
+            //Atualizando os dados
+            $visita->save();
+
+            //Retorna um json com formatação padrão
+            return $this->responseJson(
+                "Entrada registrada registrada com sucesso!", //Menssagem
+                200,
+                [
+                    "visita" => new VisitaResource(Visita::find($id))
+                ]
+            );
+
+        }else{
+
+            //Retorna uma menssagem de erro
             return $this->errorJson(
-                'Os dados informados são inválidos.',
-                422,
-                $validator->errors()->toArray()
+                "Não é possivel registrar a entrada do visitante! Não foi permitido a sua entrada", //Menssage
+                400, //Status code
+                [
+
+                ]
             );
         }
 
-        // Retrieves the authenticated doorman
-        $porteiro = $request->user();
-
-        if (
-            !$porteiro ||
-            (int) $porteiro->pk_id_porteiro !==
-            (int) $request->input('fk_porteiro')
-        ) {
-            return $this->errorJson(
-                'O ID informado não corresponde ao porteiro autenticado.',
-                403
-            );
-        }
-
-        // Finds the visitor
-        $visitante = Visitante::find($request->input('fk_visitante'));
-
-        if (!$visitante) {
-            return $this->errorJson(
-                'Visitante não encontrado.',
-                404
-            );
-        }
-
-        // Checks whether the visitor already has an open visit
-        $visitaAberta = Visita::where(
-            'fk_visitante',
-            $visitante->pk_id_visitante
-        )
-            ->whereNotNull('entrada')
-            ->whereNull('saida')
-            ->exists();
-
-        if ($visitaAberta) {
-            return $this->errorJson(
-                'Este visitante já possui uma visita em andamento.',
-                400
-            );
-        }
-
-        // Creates the visit with all required foreign keys
-        $visita = Visita::create([
-            'fk_visitante' => $visitante->pk_id_visitante,
-            'fk_morador' => $request->input('fk_morador'),
-            'fk_porteiro' => $porteiro->pk_id_porteiro,
-            'entrada' => now(),
-            'saida' => null,
-        ]);
-
-        return $this->responseJson(
-            'Entrada do visitante registrada com sucesso!',
-            201,
-            [$visita->load(['visitante', 'morador', 'porteiro'])->toArray()]
-        );
+        
+        
     }
 
-    // Registers the visitor's exit
-    public function registerExit(string $id)
-    {
-        $visitante = Visitante::find($id);
+    //Função que registra a saida do visitante no condominio
+    public function saida(Request $request, string $id){
 
-        if (!$visitante) {
+        //Pegando a pk do porteiro
+        $pkPorteiro = $request->user()->pk_id_porteiro;
+
+        //Pegando a visita
+        $visita = Visita::findOrFail($id);
+
+        //Verifica se o morador autorizou a entrada
+        if($visita->autorizacao_visita === 1 && $visita->hora_registro_entrada_visita !== null){
+
+            //Adicioandan os novos dados
+            $visita->fk_id_porteiro_saida = $pkPorteiro;
+            $visita->hora_registro_saida_visita = now();
+
+            //Atualizando os dados
+            $visita->save();
+
+            //Retorna um json com formatação padrão
+            return $this->responseJson(
+                "Entrada saida do visitante foi registrada com sucesso!", //Menssagem
+                200,
+                [
+                    "visita" => new VisitaResource(Visita::find($id))
+                ]
+            );
+
+        }else{
+
+            //Retorna uma menssagem de erro
             return $this->errorJson(
-                'Visitante não encontrado.',
-                404
+                "Não é possivel registrar a saida do visitante! Não foi registrada a sua entrada", //Menssage
+                400, //Status code
+                [
+
+                ]
             );
         }
 
-        $visita = Visita::where(
-            'fk_visitante',
-            $visitante->pk_id_visitante
-        )
-            ->whereNotNull('entrada')
-            ->whereNull('saida')
-            ->orderByDesc('entrada')
-            ->first();
-
-        if (!$visita) {
-            return $this->errorJson(
-                'Não existe uma visita em andamento para este visitante.',
-                404
-            );
-        }
-
-        $visita->update([
-            'saida' => now(),
-        ]);
-
-        return $this->responseJson(
-            'Saída do visitante registrada com sucesso!',
-            200,
-            [$visita->load(['visitante', 'morador', 'porteiro'])->toArray()]
-        );
+        
+        
     }
 }
