@@ -267,6 +267,100 @@ class VisitaController extends Controller
         );
     }
 
+    //Função que recupera todas visitas para o porteiro
+    public function indexPorteiro(Request $request){
+
+        //Comando que cria um construtor flexivel para montar as consulta
+        $query = Visita::query();
+
+        //Carrega os relacionamentos
+        $query->with(['visitante', 'morador', 'porteiroEntrda', 'porteiroSaida']);
+
+        //Verifica se foi enviado o nome do morador
+        if($request->query("nome") != null){
+            $termo = $request->query("nome");
+
+            //Adiciona na consulta a clausula de conlsulta que filtra pelo nome do morador
+            $query->whereHas("visitante", function ($q) use ($termo) {
+                $q->where('nome_visitante', 'LIKE', "%" . $termo . "%");
+            });
+        }
+        
+        //Realizando a conuslta das visitas pendentes
+        $visitasPendentes = $query->clone()->where("autorizacao_visita", null)->get();
+
+        //Realizando a consulta das visitas ativas
+        $visitasAtivas = $query->clone()->where("autorizacao_visita", true)
+            ->where("hora_registro_entrada_visita", "!=", null)
+            ->where("hora_registro_saida_visita", null)->get();
+        
+        //Realizando a consulta das vistas que vão acontecer
+        $visitaFuturas = $query->clone()->where("autorizacao_visita", true)
+            ->where("hora_registro_entrada_visita", null)
+            ->where("hora_registro_saida_visita", null)->get();
+
+        //Retona os dados com uma formatação padrão
+        return $this->responseJson(
+            "As visitas do morador forma recuperadas com sucesso!", //Menssagem
+            200, //Status code
+            [
+                "visitas_ativas" => VisitaResource::collection($visitasAtivas),
+                "visitas_pendentes" => VisitaResource::collection($visitasPendentes),
+                "visitas_futuras" => VisitaResource::collection($visitaFuturas)
+            ]
+        );
+    }
+
+    //Função que recupera o histórico de visitas do predio
+    public function historicoPorteiro(Request $request){
+
+        //Comando que cria um construtor flexivel para montar as consulta
+        $query = Visita::query();
+
+        //Carrega os relacionamentos
+        $query->with(['visitante', 'morador', 'porteiroEntrda', 'porteiroSaida']);
+
+        //Verifica se foi enviado o nome do morador
+        if($request->query("nome") != null){
+            $termo = $request->query("nome");
+
+            //Adiciona na consulta a clausula de conlsulta que filtra pelo nome do morador
+            $query->whereHas("visitante", function ($q) use ($termo) {
+                $q->where('nome_visitante', 'LIKE', "%" . $termo . "%");
+            });
+        }
+
+        //Recupera todos os registros
+        $visitas = $query->orderByDesc('created_at')->get();
+
+        //realiza o retorno da com json padronozado
+        return $this->responseJson(
+            "Histórico de visitas recuperdada com sucesso!",
+            200, //Status code
+            //Dados
+            [
+                "visitas" => VisitaResource::collection($visitas)
+            ]
+        );
+    }
+
+    //Função que recupera os dados de uma única visita para o porteiro
+    public function showPorteiro(string $id){
+
+        //Buscando a visita
+        $visita = Visita::findOrFail($id);
+
+        //realiza o retorno da com json padronozado
+        return $this->responseJson(
+            "Dados da visita recuperda com sucesso!",
+            200, //Status code
+            //Dados
+            [
+                "visita" => new VisitaResource($visita)
+            ]
+        );
+    }
+
     // Registers the visitor's entry
     public function allowEntry(Request $request)
     {

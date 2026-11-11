@@ -540,63 +540,26 @@ Route::middleware('auth:sanctum')->group(function () {
         // =========================
         // VISITANTES
         // =========================
-
+        //Grupo de rotas para o portiero trabalhar com o visitante
         Route::prefix('visitante')->group(function () {
 
-            // Listar visitantes
-            Route::get('/get', [
-                VisitanteController::class,
-                'index'
-            ]);
-
-            // Consultar um visitante
-            Route::get('/show/{id}', [
-                VisitanteController::class,
-                'show'
-            ]);
-
-            // Cadastrar visitante
-            Route::post('/create', [
-                VisitanteController::class,
-                'store'
-            ]);
-
-            // Atualizar visitante
-            Route::put('/update/{id}', [
-                VisitanteController::class,
-                'update'
-            ]);
-
-            // Excluir visitante
-            Route::delete('/delete/{id}', [
-                VisitanteController::class,
-                'destroy'
-            ]);
+           
         });
 
         // =========================
         // ENTRADA, SAÍDA E HISTÓRICO
         // =========================
-
+        //Grupo de rotas onde o visitante vai trabarlhar com a visita
         Route::prefix('visita')->group(function () {
 
-            // Liberar entrada após autorização pelo interfone
-            Route::put('/entry', [
-                VisitaController::class,
-                'allowEntry'
-            ]);
+            //Rota que recupera todas as visitas para o porteiro
+            Route::get("/get", [VisitaController::class, 'indexPorteiro']);
 
-            // Registrar saída
-            Route::put('/exit/{id}', [
-                VisitaController::class,
-                'registerExit'
-            ]);
+            //Rota que recupera o histórico do banco de dados de visitas
+            Route::get("/historico/get", [VisitaController::class, 'historicoPorteiro']);
 
-            // Consultar histórico de visitas
-            Route::get('/get', [
-                VisitaController::class,
-                'index'
-            ]);
+            //Rota que recupera os dados deum uníca visita
+            Route::get("/show/{id}", [VisitaController::class, 'showPorteiro']);
         });
 
 
