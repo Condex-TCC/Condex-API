@@ -543,7 +543,11 @@ Route::middleware('auth:sanctum')->group(function () {
         //Grupo de rotas para o portiero trabalhar com o visitante
         Route::prefix('visitante')->group(function () {
 
-           
+            //Rota que realiza a consulta para o visitante
+            Route::post('/consulta', [VisitanteController::class, 'consulta']);
+
+            //Rota que permite o porteiro cadastrar o visitante
+            Route::post('/create', [VisitanteController::class, 'store']);
         });
 
         // =========================
