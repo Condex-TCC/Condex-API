@@ -463,6 +463,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
             //Rota que cadastrar uma visita
             Route::post("/create", [VisitaController::class, "storeMorador"]);
+
+            //Rota que autoriza a reserva pendente
+            Route::put("/autoriza/{id}", [VisitaController::class, 'autoriza']);
+
+            //Rota que cancela uma visita
+            Route::delete("/cancela/{id}", [VisitaController::class, "cancela"]);
         });
 
         // =========================

@@ -223,6 +223,50 @@ class VisitaController extends Controller
         );
     }
 
+    //Função que autoriza a visita
+    public function autoriza(string $id){
+
+        //Recupera a visita
+        $visita = Visita::findOrFail($id);
+
+        //Muda a visita para autorizado
+        $visita->autorizacao_visita = true;
+
+        //Salva a alterção no banco de dados
+        $visita->save();
+
+        //Retorna um json com formatação padrão
+        return $this->responseJson(
+            "Visitia autorizada!", //Menssagem
+            200,
+            [
+                "visita" => new VisitaResource($visita)
+            ]
+        );
+    }
+
+    //Função que cancela a visita 
+    public function cancela(string $id){
+
+        //Recupera a visita
+        $visita = Visita::findOrFail($id);
+
+        //Muda a visita para calcelada
+        $visita->autorizacao_visita = false;
+
+        //Salva a alterção no banco de dados
+        $visita->save();
+
+        //Retorna um json com formatação padrão
+        return $this->responseJson(
+            "Visita cancela!", //Menssagem
+            200,
+            [
+                "visita" => new VisitaResource($visita)
+            ]
+        );
+    }
+
     // Registers the visitor's entry
     public function allowEntry(Request $request)
     {
