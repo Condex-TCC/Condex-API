@@ -361,6 +361,117 @@ class VisitaController extends Controller
         );
     }
 
+    //Função que cadastra um visita para o porteiro
+    public function storePorteiro(Request $request){
+
+
+        //Monstando um array com os dados da requisição
+        $dadosMapeados = [
+            'hora_entrada_visita' => $request->input("hora_entrada"),
+            'hora_saida_visita' => $request->input("hora_saida"),
+            'fk_id_visitante' => $request->input("id_visitante"),
+            'fk_id_morador' => $request->input("id_morador"),
+        ];
+
+        //Validando os dados
+        $validador = validator($dadosMapeados, [
+            'hora_entrada_visita' => "required|date_format:Y-m-d\TH:i",
+            'hora_saida_visita' => "required|date_format:Y-m-d\TH:i",
+            'fk_id_visitante' => "required",
+            'fk_id_morador' => "required",
+        ]);
+
+        //Verifica se hove algum erro
+        if($validador->fails()){
+
+            //Retorna o json com os erros
+            return $this->errorJson(
+                "Houve um erro no cadastro da visita",
+                400, //Status code
+                //Erros
+                [
+                    $validador->errors(),
+                ]
+            );
+        }
+
+        // Realiza uma consulta para verificar se o morador já está em outra visita no mesmo período
+        $outraVisita = Visita::where("fk_id_visitante", $dadosMapeados["fk_id_visitante"])
+            // Lógica correta de sobreposição de intervalos de tempo
+            ->where("hora_entrada_visita", "<=", $dadosMapeados["hora_saida_visita"])
+            ->where("hora_saida_visita", ">=", $dadosMapeados["hora_entrada_visita"])
+            // Agrupamento (Closure) para garantir que a checagem de status ocorra apenas para este visitante e período
+            ->where(function ($query) {
+                $query->where("autorizacao_visita", 1) // Autorizado
+                      ->orWhere("autorizacao_visita", null); // Pendente
+            })
+            ->first();
+        
+        //Verifica se já existe outra visita nesse horario selecionado
+        if($outraVisita != null){
+
+            //Retorna um json de erro
+            return $this->errorJson(
+                "Esse visitante já está agendado para outra visita! Por favor, agenda para outro horario", //Menssagem
+                400, //Status code
+                //Dados
+                []
+            );
+        }
+
+        //Salva o visitante no banco de dados
+        $visita = Visita::create($dadosMapeados);
+
+        //Retorna um json com formatação padrão
+        return $this->responseJson(
+            "Visita agendada com sucesso!", //Menssagem
+            200, //Status code
+            //Dados
+            [
+                "visita" => new VisitaResource($visita)
+            ]
+        );
+    }
+
+    //Função que deleta o registro de uma visita não autorizada
+    public function delete(string $id){
+
+        //Recuperando o registro
+        $visita = Visita::findOrFail($id);
+
+        //Verificando se a visita é nula e pode ser deletada
+        if($visita->autorizacao_visita !== null){
+
+            //Montando a menssagem
+            $menssagem =  $visita->autorizacao_visita == 1 ? "autorizou" : "resucou" . " visita";
+
+            //Retorna uma menssagen com formatação padrão
+            return $this->errorJson(
+                "O registro não pode ser apagado, pois morador já " . $menssagem, //Menssgam
+                400, //Status code
+                //Dados
+                [
+
+                ]
+            );
+
+        }else{
+            
+            //Deletando a visita 
+            $visita->delete();
+
+            //Retorna uma menssagen com formatação padrão
+            return $this->responseJson(
+                "O registro foi apagado com sucesso!", //Menssgam
+                200, //Status code
+                //Dados
+                [
+
+                ]
+            );
+        }
+    }
+
     // Registers the visitor's entry
     public function allowEntry(Request $request)
     {

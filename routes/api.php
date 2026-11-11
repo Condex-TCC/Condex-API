@@ -557,6 +557,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
             //Rota que recupera os dados deum uníca visita
             Route::get("/show/{id}", [VisitaController::class, 'showPorteiro']);
+
+            //Rota que cria uma nova visita
+            Route::post("/create", [VisitaController::class, 'storePorteiro']);
+
+            //Rota que delete uma visita cadastrada pelo porterio
+            Route::delete('/delete/{id}', [VisitaController::class, 'delete']);
         });
 
 
