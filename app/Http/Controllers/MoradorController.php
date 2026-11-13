@@ -22,6 +22,24 @@ class MoradorController extends Controller
         // Inicia a consulta carregando o relacionamento com unidade
         $query = Morador::with('unidade');
 
+        // Filtra pelo nome quando o parâmetro for informado
+        if ($request->filled('nome')) {
+            $query->where(
+                'nome_morador',
+                'LIKE',
+                '%' . $request->input('nome') . '%'
+            );
+        }
+
+        // Filtra pelo CPF quando o parâmetro for informado
+        if ($request->filled('cpf')) {
+            $query->where(
+                'cpf_morador',
+                'LIKE',
+                '%' . $request->input('cpf') . '%'
+            );
+        }
+
         // Filtra pelo email quando o parâmetro for informado
         if ($request->filled('email')) {
             $query->where(
