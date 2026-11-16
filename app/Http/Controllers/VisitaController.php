@@ -8,12 +8,16 @@ use App\Models\Visita;
 use App\Models\Visitante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\EnviaSms;
 
 //Classe que intermedia as requisições
 class VisitaController extends Controller
 {
     //Chama o pacote de funções reutilizadas para o envio padronizado se JSON de retorno
     use HttpResposta;
+
+    //Adicioana a trait para o envio de sms
+    use EnviaSms;
 
     //Função que retorna todas as visitas realizadas no consominio
     public function index(Request $request)
@@ -422,6 +426,24 @@ class VisitaController extends Controller
         //Salva o visitante no banco de dados
         $visita = Visita::create($dadosMapeados);
 
+        //Chama a função que envia o código SMS para o celular do morador cadastrado
+        $resultado = $this->enviarSms($visita->morador->telefone_morador, "[Condex] Voce tem uma nova visita para ser autorizada");
+
+        //Se o envio falhou
+        //O "!" inverte o valor: lê-se "se NÃO deu sucesso"
+        if (!$resultado['sucesso']) {
+
+            //Retorna um Json com formatação de erro
+            //errorJson() recebe: mensagem, status HTTP, lista de erros (e opcionalmente dados)
+            return $this->errorJson(
+                "Não foi possível enviar o SMS!", //Menssagem
+                //Status 0 (falha de rede) vira 502, o resto mantém o status da API
+                //O "?:" é um atalho: se o status_http for 0 (considerado "vazio"), usa 502; senão usa o próprio status_http
+                $resultado['status_http'] ?: 502, //Status code
+                [$resultado['codigo'], $resultado['mensagem']], //Erros
+            );
+        }
+
         //Retorna um json com formatação padrão
         return $this->responseJson(
             "Visita agendada com sucesso!", //Menssagem
@@ -491,6 +513,24 @@ class VisitaController extends Controller
             //Atualizando os dados
             $visita->save();
 
+            //Chama a função que envia o código SMS para o celular do morador cadastrado
+            $resultado = $this->enviarSms($visita->morador->telefone_morador, "[Condex] Um visitante acabou de entrar no condominio");
+
+            //Se o envio falhou
+            //O "!" inverte o valor: lê-se "se NÃO deu sucesso"
+            if (!$resultado['sucesso']) {
+
+                //Retorna um Json com formatação de erro
+                //errorJson() recebe: mensagem, status HTTP, lista de erros (e opcionalmente dados)
+                return $this->errorJson(
+                    "Não foi possível enviar o SMS!", //Menssagem
+                    //Status 0 (falha de rede) vira 502, o resto mantém o status da API
+                    //O "?:" é um atalho: se o status_http for 0 (considerado "vazio"), usa 502; senão usa o próprio status_http
+                    $resultado['status_http'] ?: 502, //Status code
+                    [$resultado['codigo'], $resultado['mensagem']], //Erros
+                );
+            }
+
             //Retorna um json com formatação padrão
             return $this->responseJson(
                 "Entrada registrada registrada com sucesso!", //Menssagem
@@ -534,6 +574,24 @@ class VisitaController extends Controller
 
             //Atualizando os dados
             $visita->save();
+
+            //Chama a função que envia o código SMS para o celular do morador cadastrado
+            $resultado = $this->enviarSms($visita->morador->telefone_morador, "[Condex] Um visitante acabou de sair no condominio");
+
+            //Se o envio falhou
+            //O "!" inverte o valor: lê-se "se NÃO deu sucesso"
+            if (!$resultado['sucesso']) {
+
+                //Retorna um Json com formatação de erro
+                //errorJson() recebe: mensagem, status HTTP, lista de erros (e opcionalmente dados)
+                return $this->errorJson(
+                    "Não foi possível enviar o SMS!", //Menssagem
+                    //Status 0 (falha de rede) vira 502, o resto mantém o status da API
+                    //O "?:" é um atalho: se o status_http for 0 (considerado "vazio"), usa 502; senão usa o próprio status_http
+                    $resultado['status_http'] ?: 502, //Status code
+                    [$resultado['codigo'], $resultado['mensagem']], //Erros
+                );
+            }
 
             //Retorna um json com formatação padrão
             return $this->responseJson(

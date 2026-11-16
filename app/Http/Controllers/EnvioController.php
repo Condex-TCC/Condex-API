@@ -11,10 +11,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\HttpResposta;
 use App\Models\Morador;
+use App\EnviaSms;
 
 class EnvioController extends Controller
 {
     use HttpResposta;
+
+    //Adicioana a trait para o envio de sms
+    use EnviaSms;
 
     //Função do sindico que cadastra as comunicados e os registros
     public function store(Request $request)
@@ -79,6 +83,24 @@ class EnvioController extends Controller
 
                 //Cadastrando o registro
                 $cadastro = Envio::create($dadosMapeadosEnvios);
+
+                //Chama a função que envia o código SMS para o celular do morador cadastrado
+                $resultado = $this->enviarSms($cadastro->morador->telefone_morador, "[Condex] Voce tem um novo comunicado");
+
+                //Se o envio falhou
+                //O "!" inverte o valor: lê-se "se NÃO deu sucesso"
+                if (!$resultado['sucesso']) {
+
+                    //Retorna um Json com formatação de erro
+                    //errorJson() recebe: mensagem, status HTTP, lista de erros (e opcionalmente dados)
+                    return $this->errorJson(
+                        "Não foi possível enviar o SMS!", //Menssagem
+                        //Status 0 (falha de rede) vira 502, o resto mantém o status da API
+                        //O "?:" é um atalho: se o status_http for 0 (considerado "vazio"), usa 502; senão usa o próprio status_http
+                        $resultado['status_http'] ?: 502, //Status code
+                        [$resultado['codigo'], $resultado['mensagem']], //Erros
+                    );
+                }
             }
 
             //Retona um Json de sucesso com formatação padrão
@@ -107,6 +129,24 @@ class EnvioController extends Controller
 
                 //Cadastrando o registro
                 $cadastro = Envio::create($dadosMapeadosEnvios);
+
+                //Chama a função que envia o código SMS para o celular do morador cadastrado
+                $resultado = $this->enviarSms($cadastro->morador->telefone_morador, "[Condex] Voce tem um novo comunicado");
+    
+                //Se o envio falhou
+                //O "!" inverte o valor: lê-se "se NÃO deu sucesso"
+                if (!$resultado['sucesso']) {
+
+                    //Retorna um Json com formatação de erro
+                    //errorJson() recebe: mensagem, status HTTP, lista de erros (e opcionalmente dados)
+                    return $this->errorJson(
+                        "Não foi possível enviar o SMS!", //Menssagem
+                        //Status 0 (falha de rede) vira 502, o resto mantém o status da API
+                        //O "?:" é um atalho: se o status_http for 0 (considerado "vazio"), usa 502; senão usa o próprio status_http
+                        $resultado['status_http'] ?: 502, //Status code
+                        [$resultado['codigo'], $resultado['mensagem']], //Erros
+                    );
+                }
             }
 
             //Retona um Json de sucesso com formatação padrão
@@ -175,6 +215,24 @@ class EnvioController extends Controller
 
         //Atualiza a contra resposta
         $envio->contra_resposta = $contraResposta;
+
+        //Chama a função que envia o código SMS para o celular do morador cadastrado
+        $resultado = $this->enviarSms($envio->morador->telefone_morador, "[Condex] O sindico respondeu a sua duvida no comunicado");
+
+        //Se o envio falhou
+        //O "!" inverte o valor: lê-se "se NÃO deu sucesso"
+        if (!$resultado['sucesso']) {
+
+            //Retorna um Json com formatação de erro
+            //errorJson() recebe: mensagem, status HTTP, lista de erros (e opcionalmente dados)
+            return $this->errorJson(
+                "Não foi possível enviar o SMS!", //Menssagem
+                //Status 0 (falha de rede) vira 502, o resto mantém o status da API
+                //O "?:" é um atalho: se o status_http for 0 (considerado "vazio"), usa 502; senão usa o próprio status_http
+                $resultado['status_http'] ?: 502, //Status code
+                [$resultado['codigo'], $resultado['mensagem']], //Erros
+            );
+        }
 
         //Realiza a atualização 
         $envio->save();
