@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'paths' => ['api/*'],
+    'paths' => [],
     'allowed_methods' => ['*'],
     'allowed_origins' => ['https://condexsistema.com.br'],
     'allowed_origins_patterns' => [],
