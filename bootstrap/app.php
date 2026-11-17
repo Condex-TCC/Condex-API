@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-
+        $middleware->statefulApi();
         //Adicionando Middleware para filtrar os tokens 
         $middleware->alias([
             'abilities' => CheckAbilities::class,
