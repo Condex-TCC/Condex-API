@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
         ]);
+        $middleware->prepend(\App\Http\Middleware\CorsManual::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
